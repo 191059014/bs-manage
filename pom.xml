@@ -38,6 +38,7 @@
 
         <bs.manage.version>0.0.1-SNAPSHOT</bs.manage.version>
         <unic.version>0.0.1-SNAPSHOT</unic.version>
+        <simple.mybatis.version>0.0.1-SNAPSHOT</simple.mybatis.version>
     </properties>
 
     <dependencyManagement>
@@ -89,6 +90,12 @@
                 <groupId>com.hb.unic</groupId>
                 <artifactId>unic-util</artifactId>
                 <version>${unic.version}</version>
+            </dependency>
+            <!-- simple-mybatis -->
+            <dependency>
+                <groupId>com.hb.mybatis</groupId>
+                <artifactId>simple-mybatis</artifactId>
+                <version>${simple.mybatis.version}</version>
             </dependency>
             <!-- mysql -->
             <dependency>

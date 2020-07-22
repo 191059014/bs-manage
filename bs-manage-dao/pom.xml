@@ -24,7 +24,21 @@
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
         </dependency>
-
+        <!-- unic-base -->
+        <dependency>
+            <groupId>com.hb.unic</groupId>
+            <artifactId>unic-base</artifactId>
+        </dependency>
+        <!-- unic-logger -->
+        <dependency>
+            <groupId>com.hb.unic</groupId>
+            <artifactId>unic-logger</artifactId>
+        </dependency>
+        <!-- unic-util -->
+        <dependency>
+            <groupId>com.hb.unic</groupId>
+            <artifactId>unic-util</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
