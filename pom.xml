@@ -145,12 +145,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <!--guava -->
         <dependency>
             <groupId>com.google.guava</groupId>

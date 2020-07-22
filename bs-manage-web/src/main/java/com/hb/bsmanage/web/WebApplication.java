@@ -3,13 +3,17 @@ package com.hb.bsmanage.web;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
  * 项目入口
  */
 @SpringBootApplication
+@ImportResource({"classpath*:META-INF/applicationContext-web.xml"})
 public class WebApplication {
+
     /**
      * main方法
      *

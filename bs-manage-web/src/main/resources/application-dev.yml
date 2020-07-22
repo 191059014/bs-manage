@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://10.6.252.47:3306/jdbc
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    password: 666666
+    timeout: 5000ms
+
