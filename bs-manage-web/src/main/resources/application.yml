@@ -15,3 +15,6 @@ simple:
 unicLogger:
   httpFilter:
     urlPatterns: /controller/*,/app/*
+
+    logging.level.com.gaoyang.wfplatform.wfpserver=${logging_level}
+    logging.path=${logging_path}
