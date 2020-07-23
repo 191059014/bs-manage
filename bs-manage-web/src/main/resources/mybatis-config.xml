@@ -8,10 +8,8 @@
         <setting name="jdbcTypeForNull" value="NULL"/>
         <!--mybatis打印sql语句-->
         <setting name="logImpl" value="SLF4J"/>
-        <!--        STDOUT_LOGGING-->
+        <!--STDOUT_LOGGING-->
         <setting name="logPrefix" value="dao."/>
-        <!-- 自动转驼峰 -->
-        <setting name="mapUnderscoreToCamelCase" value="true" />
     </settings>
 
 </configuration>

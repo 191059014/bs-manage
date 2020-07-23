@@ -4,7 +4,7 @@ spring:
   application:
     name: bs-manage-web
   profiles:
-    active: dev
+    active: test
   main:
     allow-bean-definition-overriding: true
 #################################################### simple-mybatis ####################################################
@@ -15,6 +15,9 @@ simple:
 unicLogger:
   httpFilter:
     urlPatterns: /controller/*,/app/*
-
-    logging.level.com.gaoyang.wfplatform.wfpserver=${logging_level}
-    logging.path=${logging_path}
+#################################################### logging ####################################################
+logging:
+  level:
+    com.hb.bsmanage.web: info
+  file:
+    path: /log/
