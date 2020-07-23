@@ -24,8 +24,8 @@ public class WebApplication {
         ConfigurableEnvironment env = applicationContext.getEnvironment();
         String host = env.getProperty("server.address");
         String port = env.getProperty("server.port");
-        System.out.println("===========================================");
-        System.out.println(String.format(" http://%s:%s/index.html", host == null ? "localhost" : host, port));
-        System.out.println("===========================================");
+        System.out.println("======================================================================================");
+        System.out.println(String.format(" you can enjoy yourself, more please see: http://%s:%s/index.html", host == null ? "localhost" : host, port));
+        System.out.println("======================================================================================");
     }
 }

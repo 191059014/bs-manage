@@ -7,3 +7,11 @@ spring:
     active: dev
   main:
     allow-bean-definition-overriding: true
+#################################################### simple-mybatis ####################################################
+simple:
+  mybatis:
+    hump_mapping: false
+#################################################### unic-logger ####################################################
+unicLogger:
+  httpFilter:
+    urlPatterns: /controller/*,/app/*
