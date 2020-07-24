@@ -1,8 +1,12 @@
 package com.hb.bsmanage.web.controller;
 
+import com.hb.unic.cache.service.IRedisService;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +25,9 @@ public class ControllerTest implements InitializingBean {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ControllerTest.class);
 
+    @Autowired
+    private IRedisService iRedisService;
+
     @GetMapping("/test")
     public void test() {
         LOGGER.info("测试");
@@ -29,6 +36,7 @@ public class ControllerTest implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         LOGGER.info("afterPropertiesSet");
+        iRedisService.set("name", "zhangsan", 15);
     }
 }
 
