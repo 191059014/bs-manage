@@ -18,7 +18,11 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+        </dependency>
+        <!-- simple-mybatis -->
+        <dependency>
+            <groupId>com.hb.mybatis</groupId>
+            <artifactId>simple-mybatis</artifactId>
         </dependency>
     </dependencies>
 

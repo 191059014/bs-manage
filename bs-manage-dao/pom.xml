@@ -39,11 +39,6 @@
             <groupId>com.hb.unic</groupId>
             <artifactId>unic-util</artifactId>
         </dependency>
-        <!-- simple-mybatis -->
-        <dependency>
-            <groupId>com.hb.mybatis</groupId>
-            <artifactId>simple-mybatis</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

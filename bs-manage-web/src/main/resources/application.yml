@@ -7,17 +7,26 @@ spring:
     active: dev
   main:
     allow-bean-definition-overriding: true
-#################################################### simple-mybatis ####################################################
 simple:
   mybatis:
-    hump_mapping: false
-#################################################### unic-logger ####################################################
+    hump_mapping: false # 开启数据库字段和实体类字段驼峰映射
 unicLogger:
   httpFilter:
-    urlPatterns: /controller/*,/app/*
-#################################################### logging ####################################################
+    urlPatterns: /controller/*,/app/* # traceId过滤器拦截路径
 logging:
   level:
     com.hb.bsmanage.web: info
   file:
-    path: /log/
+    path: /log/bs-manage-web/
+jasypt:
+  encryptor:
+    password: bs_manage_web # jasypt加密的key
+security:
+  ignoreUrlPatterns: # springsecurity忽略的url
+      - /test/*
+      - /controller/user/*
+jwt:
+  config:
+    key: bs_manage_web  # jwt签名key
+    defaultTtl: 600000  # jwt默认过期时间
+    rememberMeTtl: 604800000  # jwt记住我时的过期时间

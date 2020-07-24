@@ -1,5 +1,6 @@
 package com.hb.bsmanage.web;
 
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -12,6 +13,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
  */
 @SpringBootApplication
 @ImportResource({"classpath*:META-INF/applicationContext-web.xml"})
+@EnableEncryptableProperties
 public class WebApplication {
 
     /**
