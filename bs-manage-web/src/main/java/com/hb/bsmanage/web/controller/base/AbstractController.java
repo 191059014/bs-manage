@@ -63,7 +63,7 @@ public abstract class AbstractController {
     @ResponseBody
     public ResponseData exception(Exception e) {
         String baseLog = "[统一异常处理]";
-        LOGGER.info("{}{}",baseLog,LogExceptionWapper.getStackTrace(e));
+        LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
         return ResponseUtils.generateResponseData(ResponseEnum.ERROR);
     }
 

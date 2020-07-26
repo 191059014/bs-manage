@@ -1,6 +1,7 @@
 package com.hb.bsmanage.model.base;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 常用固定属性
@@ -14,9 +15,9 @@ public class FixedEntity implements Serializable {
     // 物理主键
     private Integer id;
     // 创建时间
-    private Integer createTime;
+    private Date createTime;
     // 更新时间
-    private Integer updateTime;
+    private Date updateTime;
     // 记录状态
     private Integer recordStatus;
 
@@ -28,19 +29,19 @@ public class FixedEntity implements Serializable {
         this.id = id;
     }
 
-    public Integer getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Integer createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public Integer getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Integer updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -57,10 +58,10 @@ public class FixedEntity implements Serializable {
         return "{"
                 + "\"id\":"
                 + id
-                + ",\"createTime\":"
-                + createTime
-                + ",\"updateTime\":"
-                + updateTime
+                + ",\"createTime\":\""
+                + createTime + '\"'
+                + ",\"updateTime\":\""
+                + updateTime + '\"'
                 + ",\"recordStatus\":"
                 + recordStatus
                 + "}";

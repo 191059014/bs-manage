@@ -28,9 +28,15 @@ import java.util.Set;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    /**
+     * userDetailsService
+     */
     @Autowired
     private UserDetailsService userDetailsService;
 
+    /**
+     * jwt认证过滤器
+     */
     @Autowired
     private JWTAuthenticationFilter jwtAuthenticationFilter;
 
@@ -76,12 +82,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 认证请求
                 .authorizeRequests()
                 // 所有请求都需要登录访问
-                .anyRequest()
-                .authenticated()
+//                .anyRequest()
+//                .authenticated()
                 // RBAC 动态 url 认证
                 .anyRequest()
                 .access("@rbacAuthorityService.hasPermission(authentication)")
-
                 // 登出行为由自己实现，参考 com.hb.test.springsecurity.jwt.controller.LoginController.logout
                 .and().logout().disable()
                 // Session 管理

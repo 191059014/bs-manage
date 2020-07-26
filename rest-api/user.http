@@ -1,0 +1,18 @@
+### 添加用户
+POST http://localhost:8080/controller/user/addOne
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{"userId":"1234567","userName":"张三","password":"123456","mobile":"1234567"}
+
+### 查找用户
+POST http://localhost:8080/controller/user/findOne
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{"userId":"1234567"}
+
+###
+

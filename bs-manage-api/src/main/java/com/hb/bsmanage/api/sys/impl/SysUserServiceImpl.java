@@ -3,6 +3,7 @@ package com.hb.bsmanage.api.sys.impl;
 import com.hb.bsmanage.api.base.AbstractBaseService;
 import com.hb.bsmanage.api.sys.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.mybatis.sql.Query;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,6 +13,11 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SysUserServiceImpl extends AbstractBaseService implements ISysUserService {
+
+    @Override
+    public SysUserDO findOne(SysUserDO sysUserDO) {
+        return selectOne(SysUserDO.class, Query.build().analysisAll(sysUserDO));
+    }
 
     @Override
     public int add(SysUserDO sysUserDO) {

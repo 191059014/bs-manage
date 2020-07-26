@@ -4,18 +4,20 @@ spring:
   application:
     name: bs-manage-web
   profiles:
-    active: dev
+    active: test
   main:
     allow-bean-definition-overriding: true
 simple:
   mybatis:
-    hump_mapping: false # 开启数据库字段和实体类字段驼峰映射
+    hump_mapping: true # 开启数据库字段和实体类字段驼峰映射
 unicLogger:
   httpFilter:
     urlPatterns: /controller/*,/app/* # traceId过滤器拦截路径
 logging:
   level:
     com.hb.bsmanage.web: info
+    com.hb.mybatis.mapper: debug
+    com.hb.bsmanage.dao.mapper: debug
   file:
     path: /log/bs-manage-web/
 jasypt:
@@ -30,3 +32,5 @@ jwt:
     key: bs_manage_web  # jwt签名key
     defaultTtl: 600000  # jwt默认过期时间
     rememberMeTtl: 604800000  # jwt记住我时的过期时间
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml

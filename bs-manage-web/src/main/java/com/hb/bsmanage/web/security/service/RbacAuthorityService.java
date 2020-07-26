@@ -1,4 +1,4 @@
-package com.hb.bsmanage.web.security.config;
+package com.hb.bsmanage.web.security.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

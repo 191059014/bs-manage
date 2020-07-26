@@ -10,6 +10,14 @@ import com.hb.bsmanage.model.dobj.SysUserDO;
 public interface ISysUserService {
 
     /**
+     * 查询用户信息
+     *
+     * @param sysUserDO 用户信息
+     * @return 影响的条数
+     */
+    SysUserDO findOne(SysUserDO sysUserDO);
+
+    /**
      * 新增用户信息
      *
      * @param sysUserDO 用户信息

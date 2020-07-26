@@ -1,6 +1,9 @@
 package com.hb.bsmanage.web.security.jwt;
 
+import com.hb.bsmanage.web.controller.sys.UserController;
 import com.hb.bsmanage.web.security.config.SecurityProperties;
+import com.hb.unic.logger.Logger;
+import com.hb.unic.logger.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,9 +32,20 @@ import java.util.Set;
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
+    /**
+     * 日志
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
+
+    /**
+     * jwt工具类
+     */
     @Autowired
     private JwtUtils jwtUtils;
 
+    /**
+     * 用户service
+     */
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -48,9 +62,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        System.out.println("JWTAuthenticationFilter.doFilterInternal: " + request.getRequestURI());
+        String baseLog = "[jwt认证过滤器]";
         if (checkIgnores(request)) {
-            System.out.println("不需要进行权限拦截");
+            LOGGER.info("{}不需要进行权限拦截[{}]", baseLog, request.getRequestURI());
             //放行
             chain.doFilter(request, response);
             return;

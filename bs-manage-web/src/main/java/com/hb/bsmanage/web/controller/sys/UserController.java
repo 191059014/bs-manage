@@ -40,6 +40,18 @@ public class UserController extends AbstractController {
      * @param userDO 用户信息
      * @return 结果
      */
+    @PostMapping("/findOne")
+    public ResponseData<SysUserDO> findOne(@RequestBody SysUserDO userDO) {
+        SysUserDO one = iSysUserService.findOne(userDO);
+        return ResponseUtils.generateResponseData(ResponseEnum.SUCCESS, one);
+    }
+
+    /**
+     * 添加用户
+     *
+     * @param userDO 用户信息
+     * @return 结果
+     */
     @PostMapping("/addOne")
     public ResponseData<Integer> addOne(@RequestBody SysUserDO userDO) {
         int addRows = iSysUserService.add(userDO);

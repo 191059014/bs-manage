@@ -144,7 +144,7 @@ public class JwtUtils {
      */
     public String getUsernameFromJWT(String jwt) {
         Claims claims = parseToken(jwt);
-        return claims.getSubject();
+        return claims == null ? null : claims.getSubject();
     }
 
     /**

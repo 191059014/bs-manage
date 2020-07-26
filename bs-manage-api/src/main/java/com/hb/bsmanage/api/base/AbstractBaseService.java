@@ -1,9 +1,15 @@
 package com.hb.bsmanage.api.base;
 
+import com.hb.bsmanage.model.common.Consts;
+import com.hb.bsmanage.model.enums.RecordStatusEnum;
 import com.hb.mybatis.base.DmlMapper;
-import com.hb.mybatis.helper.QueryCondition;
-import com.hb.mybatis.helper.WhereCondition;
-import com.hb.mybatis.model.PagesResult;
+import com.hb.mybatis.model.PageResult;
+import com.hb.mybatis.sql.Query;
+import com.hb.mybatis.sql.Where;
+import com.hb.unic.logger.Logger;
+import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.logger.util.LogExceptionWapper;
+import com.hb.unic.util.util.ReflectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -15,6 +21,11 @@ import java.util.Map;
  * @version v0.1, 2020/7/24 14:50, create by huangbiao.
  */
 public abstract class AbstractBaseService {
+
+    /**
+     * 日志
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBaseService.class);
 
     /**
      * 公共数据库操作类
@@ -30,8 +41,20 @@ public abstract class AbstractBaseService {
      * @param <T>         实体类
      * @return 集合
      */
-    protected <T> List<T> dynamicSelect(Class<T> entityClass, QueryCondition query) {
-        return dmlMapper.dynamicSelect(entityClass, query);
+    protected <T> T selectOne(Class<T> entityClass, Query query) {
+        return dmlMapper.selectOne(entityClass, query);
+    }
+
+    /**
+     * 通过QueryCondition来查询
+     *
+     * @param entityClass 实体类
+     * @param query       QueryCondition查询对象
+     * @param <T>         实体类
+     * @return 集合
+     */
+    protected <T> List<T> selectList(Class<T> entityClass, Query query) {
+        return dmlMapper.selectList(entityClass, query);
     }
 
     /**
@@ -41,7 +64,7 @@ public abstract class AbstractBaseService {
      * @param query       查询条件
      * @return 总条数
      */
-    protected <T> int selectCount(Class<T> entityClass, QueryCondition query) {
+    protected <T> int selectCount(Class<T> entityClass, Query query) {
         return dmlMapper.selectCount(entityClass, query);
     }
 
@@ -52,7 +75,7 @@ public abstract class AbstractBaseService {
      * @param query       查询对象
      * @return 分页集合
      */
-    protected <T> PagesResult<T> selectPages(Class<T> entityClass, QueryCondition query) {
+    protected <T> PageResult<T> selectPages(Class<T> entityClass, Query query) {
         return dmlMapper.selectPages(entityClass, query);
     }
 
@@ -63,7 +86,7 @@ public abstract class AbstractBaseService {
      * @param whereCondition          where条件
      * @return 结果集合
      */
-    protected List<Map<String, Object>> customSelect(String sqlStatementBeforeWhere, WhereCondition whereCondition) {
+    protected List<Map<String, Object>> customSelect(String sqlStatementBeforeWhere, Where whereCondition) {
         return dmlMapper.customSelect(sqlStatementBeforeWhere, whereCondition);
     }
 
@@ -84,19 +107,27 @@ public abstract class AbstractBaseService {
      * @param whereCondition 条件
      * @return 更新行数
      */
-    protected <T> int updateBySelective(T entity, WhereCondition whereCondition) {
+    protected <T> int updateBySelective(T entity, Where whereCondition) {
         return dmlMapper.updateBySelective(entity, whereCondition);
     }
 
     /**
-     * 选择性删除
+     * 逻辑删除
      *
      * @param entityClass    实体类对象
      * @param whereCondition 条件
      * @return 删除行数
      */
-    protected <T> int deleteBySelective(Class<T> entityClass, WhereCondition whereCondition) {
-        return dmlMapper.deleteBySelective(entityClass, whereCondition);
+    protected <T> int logicDelete(Class<T> entityClass, Where whereCondition) {
+        try {
+            T t = entityClass.newInstance();
+            ReflectUtils.setPropertyValue(Consts.RECORD_STATUS, RecordStatusEnum.INVALID.getValue(), t);
+            return dmlMapper.updateBySelective(t, whereCondition);
+        } catch (Exception e) {
+            LOGGER.error("逻辑删除异常：{}", LogExceptionWapper.getStackTrace(e));
+            return 0;
+        }
+
     }
 
 }
