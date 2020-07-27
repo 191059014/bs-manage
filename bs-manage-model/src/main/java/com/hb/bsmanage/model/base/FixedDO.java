@@ -8,7 +8,7 @@ import java.util.Date;
  *
  * @version v0.1, 2020/7/24 13:53, create by huangbiao.
  */
-public class FixedEntity implements Serializable {
+public class FixedDO implements Serializable {
 
     // serialVersionUID
     private static final long serialVersionUID = 2134467222395310313L;
@@ -16,8 +16,12 @@ public class FixedEntity implements Serializable {
     private Integer id;
     // 创建时间
     private Date createTime;
+    // 创建人
+    private String createUserId;
     // 更新时间
     private Date updateTime;
+    // 更新人
+    private String updateUserId;
     // 记录状态
     private Integer recordStatus;
 
@@ -53,6 +57,22 @@ public class FixedEntity implements Serializable {
         this.recordStatus = recordStatus;
     }
 
+    public String getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
+    }
+
+    public String getUpdateUserId() {
+        return updateUserId;
+    }
+
+    public void setUpdateUserId(String updateUserId) {
+        this.updateUserId = updateUserId;
+    }
+
     @Override
     public String toString() {
         return "{"
@@ -60,8 +80,12 @@ public class FixedEntity implements Serializable {
                 + id
                 + ",\"createTime\":\""
                 + createTime + '\"'
+                + ",\"createUserId\":\""
+                + createUserId + '\"'
                 + ",\"updateTime\":\""
                 + updateTime + '\"'
+                + ",\"updateUserId\":\""
+                + updateUserId + '\"'
                 + ",\"recordStatus\":"
                 + recordStatus
                 + "}";

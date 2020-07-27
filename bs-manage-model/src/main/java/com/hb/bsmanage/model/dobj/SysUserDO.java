@@ -1,6 +1,6 @@
 package com.hb.bsmanage.model.dobj;
 
-import com.hb.bsmanage.model.base.FixedEntity;
+import com.hb.bsmanage.model.base.FixedDO;
 import com.hb.mybatis.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("sys_user")
-public class SysUserDO extends FixedEntity {
+public class SysUserDO extends FixedDO {
     // serialVersionUID
     private static final long serialVersionUID = -2355680884700265496L;
     // 用户标识
