@@ -7,7 +7,6 @@ package com.hb.bsmanage.model.common;
  */
 public class Consts {
 
-    // 数据记录状态
-    public static final String RECORD_STATUS = "recordStatus";
+
 
 }

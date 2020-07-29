@@ -24,6 +24,10 @@ public class FixedDO implements Serializable {
     private String updateUserId;
     // 记录状态
     private Integer recordStatus;
+    // 父级ID
+    private Integer parentId;
+    // 多租户ID
+    private Integer tenantId;
 
     public Integer getId() {
         return id;
@@ -41,12 +45,28 @@ public class FixedDO implements Serializable {
         this.createTime = createTime;
     }
 
+    public String getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
+    }
+
     public Date getUpdateTime() {
         return updateTime;
     }
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getUpdateUserId() {
+        return updateUserId;
+    }
+
+    public void setUpdateUserId(String updateUserId) {
+        this.updateUserId = updateUserId;
     }
 
     public Integer getRecordStatus() {
@@ -57,20 +77,20 @@ public class FixedDO implements Serializable {
         this.recordStatus = recordStatus;
     }
 
-    public String getCreateUserId() {
-        return createUserId;
+    public Integer getParentId() {
+        return parentId;
     }
 
-    public void setCreateUserId(String createUserId) {
-        this.createUserId = createUserId;
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 
-    public String getUpdateUserId() {
-        return updateUserId;
+    public Integer getTenantId() {
+        return tenantId;
     }
 
-    public void setUpdateUserId(String updateUserId) {
-        this.updateUserId = updateUserId;
+    public void setTenantId(Integer tenantId) {
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -88,6 +108,10 @@ public class FixedDO implements Serializable {
                 + updateUserId + '\"'
                 + ",\"recordStatus\":"
                 + recordStatus
+                + ",\"parentId\":"
+                + parentId
+                + ",\"tenantId\":"
+                + tenantId
                 + "}";
     }
 }

@@ -8,21 +8,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 权限实体
+ * 用户角色表
  *
- * @version v0.1, 2020/7/27 21:54, create by huangbiao.
+ * @version v0.1, 2020/7/29 11:10, create by huangbiao.
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("sys_resource")
-public class SysResourceDO extends FixedDO {
-
+@Table("sys_role_access")
+public class SysRoleAccessDO extends FixedDO {
     // 序列化ID
-    private static final long serialVersionUID = 4702444967524003359L;
-    // 资源ID
-    private String resourceId;
-    // 资源名称
-    private String resourceName;
+    private static final long serialVersionUID = 3873773717231088322L;
+    // 用户ID
+    private String roleId;
+    // 权限ID
+    private String accessId;
 }
+
+    
