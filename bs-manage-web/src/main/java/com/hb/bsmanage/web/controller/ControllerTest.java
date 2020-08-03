@@ -1,5 +1,6 @@
 package com.hb.bsmanage.web.controller;
 
+import com.hb.bsmanage.web.controller.base.AbstractController;
 import com.hb.unic.cache.service.IRedisService;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/controller/test")
-public class ControllerTest implements InitializingBean {
+public class ControllerTest extends AbstractController implements InitializingBean {
 
     /**
      * 日志
@@ -28,9 +30,16 @@ public class ControllerTest implements InitializingBean {
     @Autowired
     private IRedisService iRedisService;
 
-    @GetMapping("/test")
-    public void test() {
-        LOGGER.info("测试");
+    @GetMapping("/testGet")
+    public void testGet() {
+        getUrlParams();
+        LOGGER.info("get测试");
+    }
+
+    @PostMapping("/testPost")
+    public void testPost(String json) {
+        getUrlParams();
+        LOGGER.info("post测试: {}", json);
     }
 
     @Override

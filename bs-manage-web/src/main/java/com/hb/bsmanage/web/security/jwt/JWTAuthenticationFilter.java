@@ -1,11 +1,13 @@
 package com.hb.bsmanage.web.security.jwt;
 
-import com.hb.bsmanage.web.controller.sys.UserController;
 import com.hb.bsmanage.web.security.config.SecurityProperties;
+import com.hb.unic.base.exception.BusinessException;
+import com.hb.unic.base.util.ResponseUtils;
+import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,12 +40,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
     /**
-     * jwt工具类
-     */
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    /**
      * 用户service
      */
     @Autowired
@@ -69,12 +65,17 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-        String jwt = jwtUtils.getJwtFromRequest(request);
-        String username = jwtUtils.getUsernameFromJWT(jwt);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            String jwt = JwtUtils.getJwtFromRequest(request);
+            String userId = JwtUtils.getUserIdFromJWT(jwt);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (BusinessException e) {
+            ServletUtils.writeResponse(response, JsonUtils.toJson(ResponseUtils.generateResponseData(e.getKey(), e.getMessage())));
+            return;
+        }
         //放行
         chain.doFilter(request, response);
     }

@@ -7,6 +7,7 @@ package com.hb.bsmanage.model.common;
  */
 public class Consts {
 
-
+    // 项目名称
+    public static final String projectName = "bs-manage";
 
 }

@@ -1,5 +1,7 @@
 package com.hb.bsmanage.web.common;
 
+import com.hb.bsmanage.model.common.Consts;
+
 /**
  * redis缓存key管理工厂
  *
@@ -15,7 +17,7 @@ public class RedisKeyFactory {
      * @return key
      */
     public static String getJwtKey(String userId) {
-        return new StringBuilder().append("jwt:token:").append(userId).toString();
+        return new StringBuilder(Consts.projectName).append("jwt:token:").append(userId).toString();
     }
 
 }

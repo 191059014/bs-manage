@@ -4,7 +4,7 @@ spring:
   application:
     name: bs-manage-web
   profiles:
-    active: test
+    active: dev
   main:
     allow-bean-definition-overriding: true
 simple:
@@ -25,7 +25,7 @@ jasypt:
     password: bs_manage_web # jasypt加密的key
 security:
   ignoreUrlPatterns: # springsecurity忽略的url
-      - /test/*
+      - /controller/test/*
       - /controller/user/*
 jwt:
   config:

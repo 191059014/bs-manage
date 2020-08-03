@@ -25,4 +25,12 @@ public interface ISysUserService {
      */
     int add(SysUserDO sysUserDO);
 
+    /**
+     * 通过用户ID或者手机号查询
+     *
+     * @param userIdOrMobile 用户ID或者手机号查询
+     * @return 用户信息
+     */
+    SysUserDO findByUserIdOrMobile(String userIdOrMobile);
+
 }

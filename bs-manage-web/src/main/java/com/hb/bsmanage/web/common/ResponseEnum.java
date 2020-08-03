@@ -15,8 +15,19 @@ package com.hb.bsmanage.web.common;
  */
 public enum ResponseEnum {
 
-    SUCCESS("BMW_00000", "成功"),
-    ERROR("BMW_99999", "系统异常，请稍后再试"),;
+    /**
+     * 最基本的三个状态：成功，异常，失败
+     */
+    SUCCESS("BMW_000", "成功"),
+    ERROR("BMW_500", "系统异常，请稍后再试"),
+    FAIL("BMW_999", "失败"),
+    /**
+     * 第一个001代表“系统级别”的错误
+     */
+    ACCESS_DENY("BMW_001_P_001", "禁止访问"),
+    NULL_TOKEN("BMW_001_P_002", "token为空"),
+    ILLEGAL_TOKEN("BMW_001_P_003", "非法的token"),
+    EXPIRE_TOKEN("BMW_001_P_004", "过期的token"),;
 
     /**
      * 响应码

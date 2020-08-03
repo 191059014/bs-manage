@@ -2,7 +2,10 @@ package com.hb.bsmanage.web.controller.base;
 
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.unic.base.common.ResponseData;
+import com.hb.unic.base.exception.BusinessException;
+import com.hb.unic.base.exception.StandardRuntimeException;
 import com.hb.unic.base.util.ResponseUtils;
+import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.logger.util.LogExceptionWapper;
@@ -12,8 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -46,23 +47,38 @@ public abstract class AbstractController {
      * @return 参数集合
      */
     protected Map<String, Object> getUrlParams() {
-        Map<String, Object> param = new HashMap<>();
-        Enumeration e = request.getParameterNames();
-        // 循环获取参数
-        while (e.hasMoreElements()) {
-            String paramterName = e.nextElement().toString();
-            param.put(paramterName, request.getParameter(paramterName));
-        }
-        return param;
+        return ServletUtils.getParameterMap(request);
     }
 
     /**
-     * 异常统一处理
+     * 业务异常
+     */
+    @ExceptionHandler(BusinessException.class)
+    @ResponseBody
+    public ResponseData exception(BusinessException e) {
+        String baseLog = "[统一异常处理-业务异常]";
+        LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
+        return ResponseUtils.generateResponseData(e.getKey(), e.getMessage());
+    }
+
+    /**
+     * 标准异常
+     */
+    @ExceptionHandler(StandardRuntimeException.class)
+    @ResponseBody
+    public ResponseData exception(StandardRuntimeException e) {
+        String baseLog = "[统一异常处理-标准异常]";
+        LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
+        return ResponseUtils.generateResponseData(e.getKey(), e.getMessage());
+    }
+
+    /**
+     * 系统异常Exception
      */
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseData exception(Exception e) {
-        String baseLog = "[统一异常处理]";
+        String baseLog = "[统一异常处理-系统异常]";
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
         return ResponseUtils.generateResponseData(ResponseEnum.ERROR);
     }

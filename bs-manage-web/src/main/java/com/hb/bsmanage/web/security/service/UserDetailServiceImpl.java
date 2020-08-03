@@ -1,5 +1,6 @@
 package com.hb.bsmanage.web.security.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 @Service("userDetailsService")
 public class UserDetailServiceImpl implements UserDetailsService {
 
+
+
     public static void main(String[] args) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String encode = bCryptPasswordEncoder.encode("456");
@@ -22,7 +25,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
 //        User user = this.getUserByUserName(s);
 //        log.info("用户信息：{}", user);
 //        List<String> roleList = this.getRoleListByRoleIdArr(s);
