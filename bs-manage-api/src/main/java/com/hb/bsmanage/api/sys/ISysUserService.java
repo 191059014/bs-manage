@@ -33,4 +33,11 @@ public interface ISysUserService {
      */
     SysUserDO findByUserIdOrMobile(String userIdOrMobile);
 
+    /**
+     * 通过id查询
+     *
+     * @param id id
+     * @return 用户信息
+     */
+    SysUserDO findById(Integer id);
 }

@@ -4,7 +4,7 @@ Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 
-{"userId":"1234567","userName":"张三","password":"123456","mobile":"1234567"}
+{"userId":"U1","userName":"张三","password":"123456","mobile":"1234567"}
 
 ### 查找用户
 POST http://localhost:8080/controller/user/findOne
@@ -13,6 +13,23 @@ Cache-Control: no-cache
 Content-Type: application/json
 
 {"userId":"1234567"}
+
+###
+
+### 根据用户id或者手机号查找用户
+GET http://localhost:8080/controller/user/findByUserIdOrMobile?userIdOrMobile=U1
+Accept: */*
+Cache-Control: no-cache
+
+###
+
+### 根据主键查找用户
+POST http://localhost:8080/controller/user/findById
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{"id":1}
 
 ###
 

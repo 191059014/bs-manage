@@ -9,6 +9,7 @@ import com.hb.unic.base.util.ResponseUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +45,30 @@ public class UserController extends AbstractController {
     public ResponseData<SysUserDO> findOne(@RequestBody SysUserDO userDO) {
         SysUserDO one = iSysUserService.findOne(userDO);
         return ResponseUtils.generateResponseData(ResponseEnum.SUCCESS, one);
+    }
+
+    /**
+     * 添加用户
+     *
+     * @param userDO 用户信息
+     * @return 结果
+     */
+    @PostMapping("/findById")
+    public ResponseData<SysUserDO> findById(@RequestBody SysUserDO userDO) {
+        SysUserDO one = iSysUserService.findById(userDO.getId());
+        return ResponseUtils.generateResponseData(ResponseEnum.SUCCESS, one);
+    }
+
+    /**
+     * 通过用户ID或者手机号查询
+     *
+     * @param userIdOrMobile 用户ID或者手机号查询
+     * @return 用户信息
+     */
+    @GetMapping("/findByUserIdOrMobile")
+    public ResponseData<SysUserDO> findByUserIdOrMobile(String userIdOrMobile) {
+        SysUserDO sysUserDO = iSysUserService.findByUserIdOrMobile(userIdOrMobile);
+        return ResponseUtils.generateResponseData(ResponseEnum.SUCCESS, sysUserDO);
     }
 
     /**
