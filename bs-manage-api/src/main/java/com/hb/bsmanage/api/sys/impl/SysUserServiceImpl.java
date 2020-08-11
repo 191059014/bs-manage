@@ -3,7 +3,7 @@ package com.hb.bsmanage.api.sys.impl;
 import com.hb.bsmanage.api.sys.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.mybatis.base.DmlMapper;
-import com.hb.mybatis.helper.SqlFactory;
+import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.sql.Query;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +28,9 @@ public class SysUserServiceImpl extends DmlMapper<Integer, SysUserDO> implements
     @Override
     public SysUserDO findByUserIdOrMobile(String userIdOrMobile) {
         Query query = Query.build()
-                .sql(SqlFactory.equal("user_id"))
+                .add(QueryType.EQUAL, "user_id", userIdOrMobile)
                 .sql(" or ")
-                .sql(SqlFactory.EQUALS.buildSql("mobile",userIdOrMobile));
+                .add(QueryType.EQUAL, "mobile", userIdOrMobile);
         return selectOne(query);
     }
 
