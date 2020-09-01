@@ -1,10 +1,9 @@
 package com.hb.bsmanage.web.controller.base;
 
 import com.hb.bsmanage.web.common.ResponseEnum;
-import com.hb.unic.base.common.ResponseData;
+import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.base.exception.StandardRuntimeException;
-import com.hb.unic.base.util.ResponseUtils;
 import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -55,10 +54,10 @@ public abstract class AbstractController {
      */
     @ExceptionHandler(BusinessException.class)
     @ResponseBody
-    public ResponseData exception(BusinessException e) {
+    public Result exception(BusinessException e) {
         String baseLog = "[统一异常处理-业务异常]";
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
-        return ResponseUtils.generateResponseData(e.getKey(), e.getMessage());
+        return Result.of(e.getKey(), e.getMessage());
     }
 
     /**
@@ -66,10 +65,10 @@ public abstract class AbstractController {
      */
     @ExceptionHandler(StandardRuntimeException.class)
     @ResponseBody
-    public ResponseData exception(StandardRuntimeException e) {
+    public Result exception(StandardRuntimeException e) {
         String baseLog = "[统一异常处理-标准异常]";
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
-        return ResponseUtils.generateResponseData(e.getKey(), e.getMessage());
+        return Result.of(e.getKey(), e.getMessage());
     }
 
     /**
@@ -77,10 +76,10 @@ public abstract class AbstractController {
      */
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public ResponseData exception(Exception e) {
+    public Result exception(Exception e) {
         String baseLog = "[统一异常处理-系统异常]";
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
-        return ResponseUtils.generateResponseData(ResponseEnum.ERROR);
+        return Result.of(ResponseEnum.ERROR);
     }
 
 }

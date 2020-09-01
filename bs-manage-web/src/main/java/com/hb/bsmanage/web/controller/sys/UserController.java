@@ -4,8 +4,7 @@ import com.hb.bsmanage.api.sys.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.base.AbstractController;
-import com.hb.unic.base.common.ResponseData;
-import com.hb.unic.base.util.ResponseUtils;
+import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +41,9 @@ public class UserController extends AbstractController {
      * @return 结果
      */
     @PostMapping("/findOne")
-    public ResponseData<SysUserDO> findOne(@RequestBody SysUserDO userDO) {
+    public Result<SysUserDO> findOne(@RequestBody SysUserDO userDO) {
         SysUserDO one = iSysUserService.findOne(userDO);
-        return ResponseUtils.generateResponseData(ResponseEnum.SUCCESS, one);
+        return Result.of(ResponseEnum.SUCCESS, one);
     }
 
     /**
@@ -54,9 +53,9 @@ public class UserController extends AbstractController {
      * @return 结果
      */
     @PostMapping("/findById")
-    public ResponseData<SysUserDO> findById(@RequestBody SysUserDO userDO) {
+    public Result<SysUserDO> findById(@RequestBody SysUserDO userDO) {
         SysUserDO one = iSysUserService.findById(userDO.getId());
-        return ResponseUtils.generateResponseData(ResponseEnum.SUCCESS, one);
+        return Result.of(ResponseEnum.SUCCESS, one);
     }
 
     /**
@@ -66,9 +65,9 @@ public class UserController extends AbstractController {
      * @return 用户信息
      */
     @GetMapping("/findByUserIdOrMobile")
-    public ResponseData<SysUserDO> findByUserIdOrMobile(String userIdOrMobile) {
+    public Result<SysUserDO> findByUserIdOrMobile(String userIdOrMobile) {
         SysUserDO sysUserDO = iSysUserService.findByUserIdOrMobile(userIdOrMobile);
-        return ResponseUtils.generateResponseData(ResponseEnum.SUCCESS, sysUserDO);
+        return Result.of(ResponseEnum.SUCCESS, sysUserDO);
     }
 
     /**
@@ -78,9 +77,9 @@ public class UserController extends AbstractController {
      * @return 结果
      */
     @PostMapping("/addOne")
-    public ResponseData<Integer> addOne(@RequestBody SysUserDO userDO) {
+    public Result<Integer> addOne(@RequestBody SysUserDO userDO) {
         int addRows = iSysUserService.add(userDO);
-        return ResponseUtils.generateResponseData(ResponseEnum.SUCCESS, addRows);
+        return Result.of(ResponseEnum.SUCCESS, addRows);
     }
 
 }

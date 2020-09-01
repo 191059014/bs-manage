@@ -1,8 +1,8 @@
 package com.hb.bsmanage.web.security.jwt;
 
 import com.hb.bsmanage.web.security.config.SecurityProperties;
+import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
-import com.hb.unic.base.util.ResponseUtils;
 import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -73,7 +73,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (BusinessException e) {
-            ServletUtils.writeResponse(response, JsonUtils.toJson(ResponseUtils.generateResponseData(e.getKey(), e.getMessage())));
+            ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(e.getKey(), e.getMessage())));
             return;
         }
         //放行
