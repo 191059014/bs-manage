@@ -42,7 +42,7 @@ public class UserController extends AbstractController {
      */
     @PostMapping("/findOne")
     public Result<SysUserDO> findOne(@RequestBody SysUserDO userDO) {
-        SysUserDO one = iSysUserService.findOne(userDO);
+        SysUserDO one = iSysUserService.selectOne(userDO);
         return Result.of(ResponseEnum.SUCCESS, one);
     }
 
@@ -54,7 +54,7 @@ public class UserController extends AbstractController {
      */
     @PostMapping("/findById")
     public Result<SysUserDO> findById(@RequestBody SysUserDO userDO) {
-        SysUserDO one = iSysUserService.findById(userDO.getId());
+        SysUserDO one = iSysUserService.selectById(userDO.getId());
         return Result.of(ResponseEnum.SUCCESS, one);
     }
 
@@ -78,7 +78,7 @@ public class UserController extends AbstractController {
      */
     @PostMapping("/addOne")
     public Result<Integer> addOne(@RequestBody SysUserDO userDO) {
-        int addRows = iSysUserService.add(userDO);
+        int addRows = iSysUserService.insertBySelective(userDO);
         return Result.of(ResponseEnum.SUCCESS, addRows);
     }
 
