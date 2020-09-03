@@ -1,9 +1,8 @@
-package com.hb.bsmanage.web.controller.sys;
+package com.hb.bsmanage.web.controller;
 
-import com.hb.bsmanage.api.sys.ISysUserService;
+import com.hb.bsmanage.api.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.web.common.ResponseEnum;
-import com.hb.bsmanage.web.controller.base.AbstractController;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/controller/user")
-public class UserController extends AbstractController {
+public class UserController extends BaseController {
 
     /**
      * 日志

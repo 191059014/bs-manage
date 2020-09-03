@@ -1,4 +1,4 @@
-package com.hb.bsmanage.web.controller.base;
+package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.unic.base.common.Result;
@@ -21,12 +21,12 @@ import java.util.Map;
  *
  * @version v0.1, 2020/7/24 15:07, create by huangbiao.
  */
-public abstract class AbstractController {
+public abstract class BaseController {
 
     /**
      * 日志
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
 
     /**
      * HttpServletRequest

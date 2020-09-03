@@ -1,4 +1,4 @@
-package com.hb.bsmanage.api.sys;
+package com.hb.bsmanage.api;
 
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.mybatis.base.IDmlMapper;
