@@ -1,5 +1,6 @@
 package com.hb.bsmanage.model.base;
 
+import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Id;
 
@@ -22,14 +23,14 @@ public class FixedDO implements Serializable {
     @Column("create_time")
     private Date createTime;
     // 创建人
-    @Column("create_user_id")
-    private String createUserId;
+    @Column("create_by")
+    private String createBy;
     // 更新时间
     @Column("update_time")
     private Date updateTime;
     // 更新人
-    @Column("update_user_id")
-    private String updateUserId;
+    @Column("update_by")
+    private String updateBy;
     // 记录状态
     @Column("record_status")
     private Integer recordStatus;
@@ -56,12 +57,12 @@ public class FixedDO implements Serializable {
         this.createTime = createTime;
     }
 
-    public String getCreateUserId() {
-        return createUserId;
+    public String getCreateBy() {
+        return createBy;
     }
 
-    public void setCreateUserId(String createUserId) {
-        this.createUserId = createUserId;
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
     }
 
     public Date getUpdateTime() {
@@ -72,12 +73,12 @@ public class FixedDO implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public String getUpdateUserId() {
-        return updateUserId;
+    public String getUpdateBy() {
+        return updateBy;
     }
 
-    public void setUpdateUserId(String updateUserId) {
-        this.updateUserId = updateUserId;
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
     }
 
     public Integer getRecordStatus() {
@@ -106,25 +107,9 @@ public class FixedDO implements Serializable {
 
     @Override
     public String toString() {
-        return "{"
-                + "\"id\":"
-                + id
-                + ",\"createTime\":\""
-                + createTime + '\"'
-                + ",\"createUserId\":\""
-                + createUserId + '\"'
-                + ",\"updateTime\":\""
-                + updateTime + '\"'
-                + ",\"updateUserId\":\""
-                + updateUserId + '\"'
-                + ",\"recordStatus\":"
-                + recordStatus
-                + ",\"parentId\":"
-                + parentId
-                + ",\"tenantId\":"
-                + tenantId
-                + "}";
+        return ToStringHelper.printNoNull(this);
     }
+
 }
 
     

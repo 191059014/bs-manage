@@ -3,6 +3,7 @@ package com.hb.bsmanage.web.security.model;
 import com.hb.bsmanage.model.dobj.SysAccessDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
  *
  * @version v0.1, 2020/8/3 15:14, create by huangbiao.
  */
+@Getter
 public class UserPrincipal implements UserDetails {
 
     // 序列化ID
@@ -63,7 +65,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
@@ -73,24 +75,12 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
-    }
-
-    public SysUserDO getUser() {
-        return user;
-    }
-
-    public Set<SysRoleDO> getRoles() {
-        return roles;
-    }
-
-    public Set<SysAccessDO> getAccesses() {
-        return accesses;
+        return true;
     }
 
 }

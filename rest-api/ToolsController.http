@@ -1,0 +1,15 @@
+### 获取下拉框
+GET http://localhost:8080/bs/noauth/tools/combobox/ResourceType
+Accept: */*
+Cache-Control: no-cache
+
+### 获取redis缓存
+GET http://localhost:8080/bs/noauth/tools/redis/get/bs-managejwt:token:huangbiao
+Accept: */*
+Cache-Control: no-cache
+
+### 清除redis缓存
+GET http://localhost:8080/bs/noauth/tools/redis/clear/cachekey
+Accept: */*
+Cache-Control: no-cache
+

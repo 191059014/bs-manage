@@ -16,10 +16,11 @@ import org.springframework.stereotype.Service;
 public class SysUserServiceImpl extends DmlMapperImpl<SysUserDO> implements ISysUserService {
 
     @Override
-    public SysUserDO findByUserIdOrMobile(String userIdOrMobile) {
-        Where where = Where.build().addSingle(QueryType.EQUAL, "user_id", userIdOrMobile)
+    public SysUserDO findByUsernameOrMobile(String usernameOrMobile) {
+        Where where = Where.build()
+                .addSingle(QueryType.EQUAL, "user_name", usernameOrMobile)
                 .or()
-                .addSingle(QueryType.EQUAL, "mobile", userIdOrMobile);
+                .addSingle(QueryType.EQUAL, "mobile", usernameOrMobile);
         return selectOne(where);
     }
 

@@ -12,7 +12,7 @@ simple:
     hump_mapping: true # 开启数据库字段和实体类字段驼峰映射
 unicLogger:
   httpFilter:
-    urlPatterns: /controller/*,/app/* # traceId过滤器拦截路径
+    urlPatterns: /bs/*,/app/* # traceId过滤器拦截路径
 logging:
   level:
     com.hb.bsmanage.web: info
@@ -25,12 +25,11 @@ jasypt:
     password: bs_manage_web # jasypt加密的key
 security:
   ignoreUrlPatterns: # springsecurity忽略的url
-      - /controller/test/*
-      - /controller/user/*
+      - /bs/noauth/**
 jwt:
   config:
     key: bs_manage_web  # jwt签名key
-    defaultTtl: 600000  # jwt默认过期时间
+    defaultTtl: 6000000  # jwt默认过期时间100分钟
     rememberMeTtl: 604800000  # jwt记住我时的过期时间
 mybatis:
   mapper-locations: classpath*:mapper/*.xml

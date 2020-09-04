@@ -13,9 +13,9 @@ public interface ISysUserService extends IDmlMapper<SysUserDO> {
     /**
      * 通过用户ID或者手机号查询
      *
-     * @param userIdOrMobile 用户ID或者手机号查询
+     * @param usernameOrMobile 用户ID或者手机号查询
      * @return 用户信息
      */
-    SysUserDO findByUserIdOrMobile(String userIdOrMobile);
+    SysUserDO findByUsernameOrMobile(String usernameOrMobile);
 
 }

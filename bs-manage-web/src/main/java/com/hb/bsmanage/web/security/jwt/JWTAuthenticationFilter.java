@@ -6,6 +6,7 @@ import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.logger.util.LogExceptionWapper;
 import com.hb.unic.util.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -58,21 +59,22 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String baseLog = "[jwt认证过滤器]";
+        String baseLog = "[JWTAuthenticationFilter-doFilterInternal-jwt认证过滤器]";
         if (checkIgnores(request)) {
-            LOGGER.info("{}不需要进行权限拦截[{}]", baseLog, request.getRequestURI());
+            LOGGER.info("{}无需拦截[{}]，放行", baseLog, request.getRequestURI());
             //放行
             chain.doFilter(request, response);
             return;
         }
         try {
             String jwt = JwtUtils.getJwtFromRequest(request);
-            String userId = JwtUtils.getUserIdFromJWT(jwt);
+            String userId = JwtUtils.getUsernameFromJWT(jwt);
             UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (BusinessException e) {
+            LOGGER.info("{}业务异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
             ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(e.getKey(), e.getMessage())));
             return;
         }

@@ -4,7 +4,6 @@ import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.env.ConfigurableEnvironment;
 
@@ -30,4 +29,14 @@ public class WebApplication {
         System.out.println(String.format(" you can enjoy yourself, more please see: http://%s:%s/index.html", host == null ? "localhost" : host, port));
         System.out.println("===========================================================================");
     }
+
+    /**
+     * 开启测试模式
+     *
+     * @return true为测试模式
+     */
+    public static boolean openTestMode() {
+        return true;
+    }
+
 }

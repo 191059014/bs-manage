@@ -1,6 +1,8 @@
 package com.hb.bsmanage.model.dobj;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hb.bsmanage.model.base.FixedDO;
+import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Table("sys_user")
 public class SysUserDO extends FixedDO {
     // serialVersionUID
@@ -33,6 +36,11 @@ public class SysUserDO extends FixedDO {
     // 手机号
     @Column("mobile")
     private String mobile;
+
+    @Override
+    public String toString() {
+        return ToStringHelper.printJsonNoNull(this);
+    }
 }
 
     

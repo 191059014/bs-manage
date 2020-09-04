@@ -1,5 +1,6 @@
 package com.hb.bsmanage.web.security.service;
 
+import com.hb.bsmanage.web.WebApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -26,9 +27,8 @@ public class RbacAuthorityService {
      * @return true为有权限
      */
     public boolean hasPermission(Authentication authentication) {
-        boolean testFlag = true;
-        if (testFlag) {
-            System.out.println("RbacAuthorityService.hasPermission（模拟）: " + testFlag);
+        if (WebApplication.openTestMode()) {
+            System.out.println("RbacAuthorityService.hasPermission（模拟）");
             return true;
         }
         Object userInfo = authentication.getPrincipal();

@@ -2,7 +2,9 @@ package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.api.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.web.common.BaseController;
 import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.mybatis.model.PageResult;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -13,13 +15,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * 用户controller
  *
  * @version v0.1, 2020/7/24 15:05, create by huangbiao.
  */
 @RestController
-@RequestMapping("/controller/user")
+@RequestMapping("bs/auth/user")
 public class UserController extends BaseController {
 
     /**
@@ -65,7 +69,7 @@ public class UserController extends BaseController {
      */
     @GetMapping("/findByUserIdOrMobile")
     public Result<SysUserDO> findByUserIdOrMobile(String userIdOrMobile) {
-        SysUserDO sysUserDO = iSysUserService.findByUserIdOrMobile(userIdOrMobile);
+        SysUserDO sysUserDO = iSysUserService.findByUsernameOrMobile(userIdOrMobile);
         return Result.of(ResponseEnum.SUCCESS, sysUserDO);
     }
 
@@ -79,6 +83,30 @@ public class UserController extends BaseController {
     public Result<Integer> addOne(@RequestBody SysUserDO userDO) {
         int addRows = iSysUserService.insertBySelective(userDO);
         return Result.of(ResponseEnum.SUCCESS, addRows);
+    }
+
+    /**
+     * 查询集合
+     *
+     * @param userDO 用户信息
+     * @return 结果
+     */
+    @PostMapping("/findList")
+    public Result<Object> findList(@RequestBody SysUserDO userDO) {
+        List<SysUserDO> sysUserDOS = iSysUserService.selectList(userDO,"create_time desc",0,10);
+        return Result.of(ResponseEnum.SUCCESS, sysUserDOS);
+    }
+
+    /**
+     * 查询集合
+     *
+     * @param userDO 用户信息
+     * @return 结果
+     */
+    @PostMapping("/findPages")
+    public Result<Object> findPages(@RequestBody SysUserDO userDO) {
+        PageResult<SysUserDO> pageResult = iSysUserService.selectPages(userDO, "create_time desc",0, 10);
+        return Result.of(ResponseEnum.SUCCESS, pageResult);
     }
 
 }

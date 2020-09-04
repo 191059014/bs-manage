@@ -1,10 +1,12 @@
 package com.hb.bsmanage.web.security.service;
 
+import com.hb.bsmanage.api.ISysUserService;
+import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.web.security.model.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,16 +18,15 @@ import org.springframework.stereotype.Service;
 @Service("userDetailsService")
 public class UserDetailServiceImpl implements UserDetailsService {
 
-
-
-    public static void main(String[] args) {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String encode = bCryptPasswordEncoder.encode("456");
-        System.out.println(encode);
-    }
+    /**
+     * 用户service
+     */
+    @Autowired
+    private ISysUserService iSysUserService;
 
     @Override
-    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String usernameOrMobile) throws UsernameNotFoundException {
+        SysUserDO user = iSysUserService.findByUsernameOrMobile(usernameOrMobile);
 //        User user = this.getUserByUserName(s);
 //        log.info("用户信息：{}", user);
 //        List<String> roleList = this.getRoleListByRoleIdArr(s);
@@ -33,7 +34,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 //        List<Permission> permissionList = this.getPermissionListByPermissionIdArr(s);
 //        log.info("权限信息：{}", permissionList);
 //        return new UserPrincipal(user, roleList, permissionList);
-        return null;
+        return new UserPrincipal(user, null, null);
     }
 
 }

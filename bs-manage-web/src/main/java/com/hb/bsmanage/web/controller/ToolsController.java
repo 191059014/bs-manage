@@ -2,6 +2,7 @@ package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.model.enums.ResourceType;
 import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.common.ToolsWapper;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -20,13 +21,13 @@ import java.util.Map;
  * @version v0.1, 2020/9/3 18:01, create by huangbiao.
  */
 @RestController
-@RequestMapping("controller/noauth/common")
-public class CommonController {
+@RequestMapping("bs/noauth/tools")
+public class ToolsController {
 
     /**
      * 日志
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ToolsController.class);
 
     /**
      * 获取下拉框
@@ -41,7 +42,7 @@ public class CommonController {
         List<Map<String, Object>> combobox = null;
         switch (type) {
             case "ResourceType":
-                combobox = EnumUtils.combobox(ResourceType.class, "name", "value");
+                combobox = EnumUtils.combobox(ResourceType.class, EnumUtils.KeysEnum.name.toString(), EnumUtils.KeysEnum.value.toString());
                 break;
             default:
                 LOGGER.info("{}无此类型", baseLog);
@@ -50,6 +51,28 @@ public class CommonController {
         }
         LOGGER.info("{}出参={}", baseLog, combobox);
         return Result.of(ResponseEnum.SUCCESS, combobox);
+    }
+
+    /**
+     * 从redis中获取key对应value
+     *
+     * @param key 缓存key
+     * @return 缓存值
+     */
+    @GetMapping("/redis/get/{key}")
+    public Result<Object> getFromRedis(@PathVariable("key") String key) {
+        return Result.of(ResponseEnum.SUCCESS, ToolsWapper.redis().get(key));
+    }
+
+    /**
+     * 从redis中删除key
+     *
+     * @param key 缓存key
+     * @return 缓存值
+     */
+    @GetMapping("/redis/clear/{key}")
+    public Result<Object> clearFromRedis(@PathVariable("key") String key) {
+        return Result.of(ResponseEnum.SUCCESS, ToolsWapper.redis().delete(key));
     }
 
 }

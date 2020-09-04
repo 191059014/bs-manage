@@ -75,19 +75,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors()
                 // 关闭 CSRF
                 .and().csrf().disable()
-                // 登录行为由自己实现，参考 com.hb.test.springsecurity.jwt.controller.LoginController.doLogin
+                // 登录行为由自己实现
                 .formLogin().disable()
                 // 关闭http验证
                 .httpBasic().disable()
-                // 认证请求
+                // 对请求授权
                 .authorizeRequests()
-                // 所有请求都需要登录访问
+                .antMatchers("/bs/noauth/**").permitAll() //允许所有人访问/noAuth
+//                // 所有请求都需要登录访问
 //                .anyRequest()
 //                .authenticated()
-                // RBAC 动态 url 认证
+//                // RBAC 动态 url 认证
                 .anyRequest()
                 .access("@rbacAuthorityService.hasPermission(authentication)")
-                // 登出行为由自己实现，参考 com.hb.test.springsecurity.jwt.controller.LoginController.logout
+                // 登出行为由自己实现
                 .and().logout().disable()
                 // Session 管理
                 .sessionManagement()

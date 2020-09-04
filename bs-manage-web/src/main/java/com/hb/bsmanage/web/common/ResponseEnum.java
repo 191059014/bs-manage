@@ -19,15 +19,21 @@ public enum ResponseEnum {
      * 最基本的三个状态：成功，异常，失败
      */
     SUCCESS("BMW_000", "成功"),
+    PARAM_ILLEGAL("BMW_001", "参数非法"),
+    FAIL("BMW_499", "失败"),
     ERROR("BMW_500", "系统异常，请稍后再试"),
-    FAIL("BMW_999", "失败"),
     /**
      * 第一个001代表“系统级别”的错误
      */
-    ACCESS_DENY("BMW_001_P_001", "禁止访问"),
-    NULL_TOKEN("BMW_001_P_002", "token为空"),
-    ILLEGAL_TOKEN("BMW_001_P_003", "非法的token"),
-    EXPIRE_TOKEN("BMW_001_P_004", "过期的token"),;
+    ACCESS_DENY("BMW_SYS_P_001", "禁止访问"),
+    NULL_TOKEN("BMW_SYS_P_002", "token为空"),
+    ILLEGAL_TOKEN("BMW_SYS_P_003", "非法的token"),
+    EXPIRE_TOKEN("BMW_SYS_P_004", "过期的token"),
+    USERNAME_EMPTY("BMW_SYS_P_005", "用户名为空"),
+    PWD_EMPTY("BMW_SYS_P_006", "密码为空"),
+    PWD_ERROR("BMW_SYS_P_007", "密码错误"),
+
+    ;
 
     /**
      * 响应码
