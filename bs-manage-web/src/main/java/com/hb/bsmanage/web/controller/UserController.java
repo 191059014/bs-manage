@@ -2,12 +2,14 @@ package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.api.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.enums.TableEnum;
 import com.hb.bsmanage.web.common.BaseController;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.mybatis.model.PageResult;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.util.KeyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +25,7 @@ import java.util.List;
  * @version v0.1, 2020/7/24 15:05, create by huangbiao.
  */
 @RestController
-@RequestMapping("bs/auth/user")
+@RequestMapping("bs/noauth/user")
 public class UserController extends BaseController {
 
     /**
@@ -81,6 +83,7 @@ public class UserController extends BaseController {
      */
     @PostMapping("/addOne")
     public Result<Integer> addOne(@RequestBody SysUserDO userDO) {
+        userDO.setUserId(KeyUtils.getUniqueKey(TableEnum.USER_ID.getIdPrefix()));
         int addRows = iSysUserService.insertBySelective(userDO);
         return Result.of(ResponseEnum.SUCCESS, addRows);
     }

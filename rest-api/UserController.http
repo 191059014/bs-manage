@@ -4,7 +4,7 @@ Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 
-{"userId":"U1","userName":"huangbiao","password":"123456","mobile":"18310673000"}
+{"userName":"huangbiao","password":"123456","mobile":"18310673000"}
 
 ### 查找用户
 POST http://localhost:8080/bs/auth/user/findOne
