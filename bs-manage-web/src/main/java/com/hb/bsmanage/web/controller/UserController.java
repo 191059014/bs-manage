@@ -25,7 +25,7 @@ import java.util.List;
  * @version v0.1, 2020/7/24 15:05, create by huangbiao.
  */
 @RestController
-@RequestMapping("bs/noauth/user")
+@RequestMapping("bs/auth/user")
 public class UserController extends BaseController {
 
     /**

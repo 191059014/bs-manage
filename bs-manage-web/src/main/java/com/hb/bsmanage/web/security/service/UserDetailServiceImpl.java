@@ -2,7 +2,10 @@ package com.hb.bsmanage.web.security.service;
 
 import com.hb.bsmanage.api.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.web.controller.LoginController;
 import com.hb.bsmanage.web.security.model.UserPrincipal;
+import com.hb.unic.logger.Logger;
+import com.hb.unic.logger.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +22,11 @@ import org.springframework.stereotype.Service;
 public class UserDetailServiceImpl implements UserDetailsService {
 
     /**
+     * 日志
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailServiceImpl.class);
+
+    /**
      * 用户service
      */
     @Autowired
@@ -26,6 +34,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrMobile) throws UsernameNotFoundException {
+        System.out.println(("UserDetailServiceImpl-loadUserByUsername====="));
         SysUserDO user = iSysUserService.findByUsernameOrMobile(usernameOrMobile);
 //        User user = this.getUserByUserName(s);
 //        log.info("用户信息：{}", user);

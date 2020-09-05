@@ -122,7 +122,7 @@ public class JwtUtils {
 
         // 从redis缓存中拿到token，验证token合法性
         String jwtKey = RedisKeyFactory.getJwtKey(claims.getSubject());
-        String redisToken = ToolsWapper.redis().getString(jwtKey);
+        String redisToken = ToolsWapper.redis().get(jwtKey);
         if (redisToken == null) {
             throw new BusinessException(ResponseEnum.EXPIRE_TOKEN);
         }

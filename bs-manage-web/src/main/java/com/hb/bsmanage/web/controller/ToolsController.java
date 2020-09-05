@@ -7,10 +7,7 @@ import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.util.EnumUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -37,8 +34,7 @@ public class ToolsController {
      */
     @GetMapping("/combobox/{type}")
     public Result<List<Map<String, Object>>> getCombobox(@PathVariable("type") String type) {
-        String baseLog = "[CommonController-getCombobox-获取下拉框]";
-        LOGGER.info("{}入参={}", baseLog, type);
+        String baseLog = "[ToolsController-getCombobox-获取下拉框]";
         List<Map<String, Object>> combobox = null;
         switch (type) {
             case "ResourceType":
@@ -49,8 +45,22 @@ public class ToolsController {
                 break;
 
         }
-        LOGGER.info("{}出参={}", baseLog, combobox);
         return Result.of(ResponseEnum.SUCCESS, combobox);
+    }
+
+    /**
+     * 往redis缓存里设置值
+     *
+     * @param key 缓存key
+     * @return 缓存值
+     */
+    @RequestMapping("/redis/set/{key}/{expire}")
+    public Result setToRedis(@PathVariable("key") String key,
+                             @PathVariable("expire") Long expire,
+                             @RequestParam(required = false, name = "value") String value,
+                             @RequestBody(required = false) String json) {
+        ToolsWapper.redis().set(key, value == null ? json : value, expire);
+        return Result.of(ResponseEnum.SUCCESS);
     }
 
     /**

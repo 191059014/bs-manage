@@ -29,7 +29,7 @@ security:
 jwt:
   config:
     key: bs_manage_web  # jwt签名key
-    defaultTtl: 6000000  # jwt默认过期时间100分钟
+    defaultTtl: 60000000  # jwt默认过期时间1000分钟
     rememberMeTtl: 604800000  # jwt记住我时的过期时间
 mybatis:
   mapper-locations: classpath*:mapper/*.xml

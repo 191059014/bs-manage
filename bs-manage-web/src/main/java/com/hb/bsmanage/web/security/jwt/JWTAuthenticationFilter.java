@@ -1,5 +1,6 @@
 package com.hb.bsmanage.web.security.jwt;
 
+import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.security.config.SecurityProperties;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
@@ -76,6 +77,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         } catch (BusinessException e) {
             LOGGER.info("{}业务异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
             ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(e.getKey(), e.getMessage())));
+            return;
+        } catch (Exception e) {
+            LOGGER.info("{}系统异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
+            ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.ERROR)));
             return;
         }
         //放行

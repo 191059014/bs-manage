@@ -4,14 +4,14 @@ Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 
-{"userName":"huangbiao","password":"123456","mobile":"18310673000"}
+{"userName":"huangbiao","password":"123456","mobile":"18310673001"}
 
 ### 查找用户
 POST http://localhost:8080/bs/auth/user/findOne
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-token: Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJVMSIsInN1YiI6Imh1YW5nYmlhbyIsImlhdCI6MTU5OTIxMjAyMCwiZXhwIjoxNTk5MjE4MDIwfQ.on33rce9hhZCxFx6UzPpy3_SMI90kig4C8a2t1-usw8
+token: Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ1MjAyMDA5MDUxNjQ4MDY2NDEwOTM4ODE4OCIsInN1YiI6Imh1YW5nYmlhbyIsImlhdCI6MTU5OTI5NzgxMSwiZXhwIjoxNTk5MzU3ODExfQ.Z8dcS3WYzFDlF9kfzdvz1Jtfkf_6-raWCeGE4U3y580
 
 {"userId":"1234567","mobile":"1234567"}
 
