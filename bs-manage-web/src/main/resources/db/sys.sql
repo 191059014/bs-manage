@@ -76,3 +76,17 @@ CREATE TABLE `sys_role_access` (
   `tenant_id` varchar(32) NOT NULL DEFAULT '-1' COMMENT '多租户ID',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色权限关系表';
+
+CREATE TABLE `sys_merchant` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `merchant_id` varchar(32) NOT NULL COMMENT '商户ID',
+  `merchant_name` varchar(256) NOT NULL COMMENT '商户名称',
+  `create_by` varchar(32) NOT NULL DEFAULT '-1' COMMENT '创建人',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(32) NOT NULL DEFAULT '-1' COMMENT '更新人',
+  `update_time` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  `record_status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '记录有效状态',
+  `parent_id` varchar(32) NOT NULL DEFAULT '-1' COMMENT '父级ID',
+  `tenant_id` varchar(32) NOT NULL DEFAULT '-1' COMMENT '多租户ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商户表';

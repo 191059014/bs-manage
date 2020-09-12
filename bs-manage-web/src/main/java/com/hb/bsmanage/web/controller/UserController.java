@@ -59,7 +59,7 @@ public class UserController extends BaseController {
      */
     @PostMapping("/findById")
     public Result<SysUserDO> findById(@RequestBody SysUserDO userDO) {
-        SysUserDO one = iSysUserService.selectById(userDO.getId());
+        SysUserDO one = iSysUserService.selectByPk(userDO.getId());
         return Result.of(ResponseEnum.SUCCESS, one);
     }
 

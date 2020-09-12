@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户表
+ * 商户表
  *
  * @version v0.1, 2020/7/24 13:51, create by huangbiao.
  */
@@ -20,22 +20,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table("sys_user")
-public class SysUserDO extends FixedDO {
+@Table("sys_merchant")
+public class SysMerchantDO extends FixedDO {
     // serialVersionUID
-    private static final long serialVersionUID = -2355680884700265496L;
-    // 用户标识
-    @Column(columnName = "user_id", isBk = true)
-    private String userId;
-    // 用户名
-    @Column("user_name")
-    private String userName;
-    // 密码
-    @Column("password")
-    private String password;
-    // 手机号
-    @Column("mobile")
-    private String mobile;
+    private static final long serialVersionUID = 5538623345484936541L;
+    // 商户标识
+    @Column(columnName = "merchant_id", isBk = true)
+    private String merchantId;
+    // 商户名
+    @Column("merchant_name")
+    private String merchantName;
 
     @Override
     public String toString() {

@@ -1,6 +1,7 @@
 package com.hb.bsmanage.model.dobj;
 
 import com.hb.bsmanage.model.base.FixedDO;
+import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +22,10 @@ public class SysRoleDO extends FixedDO {
     // 序列化ID
     private static final long serialVersionUID = 8971646467070992455L;
     // 角色ID
+    @Column(columnName = "role_id", isBk = true)
     private String roleId;
     // 角色名称
+    @Column("role_name")
     private String roleName;
 }
 

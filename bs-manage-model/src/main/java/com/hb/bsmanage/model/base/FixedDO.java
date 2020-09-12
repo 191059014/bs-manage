@@ -2,7 +2,6 @@ package com.hb.bsmanage.model.base;
 
 import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
-import com.hb.mybatis.annotation.Id;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,7 +16,7 @@ public class FixedDO implements Serializable {
     // serialVersionUID
     private static final long serialVersionUID = 2134467222395310313L;
     // 物理主键
-    @Id
+    @Column(isPk = true)
     private Integer id;
     // 创建时间
     @Column("create_time")

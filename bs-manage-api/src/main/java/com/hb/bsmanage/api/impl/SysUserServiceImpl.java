@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * @version v0.1, 2020/7/24 15:00, create by huangbiao.
  */
 @Service
-public class SysUserServiceImpl extends DmlMapperImpl<SysUserDO> implements ISysUserService {
+public class SysUserServiceImpl extends DmlMapperImpl<SysUserDO, Integer, String> implements ISysUserService {
 
     @Override
     public SysUserDO findByUsernameOrMobile(String usernameOrMobile) {

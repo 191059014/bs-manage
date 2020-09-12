@@ -8,7 +8,7 @@ import com.hb.mybatis.base.IDmlMapper;
  *
  * @version v0.1, 2020/7/24 14:59, create by huangbiao.
  */
-public interface ISysUserService extends IDmlMapper<SysUserDO> {
+public interface ISysUserService extends IDmlMapper<SysUserDO, Integer, String> {
 
     /**
      * 通过用户ID或者手机号查询
