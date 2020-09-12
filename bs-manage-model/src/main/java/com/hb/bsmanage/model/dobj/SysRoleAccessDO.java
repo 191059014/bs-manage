@@ -1,6 +1,7 @@
 package com.hb.bsmanage.model.dobj;
 
 import com.hb.bsmanage.model.base.FixedDO;
+import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,11 @@ public class SysRoleAccessDO extends FixedDO {
     // 权限ID
     @Column("access_id")
     private String accessId;
+
+    @Override
+    public String toString() {
+        return ToStringHelper.printJsonNoNull(this);
+    }
 }
 
     

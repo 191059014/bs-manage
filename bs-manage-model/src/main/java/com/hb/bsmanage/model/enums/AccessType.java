@@ -5,7 +5,7 @@ package com.hb.bsmanage.model.enums;
  *
  * @version v0.1, 2020/7/29 10:58, create by huangbiao.
  */
-public enum ResourceType {
+public enum AccessType {
 
     PAGE("page", "页面"),
     BUTTON("button", "按钮");
@@ -15,7 +15,7 @@ public enum ResourceType {
     // 名称
     private String name;
 
-    ResourceType(String value, String name) {
+    AccessType(String value, String name) {
         this.value = value;
         this.name = name;
     }

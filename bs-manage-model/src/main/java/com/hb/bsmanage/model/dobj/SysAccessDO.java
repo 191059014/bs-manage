@@ -1,6 +1,7 @@
 package com.hb.bsmanage.model.dobj;
 
 import com.hb.bsmanage.model.base.FixedDO;
+import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import lombok.AllArgsConstructor;
@@ -38,4 +39,9 @@ public class SysAccessDO extends FixedDO {
     private String icon;
     // 链接
     private String url;
+
+    @Override
+    public String toString() {
+        return ToStringHelper.printJsonNoNull(this);
+    }
 }

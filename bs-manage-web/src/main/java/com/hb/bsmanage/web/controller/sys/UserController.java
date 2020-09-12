@@ -1,4 +1,4 @@
-package com.hb.bsmanage.web.controller;
+package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.api.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
@@ -84,7 +84,7 @@ public class UserController extends BaseController {
     @PostMapping("/addOne")
     public Result<Integer> addOne(@RequestBody SysUserDO userDO) {
         userDO.setUserId(KeyUtils.getUniqueKey(TableEnum.USER_ID.getIdPrefix()));
-        int addRows = iSysUserService.insertBySelective(userDO);
+        int addRows = iSysUserService.insert(userDO);
         return Result.of(ResponseEnum.SUCCESS, addRows);
     }
 

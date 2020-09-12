@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -28,17 +28,17 @@ public class UserPrincipal implements UserDetails {
     private SysUserDO user;
 
     // 角色信息
-    private Set<SysRoleDO> roles;
+    private List<SysRoleDO> roles;
 
     // 权限信息
-    private Set<SysAccessDO> accesses;
+    private List<SysAccessDO> accesses;
 
     // 权限信息
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(SysUserDO sysUserDO, Set<SysRoleDO> roleSet, Set<SysAccessDO> accesses) {
+    public UserPrincipal(SysUserDO sysUserDO, List<SysRoleDO> roles, List<SysAccessDO> accesses) {
         this.user = sysUserDO;
-        this.roles = roleSet;
+        this.roles = roles;
         this.accesses = accesses;
         if (accesses != null && !accesses.isEmpty()) {
             this.authorities = accesses.stream()

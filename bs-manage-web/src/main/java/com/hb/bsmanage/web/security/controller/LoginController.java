@@ -1,4 +1,4 @@
-package com.hb.bsmanage.web.controller;
+package com.hb.bsmanage.web.security.controller;
 
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
@@ -21,9 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -64,7 +64,7 @@ public class LoginController extends BaseController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             SysUserDO sysUser = userPrincipal.getUser();
-            Set<SysRoleDO> roles = userPrincipal.getRoles();
+            List<SysRoleDO> roles = userPrincipal.getRoles();
             String jwt = JwtUtils.createToken(sysUser.getUserId(), sysUser.getUserName(), roles == null ? null : roles.stream().map(SysRoleDO::getRoleId).collect(Collectors.toList()), userPrincipal.getAuthorities(), req.isRememberMe());
             return Result.of(ResponseEnum.SUCCESS, jwt);
         } catch (BadCredentialsException e) {
