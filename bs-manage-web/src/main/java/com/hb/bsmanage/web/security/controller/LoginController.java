@@ -8,9 +8,11 @@ import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.security.jwt.JwtUtils;
 import com.hb.bsmanage.web.security.model.UserPrincipal;
 import com.hb.unic.base.common.Result;
+import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.logger.util.LogExceptionWapper;
+import com.hb.unic.util.util.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +20,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,9 +72,9 @@ public class LoginController extends BaseController {
             return Result.of(ResponseEnum.SUCCESS, jwt);
         } catch (BadCredentialsException e) {
             if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("{}证书错误={}", baseLog, LogExceptionWapper.getStackTrace(e));
+                LOGGER.error("{}用户名或密码错误={}", baseLog, LogExceptionWapper.getStackTrace(e));
             }
-            return Result.of(ResponseEnum.PWD_ERROR);
+            return Result.of(ResponseEnum.BAD_CREDENTIALS);
         }
 
 

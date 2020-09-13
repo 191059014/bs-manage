@@ -117,6 +117,7 @@ public class ToolsController {
                 .merchantId(KeyUtils.getTenantId())
                 .merchantName("一级商户")
                 .build();
+        merchant.setTenantId(merchant.getMerchantId());
         iSysMerchantService.insert(merchant);
         LOGGER.info("{}添加商户成功={}", baseLog, merchant.getMerchantId());
         // 新增系统管理员用户
@@ -146,17 +147,19 @@ public class ToolsController {
         LOGGER.info("{}添加用户角色关系成功={}={}", baseLog, userRole.getUserId(), userRole.getRoleId());
         // 新增权限信息
         String[] accessNameArr = new String[]{"商户管理", "用户管理", "角色管理", "权限管理"};
-        String[] urlArr = new String[]{"/merchantManage", "/defaultContent", "/defaultContent", "/defaultContent"};
-        String[] iconArr = new String[]{"el-icon-location", "el-icon-location", "el-icon-location", "el-icon-location"};
+        String[] urlArr = new String[]{"/merchantManage", "/userManage", "/roleManage", "/accessManage"};
+        String[] accessValueArr = new String[]{"merchant_manage", "user_manage", "role_manage", "access_manage"};
+        String[] iconArr = new String[]{"el-icon-coin", "el-icon-s-custom", "el-icon-user", "el-icon-lock"};
         for (int i = 0; i < 4; i++) {
             SysAccessDO access = SysAccessDO.builder()
                     .accessId(KeyUtils.getUniqueKey(TableEnum.ACCESS_ID.getIdPrefix()))
                     .accessName(accessNameArr[i])
                     .accessType(AccessType.PAGE.getValue())
-                    .accessValue(null)
+                    .accessValue(accessValueArr[i])
                     .url(urlArr[i])
                     .icon(iconArr[i])
                     .build();
+            access.setTenantId(merchant.getMerchantId());
             iSysAccessService.insert(access);
             LOGGER.info("{}添加权限成功={}", baseLog, access.getAccessId());
             // 新增角色权限关系信息
@@ -164,6 +167,7 @@ public class ToolsController {
                     .roleId(role.getRoleId())
                     .accessId(access.getAccessId())
                     .build();
+            roleAccess.setTenantId(merchant.getMerchantId());
             iSysRoleAccessService.insert(roleAccess);
             LOGGER.info("{}添加角色权限关系成功={}={}", baseLog, role.getRoleId(), access.getAccessId());
         }

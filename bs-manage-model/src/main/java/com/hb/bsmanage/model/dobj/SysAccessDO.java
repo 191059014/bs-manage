@@ -24,7 +24,7 @@ public class SysAccessDO extends FixedDO {
     // 序列化ID
     private static final long serialVersionUID = 4702444967524003359L;
     // 权限ID
-    @Column(columnName = "access_id", isBk = true)
+    @Column(value = "access_id", isBk = true)
     private String accessId;
     // 权限名称
     @Column("access_name")

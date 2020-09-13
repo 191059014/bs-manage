@@ -11,6 +11,7 @@ import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.constant.Consts;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,12 +53,21 @@ public class AccessController extends BaseController {
     public Result<MenuDataResponse> getPrivateMenuDatas() {
         MenuDataResponse response = new MenuDataResponse();
         List<SysAccessDO> currentUserAccesses = SecurityUtils.getCurrentUserAccesses();
-        Predicate<SysAccessDO> predicate = access -> StringUtils.isBlank(access.getParentId()) && AccessType.PAGE.getValue().equals(access.getAccessType());
+        Predicate<SysAccessDO> predicate = access -> (StringUtils.isBlank(access.getParentId()) || Consts.DEFAULT_V.equals(access.getParentId())) && AccessType.PAGE.getValue().equals(access.getAccessType());
         Set<SysAccessDO> firstLevelAccesses = currentUserAccesses.stream().filter(predicate).collect(Collectors.toSet());
+        Set<Menu> menuSet = new HashSet<>();
         firstLevelAccesses.forEach(access -> {
-            Set<Menu> menuSet = findChildrenCycle(currentUserAccesses, access);
-            response.setMenuDatas(menuSet);
+            Set<Menu> children = findChildrenCycle(currentUserAccesses, access);
+            Menu menu = Menu.builder().index(access.getAccessId())
+                    .name(access.getAccessName())
+                    .icon(access.getIcon())
+                    .url(access.getUrl())
+                    .parentIndex(access.getParentId())
+                    .children(children.size() > 0 ? children : null)
+                    .build();
+            menuSet.add(menu);
         });
+        response.setMenuDatas(menuSet);
         return Result.of(ResponseEnum.SUCCESS, response);
     }
 

@@ -1,11 +1,7 @@
 package com.hb.bsmanage.web.security.service;
 
-import com.hb.bsmanage.api.ISysAccessService;
-import com.hb.bsmanage.api.ISysRoleService;
-import com.hb.bsmanage.api.ISysUserService;
-import com.hb.bsmanage.model.dobj.SysAccessDO;
-import com.hb.bsmanage.model.dobj.SysRoleDO;
-import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.api.*;
+import com.hb.bsmanage.model.dobj.*;
 import com.hb.bsmanage.web.security.model.UserPrincipal;
 import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
@@ -20,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +40,12 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private ISysUserService iSysUserService;
 
     /**
+     * 用户角色关系service
+     */
+    @Autowired
+    private ISysUserRoleService iSysUserRoleService;
+
+    /**
      * 角色service
      */
     @Autowired
@@ -54,18 +57,35 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Autowired
     private ISysAccessService iSysAccessService;
 
+    /**
+     * 角色权限关系service
+     */
+    @Autowired
+    private ISysRoleAccessService iSysRoleAccessService;
+
     @Override
     public UserDetails loadUserByUsername(String usernameOrMobile) throws UsernameNotFoundException {
-        LOGGER.info("UserDetailServiceImpl-loadUserByUsername-通过用户名加载用户信息");
+        String baseLog = "[UserDetailServiceImpl-loadUserByUsername-通过用户名加载用户信息]";
+        LOGGER.info(baseLog);
         // 查询用户信息
         SysUserDO user = iSysUserService.findByUsernameOrMobile(usernameOrMobile);
+        if (user == null) {
+            LOGGER.info("{}无此用户={}", baseLog, usernameOrMobile);
+            throw new UsernameNotFoundException("无此用户：" + usernameOrMobile);
+        }
         // 查询角色信息
-        List<SysRoleDO> roleList = iSysRoleService.selectList(Where.build().addSingle(QueryType.EQUAL, "user_id", user.getUserId()));
+        List<SysUserRoleDO> userRoleList = iSysUserRoleService.selectList(Where.build().addSingle(QueryType.EQUAL, "user_id", user.getUserId()));
         // 查询权限信息
         List<SysAccessDO> accessList = null;
-        if (CollectionUtils.isNotEmpty(roleList)) {
-            Set<String> roleIdSet = roleList.stream().map(SysRoleDO::getRoleId).collect(Collectors.toSet());
-            accessList = iSysAccessService.selectList(Where.build().addSingle(QueryType.IN, "role_id", roleIdSet));
+        List<SysRoleDO> roleList = null;
+        if (CollectionUtils.isNotEmpty(userRoleList)) {
+            Set<String> roleIdSet = userRoleList.stream().map(SysUserRoleDO::getRoleId).collect(Collectors.toSet());
+            roleList = iSysRoleService.selectList(Where.build().addSingle(QueryType.IN, "role_id", roleIdSet));
+            List<SysRoleAccessDO> roleAccessList = iSysRoleAccessService.selectList(Where.build().addSingle(QueryType.IN, "role_id", roleIdSet));
+            if (CollectionUtils.isNotEmpty(roleAccessList)) {
+                Set<String> accessIdSet = roleAccessList.stream().map(SysRoleAccessDO::getAccessId).collect(Collectors.toSet());
+                accessList = iSysAccessService.selectList(Where.build().addSingle(QueryType.IN, "access_id", accessIdSet));
+            }
         }
         return new UserPrincipal(user, roleList, accessList);
     }

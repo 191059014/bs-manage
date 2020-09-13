@@ -29,6 +29,15 @@ public class SecurityUtils {
     }
 
     /**
+     * 获取当前用户的多租户ID
+     *
+     * @return 多租户ID
+     */
+    public static String getCurrentUserTenantId() {
+        return getCurrentUser().getTenantId();
+    }
+
+    /**
      * 获取当前用户的角色信息
      *
      * @return Set<SysRoleDO>

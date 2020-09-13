@@ -23,7 +23,7 @@ public class SysRoleDO extends FixedDO {
     // 序列化ID
     private static final long serialVersionUID = 8971646467070992455L;
     // 角色ID
-    @Column(columnName = "role_id", isBk = true)
+    @Column(value = "role_id", isBk = true)
     private String roleId;
     // 角色名称
     @Column("role_name")

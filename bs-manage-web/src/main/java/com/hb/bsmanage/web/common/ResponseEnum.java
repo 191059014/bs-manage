@@ -32,6 +32,8 @@ public enum ResponseEnum {
     USERNAME_EMPTY("BMW_SYS_P_005", "用户名为空"),
     PWD_EMPTY("BMW_SYS_P_006", "密码为空"),
     PWD_ERROR("BMW_SYS_P_007", "密码错误"),
+    USERNAME_NOT_EXIST("BMW_SYS_P_008", "用户名不存在"),
+    BAD_CREDENTIALS("BMW_SYS_P_009", "用户名或密码不正确"),
 
     ;
 

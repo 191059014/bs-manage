@@ -25,7 +25,7 @@ public class SysUserDO extends FixedDO {
     // serialVersionUID
     private static final long serialVersionUID = -2355680884700265496L;
     // 用户标识
-    @Column(columnName = "user_id", isBk = true)
+    @Column(value = "user_id", isBk = true)
     private String userId;
     // 用户名
     @Column("user_name")

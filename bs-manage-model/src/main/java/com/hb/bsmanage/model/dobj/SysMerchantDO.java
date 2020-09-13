@@ -25,7 +25,7 @@ public class SysMerchantDO extends FixedDO {
     // serialVersionUID
     private static final long serialVersionUID = 5538623345484936541L;
     // 商户标识
-    @Column(columnName = "merchant_id", isBk = true)
+    @Column(value = "merchant_id", isBk = true)
     private String merchantId;
     // 商户名
     @Column("merchant_name")
