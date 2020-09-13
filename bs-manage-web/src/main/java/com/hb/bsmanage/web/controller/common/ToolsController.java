@@ -146,9 +146,30 @@ public class ToolsController {
         iSysUserRoleService.insert(userRole);
         LOGGER.info("{}添加用户角色关系成功={}={}", baseLog, userRole.getUserId(), userRole.getRoleId());
         // 新增权限信息
+
+        SysAccessDO sysAccess = SysAccessDO.builder()
+                .accessId(KeyUtils.getUniqueKey(TableEnum.ACCESS_ID.getIdPrefix()))
+                .accessName("系统管理")
+                .accessType(AccessType.PAGE.getValue())
+                .accessValue("sys")
+                .url(null)
+                .icon("el-icon-setting")
+                .build();
+        sysAccess.setTenantId(merchant.getMerchantId());
+        iSysAccessService.insert(sysAccess);
+        LOGGER.info("{}添加系统管理菜单成功={}", baseLog, sysAccess.getAccessId());
+        // 新增角色权限关系信息
+        SysRoleAccessDO sysRoleAccess = SysRoleAccessDO.builder()
+                .roleId(role.getRoleId())
+                .accessId(sysAccess.getAccessId())
+                .build();
+        sysRoleAccess.setTenantId(merchant.getMerchantId());
+        iSysRoleAccessService.insert(sysRoleAccess);
+        LOGGER.info("{}添加系统管理菜单角色权限关系成功={}={}", baseLog, role.getRoleId(), sysRoleAccess.getAccessId());
+
         String[] accessNameArr = new String[]{"商户管理", "用户管理", "角色管理", "权限管理"};
         String[] urlArr = new String[]{"/merchantManage", "/userManage", "/roleManage", "/accessManage"};
-        String[] accessValueArr = new String[]{"merchant_manage", "user_manage", "role_manage", "access_manage"};
+        String[] accessValueArr = new String[]{"sys_merchant", "sys_user", "sys_role", "sys_access"};
         String[] iconArr = new String[]{"el-icon-coin", "el-icon-s-custom", "el-icon-user", "el-icon-lock"};
         for (int i = 0; i < 4; i++) {
             SysAccessDO access = SysAccessDO.builder()
@@ -160,6 +181,7 @@ public class ToolsController {
                     .icon(iconArr[i])
                     .build();
             access.setTenantId(merchant.getMerchantId());
+            access.setParentId(sysAccess.getAccessId());
             iSysAccessService.insert(access);
             LOGGER.info("{}添加权限成功={}", baseLog, access.getAccessId());
             // 新增角色权限关系信息

@@ -82,12 +82,13 @@ public class AccessController extends BaseController {
         Set<Menu> menuSet = new HashSet<>();
         allAccess.forEach(access -> {
             if (currentAccess.getAccessId().equals(access.getParentId())) {
+                Set<Menu> children = findChildrenCycle(allAccess, access);
                 Menu menu = Menu.builder().index(access.getAccessId())
                         .name(access.getAccessName())
                         .icon(access.getIcon())
                         .url(access.getUrl())
                         .parentIndex(access.getParentId())
-                        .children(findChildrenCycle(allAccess, access))
+                        .children(children.size() > 0 ? children : null)
                         .build();
                 menuSet.add(menu);
             }
