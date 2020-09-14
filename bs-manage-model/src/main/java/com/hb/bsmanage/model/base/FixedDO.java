@@ -1,12 +1,15 @@
 package com.hb.bsmanage.model.base;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
+import com.hb.unic.util.util.DateUtils;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * 常用固定属性
@@ -24,12 +27,14 @@ public class FixedDO implements Serializable {
     private Integer id;
     // 创建时间
     @Column("create_time")
+    @JsonFormat(pattern = DateUtils.FORMAT_3, timezone = DateUtils.TIME_ZONE_1)
     private Date createTime;
     // 创建人
     @Column("create_by")
     private String createBy;
     // 更新时间
     @Column("update_time")
+    @JsonFormat(pattern = DateUtils.FORMAT_3, timezone = DateUtils.TIME_ZONE_1)
     private Date updateTime;
     // 更新人
     @Column("update_by")

@@ -114,6 +114,9 @@ public class JwtUtils {
         if (StringUtils.isEmpty(token)) {
             throw new BusinessException(ResponseEnum.NULL_TOKEN);
         }
+        if (!token.startsWith(Consts.TOKEN_BEARER)) {
+            throw new BusinessException(ResponseEnum.ILLEGAL_TOKEN);
+        }
         String simpleToken = token.replace(Consts.TOKEN_BEARER, "");
         Claims claims = Jwts.parser()
                 .setSigningKey(getKey())

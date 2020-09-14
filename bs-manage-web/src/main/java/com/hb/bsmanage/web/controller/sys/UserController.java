@@ -5,11 +5,11 @@ import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.enums.TableEnum;
 import com.hb.bsmanage.web.common.BaseController;
 import com.hb.bsmanage.web.common.ResponseEnum;
-import com.hb.mybatis.model.PageResult;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.util.KeyUtils;
+import com.hb.unic.util.util.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -108,7 +108,7 @@ public class UserController extends BaseController {
      */
     @PostMapping("/findPages")
     public Result<Object> findPages(@RequestBody SysUserDO userDO) {
-        PageResult<SysUserDO> pageResult = iSysUserService.selectPages(userDO, "create_time desc",0, 10);
+        Pagination<SysUserDO> pageResult = iSysUserService.selectPages(userDO, "create_time desc",0, 10);
         return Result.of(ResponseEnum.SUCCESS, pageResult);
     }
 
