@@ -57,13 +57,12 @@ public class AccessController extends BaseController {
         Set<SysAccessDO> firstLevelAccesses = currentUserAccesses.stream().filter(predicate).collect(Collectors.toSet());
         Set<Menu> menuSet = new HashSet<>();
         firstLevelAccesses.forEach(access -> {
-            Set<Menu> children = findChildrenCycle(currentUserAccesses, access);
             Menu menu = Menu.builder().index(access.getAccessId())
                     .name(access.getAccessName())
                     .icon(access.getIcon())
                     .url(access.getUrl())
                     .parentIndex(access.getParentId())
-                    .children(children.size() > 0 ? children : null)
+                    .children(findChildrenCycle(currentUserAccesses, access))
                     .build();
             menuSet.add(menu);
         });
@@ -82,18 +81,17 @@ public class AccessController extends BaseController {
         Set<Menu> menuSet = new HashSet<>();
         allAccess.forEach(access -> {
             if (currentAccess.getAccessId().equals(access.getParentId())) {
-                Set<Menu> children = findChildrenCycle(allAccess, access);
                 Menu menu = Menu.builder().index(access.getAccessId())
                         .name(access.getAccessName())
                         .icon(access.getIcon())
                         .url(access.getUrl())
                         .parentIndex(access.getParentId())
-                        .children(children.size() > 0 ? children : null)
+                        .children(findChildrenCycle(allAccess, access))
                         .build();
                 menuSet.add(menu);
             }
         });
-        return menuSet;
+        return menuSet.size() > 0 ? menuSet : null;
     }
 
 }
