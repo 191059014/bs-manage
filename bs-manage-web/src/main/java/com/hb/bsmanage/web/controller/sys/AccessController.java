@@ -53,7 +53,7 @@ public class AccessController extends BaseController {
     public Result<MenuDataResponse> getPrivateMenuDatas() {
         MenuDataResponse response = new MenuDataResponse();
         List<SysAccessDO> currentUserAccesses = SecurityUtils.getCurrentUserAccesses();
-        Predicate<SysAccessDO> predicate = access -> (StringUtils.isBlank(access.getParentId()) || Consts.DEFAULT_V.equals(access.getParentId())) && AccessType.PAGE.getValue().equals(access.getAccessType());
+        Predicate<SysAccessDO> predicate = access -> StringUtils.isBlank(access.getParentId()) && AccessType.PAGE.getValue().equals(access.getAccessType());
         Set<SysAccessDO> firstLevelAccesses = currentUserAccesses.stream().filter(predicate).collect(Collectors.toSet());
         Set<Menu> menuSet = new HashSet<>();
         firstLevelAccesses.forEach(access -> {

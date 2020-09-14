@@ -27,8 +27,8 @@ public enum ResponseEnum {
      */
     ACCESS_DENY("BMW_SYS_P_001", "禁止访问"),
     NULL_TOKEN("BMW_SYS_P_002", "token为空"),
-    ILLEGAL_TOKEN("BMW_SYS_P_003", "非法的token"),
-    EXPIRE_TOKEN("BMW_SYS_P_004", "过期的token"),
+    ILLEGAL_TOKEN("BMW_SYS_P_002", "非法的token"),
+    EXPIRE_TOKEN("BMW_SYS_P_002", "过期的token"),
     USERNAME_EMPTY("BMW_SYS_P_005", "用户名为空"),
     PWD_EMPTY("BMW_SYS_P_006", "密码为空"),
     PWD_ERROR("BMW_SYS_P_007", "密码错误"),

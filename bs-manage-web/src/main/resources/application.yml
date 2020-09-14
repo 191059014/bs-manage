@@ -4,7 +4,7 @@ spring:
   application:
     name: bs-manage-web
   profiles:
-    active: test
+    active: dev
   main:
     allow-bean-definition-overriding: true
 simple:
