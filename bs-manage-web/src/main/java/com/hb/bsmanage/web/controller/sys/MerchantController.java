@@ -11,6 +11,7 @@ import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,7 +93,7 @@ public class MerchantController {
      * @param merchantId 商户ID
      * @return 结果
      */
-    @PostMapping("/delete")
+    @GetMapping("/delete")
     public Result delete(@RequestParam("merchantId") String merchantId) {
         if (StringUtils.isBlank(merchantId)) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
