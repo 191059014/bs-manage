@@ -86,6 +86,21 @@ public class MerchantController {
         return Result.of(ResponseEnum.SUCCESS);
     }
 
+    /**
+     * 删除商户
+     *
+     * @param merchantId 商户ID
+     * @return 结果
+     */
+    @PostMapping("/delete")
+    public Result delete(@RequestParam("merchantId") String merchantId) {
+        if (StringUtils.isBlank(merchantId)) {
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+        }
+        iSysMerchantService.logicDeleteByBk(merchantId);
+        return Result.of(ResponseEnum.SUCCESS);
+    }
+
 }
 
     
