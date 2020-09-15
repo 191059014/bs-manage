@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
 /**
@@ -74,17 +73,17 @@ public class UserDetailServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("无此用户：" + usernameOrMobile);
         }
         // 查询角色信息
-        List<SysUserRoleDO> userRoleList = iSysUserRoleService.selectList(Where.build().addSingle(QueryType.EQUAL, "user_id", user.getUserId()));
+        List<SysUserRoleDO> userRoleList = iSysUserRoleService.selectList(Where.build().add(QueryType.EQUAL, "user_id", user.getUserId()));
         // 查询权限信息
         List<SysAccessDO> accessList = null;
         List<SysRoleDO> roleList = null;
         if (CollectionUtils.isNotEmpty(userRoleList)) {
             Set<String> roleIdSet = userRoleList.stream().map(SysUserRoleDO::getRoleId).collect(Collectors.toSet());
-            roleList = iSysRoleService.selectList(Where.build().addSingle(QueryType.IN, "role_id", roleIdSet));
-            List<SysRoleAccessDO> roleAccessList = iSysRoleAccessService.selectList(Where.build().addSingle(QueryType.IN, "role_id", roleIdSet));
+            roleList = iSysRoleService.selectList(Where.build().add(QueryType.IN, "role_id", roleIdSet));
+            List<SysRoleAccessDO> roleAccessList = iSysRoleAccessService.selectList(Where.build().add(QueryType.IN, "role_id", roleIdSet));
             if (CollectionUtils.isNotEmpty(roleAccessList)) {
                 Set<String> accessIdSet = roleAccessList.stream().map(SysRoleAccessDO::getAccessId).collect(Collectors.toSet());
-                accessList = iSysAccessService.selectList(Where.build().addSingle(QueryType.IN, "access_id", accessIdSet));
+                accessList = iSysAccessService.selectList(Where.build().add(QueryType.IN, "access_id", accessIdSet));
             }
         }
         return new UserPrincipal(user, roleList, accessList);

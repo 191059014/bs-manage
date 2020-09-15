@@ -4,12 +4,12 @@ spring:
   application:
     name: bs-manage-web
   profiles:
-    active: test
+    active: dev
   main:
     allow-bean-definition-overriding: true
 simple:
   mybatis:
-    useRecordStatus: true # 开启数据库字段和实体类字段驼峰映射
+    useRecordStatus: true # 开启数据库逻辑删除字段
 unicLogger:
   httpFilter:
     urlPatterns: /bs/*,/app/* # traceId过滤器拦截路径

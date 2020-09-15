@@ -2,11 +2,14 @@ package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.api.ISysMerchantService;
 import com.hb.bsmanage.model.dobj.SysMerchantDO;
+import com.hb.bsmanage.model.enums.TableEnum;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +53,37 @@ public class MerchantController {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         return Result.of(ResponseEnum.SUCCESS, iSysMerchantService.selectPages(merchant, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize));
+    }
+
+    /**
+     * 添加商户
+     *
+     * @param merchant 查询条件
+     * @return 结果
+     */
+    @PostMapping("/add")
+    public Result add(@RequestBody SysMerchantDO merchant) {
+        if (StringUtils.isBlank(merchant.getMerchantName())) {
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+        }
+        merchant.setMerchantId(KeyUtils.getUniqueKey(TableEnum.MERCHANT_ID.getIdPrefix()));
+        iSysMerchantService.insert(merchant);
+        return Result.of(ResponseEnum.SUCCESS);
+    }
+
+    /**
+     * 修改商户
+     *
+     * @param merchant 查询条件
+     * @return 结果
+     */
+    @PostMapping("/update")
+    public Result update(@RequestBody SysMerchantDO merchant, @RequestParam("merchantId") String merchantId) {
+        if (StringUtils.isBlank(merchantId)) {
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+        }
+        iSysMerchantService.updateByBk(merchantId, merchant);
+        return Result.of(ResponseEnum.SUCCESS);
     }
 
 }

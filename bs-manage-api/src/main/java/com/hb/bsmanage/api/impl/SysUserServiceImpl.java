@@ -18,9 +18,11 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserDO, Integer, String
     @Override
     public SysUserDO findByUsernameOrMobile(String usernameOrMobile) {
         Where where = Where.build()
-                .addSingle(QueryType.EQUAL, "user_name", usernameOrMobile)
+                .leftBracket()
+                .add(QueryType.EQUAL, "user_name", usernameOrMobile)
                 .or()
-                .addSingle(QueryType.EQUAL, "mobile", usernameOrMobile);
+                .add(QueryType.EQUAL, "mobile", usernameOrMobile)
+                .rightBracket();
         return selectOne(where);
     }
 
