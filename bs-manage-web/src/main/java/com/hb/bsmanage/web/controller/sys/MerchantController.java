@@ -2,7 +2,7 @@ package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.api.ISysMerchantService;
 import com.hb.bsmanage.model.dobj.SysMerchantDO;
-import com.hb.bsmanage.model.enums.TableEnum;
+import com.hb.bsmanage.web.common.BaseController;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("bs/auth/merchant")
-public class MerchantController {
+public class MerchantController extends BaseController {
 
     /**
      * 日志
@@ -67,7 +67,7 @@ public class MerchantController {
         if (StringUtils.isBlank(merchant.getMerchantName())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
-        merchant.setMerchantId(KeyUtils.getUniqueKey(TableEnum.MERCHANT_ID.getIdPrefix()));
+        merchant.setMerchantId(KeyUtils.getTenantId());
         iSysMerchantService.insert(merchant);
         return Result.of(ResponseEnum.SUCCESS);
     }
