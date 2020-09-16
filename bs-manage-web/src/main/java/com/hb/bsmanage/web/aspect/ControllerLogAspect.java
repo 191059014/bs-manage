@@ -30,7 +30,7 @@ public class ControllerLogAspect {
      * @param joinPoint 参数
      * @return Object
      */
-    @Around(value = "execution(* com.hb.bsmanage.web.controller.*.*(..))")
+    @Around(value = "execution(* com.hb.bsmanage.web.controller..*.*(..))")
     public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
         Stopwatch stopwatch = Stopwatch.createStarted();
         Object[] args = joinPoint.getArgs();

@@ -33,7 +33,7 @@ public class SysMerchantDO extends CommonDO {
 
     @Override
     public String toString() {
-        return ToStringHelper.printJsonNoNull(this);
+        return ToStringHelper.printNoNull(this);
     }
 }
 
