@@ -30,12 +30,12 @@ CREATE TABLE `sys_role` (
   UNIQUE KEY `uniq_role_id` (`role_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色信息表';
 
-CREATE TABLE `sys_access` (
+CREATE TABLE `sys_permission` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `access_id` varchar(32) NOT NULL COMMENT '权限ID',
-  `access_name` varchar(32) NOT NULL COMMENT '权限名称',
-  `access_type` varchar(10) NOT NULL COMMENT '权限类型',
-  `access_value` varchar(32) NOT NULL COMMENT '权限值',
+  `permission_id` varchar(32) NOT NULL COMMENT '权限ID',
+  `permission_name` varchar(32) NOT NULL COMMENT '权限名称',
+  `resource_type` varchar(10) NOT NULL COMMENT '权限类型',
+  `value` varchar(32) NOT NULL DEFAULT '' COMMENT '权限值',
   `icon` varchar(64) NOT NULL DEFAULT '' COMMENT '图标',
   `url` varchar(255) NOT NULL DEFAULT '' COMMENT '链接',
   `create_by` varchar(32) NOT NULL DEFAULT '' COMMENT '创建人',
@@ -46,7 +46,7 @@ CREATE TABLE `sys_access` (
   `parent_id` varchar(32) NOT NULL DEFAULT '' COMMENT '父级ID',
   `tenant_id` varchar(32) NOT NULL DEFAULT '' COMMENT '多租户ID',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_access_id` (`access_id`) USING BTREE
+  UNIQUE KEY `uniq_permission_id` (`permission_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限信息表';
 
 CREATE TABLE `sys_user_role` (
@@ -63,10 +63,10 @@ CREATE TABLE `sys_user_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关系表';
 
-CREATE TABLE `sys_role_access` (
+CREATE TABLE `sys_role_permission` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `access_id` varchar(32) NOT NULL COMMENT '权限ID',
   `role_id` varchar(32) NOT NULL COMMENT '角色ID',
+  `permission_id` varchar(32) NOT NULL COMMENT '权限ID',
   `create_by` varchar(32) NOT NULL DEFAULT '' COMMENT '创建人',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(32) NOT NULL DEFAULT '' COMMENT '更新人',

@@ -54,7 +54,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
      * 权限service
      */
     @Autowired
-    private ISysAccessService iSysAccessService;
+    private ISysPermissionService iSysPermissionService;
 
     /**
      * 角色权限关系service
@@ -75,15 +75,15 @@ public class UserDetailServiceImpl implements UserDetailsService {
         // 查询角色信息
         List<SysUserRoleDO> userRoleList = iSysUserRoleService.selectList(Where.build().add(QueryType.EQUAL, "user_id", user.getUserId()));
         // 查询权限信息
-        List<SysAccessDO> accessList = null;
+        List<SysPermissionDO> accessList = null;
         List<SysRoleDO> roleList = null;
         if (CollectionUtils.isNotEmpty(userRoleList)) {
             Set<String> roleIdSet = userRoleList.stream().map(SysUserRoleDO::getRoleId).collect(Collectors.toSet());
             roleList = iSysRoleService.selectList(Where.build().add(QueryType.IN, "role_id", roleIdSet));
-            List<SysRoleAccessDO> roleAccessList = iSysRoleAccessService.selectList(Where.build().add(QueryType.IN, "role_id", roleIdSet));
+            List<SysRolePermissionDO> roleAccessList = iSysRoleAccessService.selectList(Where.build().add(QueryType.IN, "role_id", roleIdSet));
             if (CollectionUtils.isNotEmpty(roleAccessList)) {
-                Set<String> accessIdSet = roleAccessList.stream().map(SysRoleAccessDO::getAccessId).collect(Collectors.toSet());
-                accessList = iSysAccessService.selectList(Where.build().add(QueryType.IN, "access_id", accessIdSet));
+                Set<String> accessIdSet = roleAccessList.stream().map(SysRolePermissionDO::getPermissionId).collect(Collectors.toSet());
+                accessList = iSysPermissionService.selectList(Where.build().add(QueryType.IN, "permission_id", accessIdSet));
             }
         }
         return new UserPrincipal(user, roleList, accessList);

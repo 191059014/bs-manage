@@ -1,6 +1,6 @@
 package com.hb.bsmanage.api;
 
-import com.hb.bsmanage.model.dobj.SysRoleAccessDO;
+import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
 import com.hb.mybatis.base.IDmlMapper;
 
 /**
@@ -8,7 +8,7 @@ import com.hb.mybatis.base.IDmlMapper;
  *
  * @version v0.1, 2020/7/24 14:59, create by huangbiao.
  */
-public interface ISysRoleAccessService extends IDmlMapper<SysRoleAccessDO, Integer, String> {
+public interface ISysRoleAccessService extends IDmlMapper<SysRolePermissionDO, Integer, String> {
 
 
 }

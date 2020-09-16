@@ -1,7 +1,5 @@
 package com.hb.bsmanage.model.request;
 
-import com.hb.bsmanage.model.base.FixedDO;
-import com.hb.mybatis.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

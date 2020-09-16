@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.security.util;
 
-import com.hb.bsmanage.model.dobj.SysAccessDO;
+import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.web.security.model.UserPrincipal;
@@ -52,7 +52,7 @@ public class SecurityUtils {
      *
      * @return Set<SysRoleDO>
      */
-    public static List<SysAccessDO> getCurrentUserAccesses() {
+    public static List<SysPermissionDO> getCurrentUserAccesses() {
         UserPrincipal userPrincipal = getUserPrincipal();
         return userPrincipal.getAccesses();
     }

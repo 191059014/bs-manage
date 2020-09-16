@@ -1,7 +1,7 @@
 package com.hb.bsmanage.web.controller.sys;
 
-import com.hb.bsmanage.api.ISysAccessService;
-import com.hb.bsmanage.model.dobj.SysAccessDO;
+import com.hb.bsmanage.api.ISysPermissionService;
+import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.enums.AccessType;
 import com.hb.bsmanage.model.model.Menu;
 import com.hb.bsmanage.model.response.MenuDataResponse;
@@ -11,7 +11,6 @@ import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.util.constant.Consts;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +41,7 @@ public class AccessController extends BaseController {
      * 权限service
      */
     @Autowired
-    private ISysAccessService iSysAccessService;
+    private ISysPermissionService iSysPermissionService;
 
     /**
      * 获取私人的所有菜单信息
@@ -52,13 +51,13 @@ public class AccessController extends BaseController {
     @GetMapping("/getPrivateMenuDatas")
     public Result<MenuDataResponse> getPrivateMenuDatas() {
         MenuDataResponse response = new MenuDataResponse();
-        List<SysAccessDO> currentUserAccesses = SecurityUtils.getCurrentUserAccesses();
-        Predicate<SysAccessDO> predicate = access -> StringUtils.isBlank(access.getParentId()) && AccessType.PAGE.getValue().equals(access.getAccessType());
-        Set<SysAccessDO> firstLevelAccesses = currentUserAccesses.stream().filter(predicate).collect(Collectors.toSet());
+        List<SysPermissionDO> currentUserAccesses = SecurityUtils.getCurrentUserAccesses();
+        Predicate<SysPermissionDO> predicate = access -> StringUtils.isBlank(access.getParentId()) && AccessType.PAGE.getValue().equals(access.getResourceType());
+        Set<SysPermissionDO> firstLevelAccesses = currentUserAccesses.stream().filter(predicate).collect(Collectors.toSet());
         Set<Menu> menuSet = new HashSet<>();
         firstLevelAccesses.forEach(access -> {
-            Menu menu = Menu.builder().index(access.getAccessId())
-                    .name(access.getAccessName())
+            Menu menu = Menu.builder().index(access.getPermissionId())
+                    .name(access.getPermissionName())
                     .icon(access.getIcon())
                     .url(access.getUrl())
                     .parentIndex(access.getParentId())
@@ -77,12 +76,12 @@ public class AccessController extends BaseController {
      * @param currentAccess 当前权限信息
      * @return 菜单列表
      */
-    private Set<Menu> findChildrenCycle(List<SysAccessDO> allAccess, SysAccessDO currentAccess) {
+    private Set<Menu> findChildrenCycle(List<SysPermissionDO> allAccess, SysPermissionDO currentAccess) {
         Set<Menu> menuSet = new HashSet<>();
         allAccess.forEach(access -> {
-            if (currentAccess.getAccessId().equals(access.getParentId())) {
-                Menu menu = Menu.builder().index(access.getAccessId())
-                        .name(access.getAccessName())
+            if (currentAccess.getPermissionId().equals(access.getParentId())) {
+                Menu menu = Menu.builder().index(access.getPermissionId())
+                        .name(access.getPermissionName())
                         .icon(access.getIcon())
                         .url(access.getUrl())
                         .parentIndex(access.getParentId())

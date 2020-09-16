@@ -1,7 +1,7 @@
 package com.hb.bsmanage.api.impl;
 
 import com.hb.bsmanage.api.ISysRoleAccessService;
-import com.hb.bsmanage.model.dobj.SysRoleAccessDO;
+import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
 import com.hb.mybatis.base.DmlMapperImpl;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * @version v0.1, 2020/7/24 15:00, create by huangbiao.
  */
 @Service
-public class SysRoleAccessServiceImpl extends DmlMapperImpl<SysRoleAccessDO, Integer, String> implements ISysRoleAccessService {
+public class SysRoleAccessServiceImpl extends DmlMapperImpl<SysRolePermissionDO, Integer, String> implements ISysRoleAccessService {
 
 
 

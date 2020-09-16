@@ -1,6 +1,6 @@
 package com.hb.bsmanage.model.dobj;
 
-import com.hb.bsmanage.model.base.FixedDO;
+import com.hb.bsmanage.model.base.impl.CommonDO;
 import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("sys_user_role")
-public class SysUserRoleDO extends FixedDO {
+public class SysUserRoleDO extends CommonDO {
     // 序列化ID
     private static final long serialVersionUID = 3873773717231088322L;
     // 用户ID

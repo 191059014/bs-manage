@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.security.model;
 
-import com.hb.bsmanage.model.dobj.SysAccessDO;
+import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import lombok.Getter;
@@ -31,19 +31,19 @@ public class UserPrincipal implements UserDetails {
     private List<SysRoleDO> roles;
 
     // 权限信息
-    private List<SysAccessDO> accesses;
+    private List<SysPermissionDO> accesses;
 
     // 权限信息
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(SysUserDO sysUserDO, List<SysRoleDO> roles, List<SysAccessDO> accesses) {
+    public UserPrincipal(SysUserDO sysUserDO, List<SysRoleDO> roles, List<SysPermissionDO> permissions) {
         this.user = sysUserDO;
         this.roles = roles;
-        this.accesses = accesses;
-        if (accesses != null && !accesses.isEmpty()) {
-            this.authorities = accesses.stream()
-                    .filter(sysAccessDO -> StringUtils.isNotBlank(sysAccessDO.getAccessValue()))
-                    .map(sysAccessDO -> new SimpleGrantedAuthority(sysAccessDO.getAccessValue()))
+        this.accesses = permissions;
+        if (permissions != null && !permissions.isEmpty()) {
+            this.authorities = permissions.stream()
+                    .filter(sysPermission -> StringUtils.isNotBlank(sysPermission.getValue()))
+                    .map(sysPermission -> new SimpleGrantedAuthority(sysPermission.getValue()))
                     .collect(Collectors.toList());
         }
     }

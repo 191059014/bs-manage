@@ -1,7 +1,17 @@
 package com.hb.bsmanage.web.controller.common;
 
-import com.hb.bsmanage.api.*;
-import com.hb.bsmanage.model.dobj.*;
+import com.hb.bsmanage.api.ISysPermissionService;
+import com.hb.bsmanage.api.ISysMerchantService;
+import com.hb.bsmanage.api.ISysRoleAccessService;
+import com.hb.bsmanage.api.ISysRoleService;
+import com.hb.bsmanage.api.ISysUserRoleService;
+import com.hb.bsmanage.api.ISysUserService;
+import com.hb.bsmanage.model.dobj.SysMerchantDO;
+import com.hb.bsmanage.model.dobj.SysPermissionDO;
+import com.hb.bsmanage.model.dobj.SysRoleDO;
+import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
+import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.dobj.SysUserRoleDO;
 import com.hb.bsmanage.model.enums.AccessType;
 import com.hb.bsmanage.model.enums.TableEnum;
 import com.hb.bsmanage.web.common.ResponseEnum;
@@ -14,7 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 通用controller
@@ -58,7 +73,7 @@ public class ToolsController {
      * 权限
      */
     @Autowired
-    private ISysAccessService iSysAccessService;
+    private ISysPermissionService iSysPermissionService;
 
     /**
      * 角色权限关系
@@ -147,51 +162,51 @@ public class ToolsController {
         LOGGER.info("{}添加用户角色关系成功={}={}", baseLog, userRole.getUserId(), userRole.getRoleId());
         // 新增权限信息
 
-        SysAccessDO sysAccess = SysAccessDO.builder()
-                .accessId(KeyUtils.getUniqueKey(TableEnum.ACCESS_ID.getIdPrefix()))
-                .accessName("系统管理")
-                .accessType(AccessType.PAGE.getValue())
-                .accessValue("sys")
+        SysPermissionDO sysPermission = SysPermissionDO.builder()
+                .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
+                .permissionName("系统管理")
+                .resourceType(AccessType.PAGE.getValue())
+                .value("sys")
                 .url(null)
                 .icon("el-icon-setting")
                 .build();
-        sysAccess.setTenantId(merchant.getMerchantId());
-        iSysAccessService.insert(sysAccess);
-        LOGGER.info("{}添加系统管理菜单成功={}", baseLog, sysAccess.getAccessId());
+        sysPermission.setTenantId(merchant.getMerchantId());
+        iSysPermissionService.insert(sysPermission);
+        LOGGER.info("{}添加系统管理菜单成功={}", baseLog, sysPermission.getPermissionId());
         // 新增角色权限关系信息
-        SysRoleAccessDO sysRoleAccess = SysRoleAccessDO.builder()
+        SysRolePermissionDO sysRolePermission = SysRolePermissionDO.builder()
                 .roleId(role.getRoleId())
-                .accessId(sysAccess.getAccessId())
+                .permissionId(sysPermission.getPermissionId())
                 .build();
-        sysRoleAccess.setTenantId(merchant.getMerchantId());
-        iSysRoleAccessService.insert(sysRoleAccess);
-        LOGGER.info("{}添加系统管理菜单角色权限关系成功={}={}", baseLog, role.getRoleId(), sysRoleAccess.getAccessId());
+        sysRolePermission.setTenantId(merchant.getMerchantId());
+        iSysRoleAccessService.insert(sysRolePermission);
+        LOGGER.info("{}添加系统管理菜单角色权限关系成功={}={}", baseLog, role.getRoleId(), sysRolePermission.getPermissionId());
 
         String[] accessNameArr = new String[]{"商户管理", "用户管理", "角色管理", "权限管理"};
         String[] urlArr = new String[]{"/merchantManage", "/userManage", "/roleManage", "/accessManage"};
         String[] accessValueArr = new String[]{"sys_merchant", "sys_user", "sys_role", "sys_access"};
         String[] iconArr = new String[]{"el-icon-coin", "el-icon-s-custom", "el-icon-user", "el-icon-lock"};
         for (int i = 0; i < 4; i++) {
-            SysAccessDO access = SysAccessDO.builder()
-                    .accessId(KeyUtils.getUniqueKey(TableEnum.ACCESS_ID.getIdPrefix()))
-                    .accessName(accessNameArr[i])
-                    .accessType(AccessType.PAGE.getValue())
-                    .accessValue(accessValueArr[i])
+            SysPermissionDO permission = SysPermissionDO.builder()
+                    .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
+                    .permissionName(accessNameArr[i])
+                    .resourceType(AccessType.PAGE.getValue())
+                    .value(accessValueArr[i])
                     .url(urlArr[i])
                     .icon(iconArr[i])
                     .build();
-            access.setTenantId(merchant.getMerchantId());
-            access.setParentId(sysAccess.getAccessId());
-            iSysAccessService.insert(access);
-            LOGGER.info("{}添加权限成功={}", baseLog, access.getAccessId());
+            permission.setTenantId(merchant.getMerchantId());
+            permission.setParentId(sysPermission.getPermissionId());
+            iSysPermissionService.insert(permission);
+            LOGGER.info("{}添加权限成功={}", baseLog, permission.getPermissionId());
             // 新增角色权限关系信息
-            SysRoleAccessDO roleAccess = SysRoleAccessDO.builder()
+            SysRolePermissionDO rolePermission = SysRolePermissionDO.builder()
                     .roleId(role.getRoleId())
-                    .accessId(access.getAccessId())
+                    .permissionId(permission.getPermissionId())
                     .build();
-            roleAccess.setTenantId(merchant.getMerchantId());
-            iSysRoleAccessService.insert(roleAccess);
-            LOGGER.info("{}添加角色权限关系成功={}={}", baseLog, role.getRoleId(), access.getAccessId());
+            rolePermission.setTenantId(merchant.getMerchantId());
+            iSysRoleAccessService.insert(rolePermission);
+            LOGGER.info("{}添加角色权限关系成功={}={}", baseLog, role.getRoleId(), permission.getPermissionId());
         }
         return Result.of(ResponseEnum.SUCCESS);
     }
