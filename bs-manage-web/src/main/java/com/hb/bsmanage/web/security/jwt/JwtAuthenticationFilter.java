@@ -1,7 +1,10 @@
 package com.hb.bsmanage.web.security.jwt;
 
+import com.hb.bsmanage.model.common.Consts;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.security.config.SecurityProperties;
+import com.hb.bsmanage.web.security.model.RbacContext;
+import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.base.util.ServletUtils;
@@ -10,11 +13,7 @@ import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.logger.util.LogExceptionWapper;
 import com.hb.unic.util.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -34,12 +33,12 @@ import java.util.Set;
  * @version v0.1, JWTAuthenticationFilter.java, 2020/6/18 13:23, create by huangbiao.
  */
 @Component
-public class JWTAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * 日志
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     /**
      * 用户service
@@ -60,7 +59,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String baseLog = "[JWTAuthenticationFilter-doFilterInternal-jwt认证过滤器]";
+        String baseLog = "[JwtAuthenticationFilter-doFilterInternal-jwt认证过滤器]";
+        if ("options".equals(request.getMethod())) {
+            chain.doFilter(request, response);
+            return;
+        }
         if (checkIgnores(request)) {
             LOGGER.info("{}无需拦截[{}]，放行", baseLog, request.getRequestURI());
             //放行
@@ -68,12 +71,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         try {
-            String jwt = JwtUtils.getJwtFromRequest(request);
-            String username = JwtUtils.getUsernameFromJWT(jwt);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // 解析jwt
+            RbacContext rbacContext = JwtUtils.parseJwtToken(request.getHeader(Consts.TOKEN));
+            // 将rbac信息放入上下文
+            SecurityUtils.setRbacContext(rbacContext);
         } catch (BusinessException e) {
             LOGGER.info("{}业务异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
             ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(e.getKey(), e.getMessage())));

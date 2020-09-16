@@ -31,7 +31,7 @@ public class UserPrincipal implements UserDetails {
     private List<SysRoleDO> roles;
 
     // 权限信息
-    private List<SysPermissionDO> accesses;
+    private List<SysPermissionDO> permissions;
 
     // 权限信息
     private Collection<? extends GrantedAuthority> authorities;
@@ -39,7 +39,7 @@ public class UserPrincipal implements UserDetails {
     public UserPrincipal(SysUserDO sysUserDO, List<SysRoleDO> roles, List<SysPermissionDO> permissions) {
         this.user = sysUserDO;
         this.roles = roles;
-        this.accesses = permissions;
+        this.permissions = permissions;
         if (permissions != null && !permissions.isEmpty()) {
             this.authorities = permissions.stream()
                     .filter(sysPermission -> StringUtils.isNotBlank(sysPermission.getValue()))

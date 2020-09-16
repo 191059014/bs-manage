@@ -1,24 +1,30 @@
 package com.hb.bsmanage.web.security.jwt;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.hb.bsmanage.model.common.Consts;
+import com.hb.bsmanage.model.dobj.SysPermissionDO;
+import com.hb.bsmanage.model.dobj.SysRoleDO;
+import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.web.common.RedisKeyFactory;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.common.ToolsWapper;
+import com.hb.bsmanage.web.security.model.RbacContext;
 import com.hb.unic.base.GlobalProperties;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.util.CloneUtils;
+import com.hb.unic.util.util.JsonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * JWT工具类
@@ -32,6 +38,11 @@ public class JwtUtils {
      * 日志
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtUtils.class);
+
+    /**
+     * 用户
+     */
+    private static final String USER = "user";
 
     /**
      * 角色
@@ -67,25 +78,26 @@ public class JwtUtils {
     /**
      * 生成jwt（也可以和redis一起使用，将token放到redis里面）
      *
-     * @param userId      用户表主键
-     * @param username    用户标识
-     * @param roles       角色
-     * @param authorities 权限
+     * @param user        用户信息
+     * @param roles       角色列表
+     * @param permissions 权限列表
      * @return jwt令牌
      */
-    public static String createToken(String userId, String username, List<String> roles, Collection<? extends GrantedAuthority> authorities, boolean rememberMe) {
-        if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(username)) {
+    public static String createToken(SysUserDO user, List<SysRoleDO> roles, List<SysPermissionDO> permissions, boolean rememberMe) {
+        if (user == null) {
             return null;
         }
         JwtBuilder jwtBuilder = Jwts.builder()
-                // 设置用户标识
-                .setId(userId)
+                // 设置jwt的id,防止jwt被重新发送
+                .setId(UUID.randomUUID().toString())
                 // jwt所面向的用户
-                .setSubject(username)
+                .setSubject(user.getUserName())
+                // 设置用户
+                .claim(USER, user)
                 // 设置角色
                 .claim(ROLES, roles)
                 // 设置权限
-                .claim(AUTHORITIES, authorities)
+                .claim(AUTHORITIES, permissions)
                 // 设置签发日期
                 .setIssuedAt(new Date())
                 // 签名方式
@@ -96,7 +108,7 @@ public class JwtUtils {
         jwtBuilder.setExpiration(new Date(System.currentTimeMillis() + expireTime));
         String token = jwtBuilder.compact();
         // 将token放进redis缓存
-        String jwtKey = RedisKeyFactory.getJwtKey(username);
+        String jwtKey = RedisKeyFactory.getJwtKey(user.getUserId());
         LOGGER.info("将token放进redis缓存={}", jwtKey);
         ToolsWapper.redis().set(jwtKey, token, expireTime);
 
@@ -108,64 +120,53 @@ public class JwtUtils {
      * 校验token（也可以和redis一起使用，看redis里是否包含token缓存）
      *
      * @param token jwt令牌
-     * @return Claims
+     * @return JwtInfo
      */
-    public static Claims parseToken(String token) {
+    public static RbacContext parseJwtToken(String token) {
+        // 校验token是否为空
         if (StringUtils.isEmpty(token)) {
             throw new BusinessException(ResponseEnum.NULL_TOKEN);
         }
+        // 校验token是否以Bearer 开头
         if (!token.startsWith(Consts.TOKEN_BEARER)) {
             throw new BusinessException(ResponseEnum.ILLEGAL_TOKEN);
         }
+        // 替换token中的Bearer
         String simpleToken = token.replace(Consts.TOKEN_BEARER, "");
+        // 解析token
         Claims claims = Jwts.parser()
                 .setSigningKey(getKey())
                 .parseClaimsJws(simpleToken)
                 .getBody();
 
-        // 从redis缓存中拿到token，验证token合法性
-        String jwtKey = RedisKeyFactory.getJwtKey(claims.getSubject());
+        // 获取用户信息
+        SysUserDO user = JsonUtils.toBean(JsonUtils.toJson(claims.get(USER)), SysUserDO.class);
+        // 从redis缓存中拿到token
+        String jwtKey = RedisKeyFactory.getJwtKey(user.getUserId());
         String redisToken = ToolsWapper.redis().get(jwtKey);
+        // 校验redis中的token是否过期
         if (redisToken == null) {
             throw new BusinessException(ResponseEnum.EXPIRE_TOKEN);
         }
+        // 校验浏览器传过来的token和缓存中的token是否相等
         if (!simpleToken.equals(redisToken)) {
             throw new BusinessException(ResponseEnum.ILLEGAL_TOKEN);
         }
-        return claims;
-    }
-
-    /**
-     * 从request里面获取jwt令牌
-     *
-     * @param request 请求
-     * @return jwt令牌
-     */
-    public static String getJwtFromRequest(HttpServletRequest request) {
-        return request.getHeader(Consts.TOKEN);
-    }
-
-    /**
-     * 根据 jwt 获取用户名
-     *
-     * @param jwt JWT
-     * @return 用户名
-     */
-    public static String getUsernameFromJWT(String jwt) {
-        Claims claims = parseToken(jwt);
-        return claims == null ? null : claims.getSubject();
+        List<SysRoleDO> roles = JsonUtils.toType(JsonUtils.toJson(claims.get(ROLES)), new TypeReference<List<SysRoleDO>>() {
+        });
+        List<SysPermissionDO> permissions = JsonUtils.toType(JsonUtils.toJson(claims.get(AUTHORITIES)), new TypeReference<List<SysPermissionDO>>() {
+        });
+        return RbacContext.builder().user(user).roles(roles).permissions(permissions).build();
     }
 
     /**
      * 设置JWT过期
      *
-     * @param request 请求
+     * @param userId 用户ID
      */
-    public static void invalidateJWT(HttpServletRequest request) {
-        String jwt = getJwtFromRequest(request);
-        String username = getUsernameFromJWT(jwt);
+    public static void deleteJwt(String userId) {
         // 从redis中清除JWT
-        ToolsWapper.redis().delete(RedisKeyFactory.getJwtKey(username));
+        ToolsWapper.redis().delete(RedisKeyFactory.getJwtKey(userId));
     }
 
 }

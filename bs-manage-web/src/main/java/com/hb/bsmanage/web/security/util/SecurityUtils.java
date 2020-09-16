@@ -3,10 +3,7 @@ package com.hb.bsmanage.web.security.util;
 import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
-import com.hb.bsmanage.web.security.model.UserPrincipal;
-import com.hb.unic.util.tool.Assert;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.hb.bsmanage.web.security.model.RbacContext;
 
 import java.util.List;
 
@@ -19,22 +16,26 @@ import java.util.List;
 public class SecurityUtils {
 
     /**
+     * rbac信息绑定当前线程
+     */
+    private static ThreadLocal<RbacContext> RC = new InheritableThreadLocal<>();
+
+    /**
+     * 设置当前线程绑定的rbac信息
+     *
+     * @param rbacContext rbac信息
+     */
+    public static void setRbacContext(RbacContext rbacContext) {
+        RC.set(rbacContext);
+    }
+
+    /**
      * 获取当前用户信息
      *
      * @return SysUserDO
      */
     public static SysUserDO getCurrentUser() {
-        UserPrincipal userPrincipal = getUserPrincipal();
-        return userPrincipal.getUser();
-    }
-
-    /**
-     * 获取当前用户的多租户ID
-     *
-     * @return 多租户ID
-     */
-    public static String getCurrentUserTenantId() {
-        return getCurrentUser().getTenantId();
+        return RC.get() == null ? null : RC.get().getUser();
     }
 
     /**
@@ -43,8 +44,7 @@ public class SecurityUtils {
      * @return Set<SysRoleDO>
      */
     public static List<SysRoleDO> getCurrentUserRoles() {
-        UserPrincipal userPrincipal = getUserPrincipal();
-        return userPrincipal.getRoles();
+        return RC.get() == null ? null : RC.get().getRoles();
     }
 
     /**
@@ -52,21 +52,8 @@ public class SecurityUtils {
      *
      * @return Set<SysRoleDO>
      */
-    public static List<SysPermissionDO> getCurrentUserAccesses() {
-        UserPrincipal userPrincipal = getUserPrincipal();
-        return userPrincipal.getAccesses();
-    }
-
-    /**
-     * 获取UserPrincipal信息
-     *
-     * @return UserPrincipal
-     */
-    private static UserPrincipal getUserPrincipal() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        Assert.notNull(principal, "从Security上下文获取Principal信息为空");
-        return (UserPrincipal) principal;
+    public static List<SysPermissionDO> getCurrentUserPermissions() {
+        return RC.get() == null ? null : RC.get().getPermissions();
     }
 
 }

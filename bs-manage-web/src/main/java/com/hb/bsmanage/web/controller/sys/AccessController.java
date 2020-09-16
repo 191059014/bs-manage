@@ -51,7 +51,7 @@ public class AccessController extends BaseController {
     @GetMapping("/getPrivateMenuDatas")
     public Result<MenuDataResponse> getPrivateMenuDatas() {
         MenuDataResponse response = new MenuDataResponse();
-        List<SysPermissionDO> currentUserAccesses = SecurityUtils.getCurrentUserAccesses();
+        List<SysPermissionDO> currentUserAccesses = SecurityUtils.getCurrentUserPermissions();
         Predicate<SysPermissionDO> predicate = access -> StringUtils.isBlank(access.getParentId()) && AccessType.PAGE.getValue().equals(access.getResourceType());
         Set<SysPermissionDO> firstLevelAccesses = currentUserAccesses.stream().filter(predicate).collect(Collectors.toSet());
         Set<Menu> menuSet = new HashSet<>();

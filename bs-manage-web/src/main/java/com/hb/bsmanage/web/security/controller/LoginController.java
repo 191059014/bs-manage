@@ -1,5 +1,6 @@
 package com.hb.bsmanage.web.security.controller;
 
+import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.request.LoginRequest;
@@ -8,27 +9,21 @@ import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.security.jwt.JwtUtils;
 import com.hb.bsmanage.web.security.model.UserPrincipal;
 import com.hb.unic.base.common.Result;
-import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.logger.util.LogExceptionWapper;
-import com.hb.unic.util.util.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 登陆
@@ -63,12 +58,14 @@ public class LoginController extends BaseController {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         try {
+            // 登陆认证
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getUsernameOrMobile(), req.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // 从认证信息中获取用户信息
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             SysUserDO sysUser = userPrincipal.getUser();
             List<SysRoleDO> roles = userPrincipal.getRoles();
-            String jwt = JwtUtils.createToken(sysUser.getUserId(), sysUser.getUserName(), roles == null ? null : roles.stream().map(SysRoleDO::getRoleId).collect(Collectors.toList()), userPrincipal.getAuthorities(), req.isRememberMe());
+            List<SysPermissionDO> permissions = userPrincipal.getPermissions();
+            String jwt = JwtUtils.createToken(sysUser, roles, permissions, req.isRememberMe());
             return Result.of(ResponseEnum.SUCCESS, jwt);
         } catch (BadCredentialsException e) {
             if (LOGGER.isErrorEnabled()) {

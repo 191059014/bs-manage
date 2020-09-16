@@ -125,7 +125,7 @@ public class ToolsController {
      */
     @GetMapping("/addHighestSys")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result addHighestSys() {
+    public Result addHighestSys() throws Exception {
         String baseLog = "[ToolsController-addAdmin-添加最高级别系统用户信息]";
         // 新增商户
         SysMerchantDO merchant = SysMerchantDO.builder()
@@ -207,6 +207,7 @@ public class ToolsController {
             rolePermission.setTenantId(merchant.getMerchantId());
             iSysRoleAccessService.insert(rolePermission);
             LOGGER.info("{}添加角色权限关系成功={}={}", baseLog, role.getRoleId(), permission.getPermissionId());
+            Thread.sleep(1000);
         }
         return Result.of(ResponseEnum.SUCCESS);
     }
