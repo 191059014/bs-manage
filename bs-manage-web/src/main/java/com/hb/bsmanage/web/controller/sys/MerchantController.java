@@ -70,7 +70,7 @@ public class MerchantController extends BaseController {
         }
         if (currentUserMerchant.getParentId() != null) {
             // 非最高系统管理员，只能查询下级
-            where.and().add(QueryType.LIKE, "parent_id_path", BsWebUtils.getParentIdPath(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
+            where.and().add(QueryType.LIKE, "parent_id_path", BsWebUtils.getSubParentIdPathPrefix(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
         }
         pagination = iSysMerchantService.selectPages(where, "create_time desc", startRow, pageSize);
         return Result.of(ResponseEnum.SUCCESS, pagination);
@@ -88,7 +88,7 @@ public class MerchantController extends BaseController {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         SysMerchantDO currentUserMerchant = iSysMerchantService.selectByBk(SecurityUtils.getCurrentUserTenantId());
-        merchant.setParentIdPath(BsWebUtils.getParentIdPath(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
+        merchant.setParentIdPath(BsWebUtils.getCurrentParentIdPath(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
         merchant.setParentId(currentUserMerchant.getMerchantId());
         merchant.setMerchantId(KeyUtils.getTenantId());
         merchant.setCreateBy(SecurityUtils.getCurrentUserId());

@@ -3,6 +3,10 @@ package com.hb.bsmanage.api;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.mybatis.base.IDmlMapper;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * 用户service接口
  *
@@ -17,5 +21,21 @@ public interface ISysUserService extends IDmlMapper<SysUserDO, Integer, String> 
      * @return 用户信息
      */
     SysUserDO findByUsernameOrMobile(String usernameOrMobile);
+
+    /**
+     * 通过用户ID集合查询用户信息
+     *
+     * @param userIdSet 用户ID集合
+     * @return 用户信息集合
+     */
+    List<SysUserDO> getUserListByUserIdSet(Set<String> userIdSet);
+
+    /**
+     * 通过用户ID集合查询用户信息
+     *
+     * @param userIdSet 用户ID集合
+     * @return 用户信息集合
+     */
+    Map<String, SysUserDO> getUserMapByUserIdSet(Set<String> userIdSet);
 
 }

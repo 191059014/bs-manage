@@ -17,14 +17,25 @@ public class BsWebUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(BsWebUtils.class);
 
     /**
-     * 获取parentIdPath
+     * 获取当前parentIdPath
      *
      * @param parentIdPathOfParent 父级的parentIdPath
      * @param idOfParent           父级的id
      * @return parentIdPath
      */
-    public static String getParentIdPath(Object parentIdPathOfParent, Object idOfParent) {
+    public static String getCurrentParentIdPath(Object parentIdPathOfParent, Object idOfParent) {
         return StrUtils.joint(parentIdPathOfParent, Consts.DOT, idOfParent);
+    }
+
+    /**
+     * 获取子级parentIdPath的前缀
+     *
+     * @param parentIdPathOfCurrent 当前的parentIdPath
+     * @param idOfCurrent           当前的id
+     * @return parentIdPath
+     */
+    public static String getSubParentIdPathPrefix(Object parentIdPathOfCurrent, Object idOfCurrent) {
+        return StrUtils.joint(parentIdPathOfCurrent, Consts.DOT, idOfCurrent, Consts.DOT);
     }
 
 }

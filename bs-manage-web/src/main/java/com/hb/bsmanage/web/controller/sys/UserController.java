@@ -16,17 +16,18 @@ import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.easybuild.MapBuilder;
 import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 用户controller
@@ -71,9 +72,27 @@ public class UserController extends BaseController {
         SysUserDO currentUser = SecurityUtils.getCurrentUser();
         if (currentUser.getParentId() != null) {
             // 非最高系统管理员，只能查询下级
-            where.and().add(QueryType.LIKE, "parent_id_path", BsWebUtils.getParentIdPath(currentUser.getParentIdPath(), currentUser.getId()));
+            where.and().add(QueryType.LIKE, "parent_id_path", BsWebUtils.getSubParentIdPathPrefix(currentUser.getParentIdPath(), currentUser.getId()));
         }
         Pagination<SysUserDO> pageResult = iSysUserService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
+
+        List<SysUserDO> userList = pageResult.getData();
+        if (CollectionUtils.isNotEmpty(userList)) {
+            Set<String> userIdSet = new HashSet<>();
+            userList.forEach(userDO -> {
+                userIdSet.add(userDO.getCreateBy());
+                userIdSet.add(userDO.getUpdateBy());
+            });
+            if (CollectionUtils.isNotEmpty(userIdSet)) {
+                Map<String, SysUserDO> map = iSysUserService.getUserMapByUserIdSet(userIdSet);
+                userList.forEach(userDO -> {
+                    SysUserDO createBy = map.get(userDO.getCreateBy());
+                    userDO.setCreateBy(createBy == null ? null : createBy.getUserName());
+                    SysUserDO updateBy = map.get(userDO.getUpdateBy());
+                    userDO.setUpdateBy(updateBy == null ? null : updateBy.getUserName());
+                });
+            }
+        }
         return Result.of(ResponseEnum.SUCCESS, pageResult);
     }
 
@@ -91,7 +110,7 @@ public class UserController extends BaseController {
         user.setUserId(KeyUtils.getUniqueKey(TableEnum.USER_ID.getIdPrefix()));
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         SysUserDO currentUser = SecurityUtils.getCurrentUser();
-        user.setParentIdPath(BsWebUtils.getParentIdPath(currentUser.getParentIdPath(), currentUser.getId()));
+        user.setParentIdPath(BsWebUtils.getCurrentParentIdPath(currentUser.getParentIdPath(), currentUser.getId()));
         user.setParentId(currentUser.getUserId());
         user.setTenantId(currentUser.getTenantId());
         user.setCreateBy(currentUser.getUserId());
