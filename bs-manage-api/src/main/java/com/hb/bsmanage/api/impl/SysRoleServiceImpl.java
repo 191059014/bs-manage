@@ -3,7 +3,13 @@ package com.hb.bsmanage.api.impl;
 import com.hb.bsmanage.api.ISysRoleService;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.mybatis.base.DmlMapperImpl;
+import com.hb.mybatis.enums.QueryType;
+import com.hb.mybatis.helper.Where;
+import com.hb.unic.base.annotation.InOutLog;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * 角色service实现类
@@ -13,7 +19,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SysRoleServiceImpl extends DmlMapperImpl<SysRoleDO, Integer, String> implements ISysRoleService {
 
-
+    @Override
+    @InOutLog("通过角色ID集合查询角色信息集合")
+    public List<SysRoleDO> getRoleListByRoleIdSet(Set<String> roleIdSet) {
+        return selectList(Where.build().add(QueryType.IN, "role_id", roleIdSet));
+    }
 
 }
 

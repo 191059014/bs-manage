@@ -1,10 +1,7 @@
 package com.hb.bsmanage.web.security.model;
 
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysRoleDO;
-import com.hb.bsmanage.model.dobj.SysUserDO;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,25 +22,20 @@ public class UserPrincipal implements UserDetails {
     private static final long serialVersionUID = -7620486743149052764L;
 
     // 用户信息
-    private SysUserDO user;
+    private String userName;
 
-    // 角色信息
-    private List<SysRoleDO> roles;
-
-    // 权限信息
-    private List<SysPermissionDO> permissions;
+    // 密码
+    private String password;
 
     // 权限信息
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(SysUserDO sysUserDO, List<SysRoleDO> roles, List<SysPermissionDO> permissions) {
-        this.user = sysUserDO;
-        this.roles = roles;
-        this.permissions = permissions;
-        if (permissions != null && !permissions.isEmpty()) {
+    public UserPrincipal(String userName, String password, List<String> permissions) {
+        this.userName = userName;
+        this.password = password;
+        if (CollectionUtils.isNotEmpty(permissions)) {
             this.authorities = permissions.stream()
-                    .filter(sysPermission -> StringUtils.isNotBlank(sysPermission.getValue()))
-                    .map(sysPermission -> new SimpleGrantedAuthority(sysPermission.getValue()))
+                    .map(permission -> new SimpleGrantedAuthority(permission))
                     .collect(Collectors.toList());
         }
     }
@@ -55,12 +47,12 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return this.user.getUserName();
+        return userName;
     }
 
     @Override

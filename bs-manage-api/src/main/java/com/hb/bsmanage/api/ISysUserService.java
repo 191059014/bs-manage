@@ -11,7 +11,7 @@ import com.hb.mybatis.base.IDmlMapper;
 public interface ISysUserService extends IDmlMapper<SysUserDO, Integer, String> {
 
     /**
-     * 通过用户ID或者手机号查询
+     * 通过用户ID或者手机号查询用户
      *
      * @param usernameOrMobile 用户ID或者手机号查询
      * @return 用户信息

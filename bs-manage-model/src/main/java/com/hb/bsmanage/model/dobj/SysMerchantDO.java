@@ -22,14 +22,21 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table("sys_merchant")
 public class SysMerchantDO extends CommonDO {
+
     // serialVersionUID
     private static final long serialVersionUID = 5538623345484936541L;
+
     // 商户标识
     @Column(value = "merchant_id", isBk = true)
     private String merchantId;
+
     // 商户名
     @Column("merchant_name")
     private String merchantName;
+
+    // 父级ID路径
+    @Column("parent_id_path")
+    private String parentIdPath;
 
     @Override
     public String toString() {

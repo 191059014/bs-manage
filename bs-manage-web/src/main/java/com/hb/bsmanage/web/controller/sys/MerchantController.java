@@ -2,8 +2,11 @@ package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.api.ISysMerchantService;
 import com.hb.bsmanage.model.dobj.SysMerchantDO;
+import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.web.common.BaseController;
+import com.hb.bsmanage.web.common.BsWebUtils;
 import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -67,6 +70,9 @@ public class MerchantController extends BaseController {
         if (StringUtils.isBlank(merchant.getMerchantName())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
+        SysUserDO currentUser = SecurityUtils.getCurrentUser();
+        SysMerchantDO currentUserMerchant = iSysMerchantService.selectByBk(currentUser.getTenantId());
+        merchant.setParentIdPath(BsWebUtils.getParentIdPath(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
         merchant.setMerchantId(KeyUtils.getTenantId());
         iSysMerchantService.insert(merchant);
         return Result.of(ResponseEnum.SUCCESS);

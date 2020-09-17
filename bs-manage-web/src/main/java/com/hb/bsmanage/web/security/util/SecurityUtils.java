@@ -5,6 +5,7 @@ import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.web.security.model.RbacContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public class SecurityUtils {
      * @return SysUserDO
      */
     public static SysUserDO getCurrentUser() {
-        return RC.get() == null ? null : RC.get().getUser();
+        return RC.get() == null ? new SysUserDO() : RC.get().getUser();
     }
 
     /**
@@ -44,7 +45,7 @@ public class SecurityUtils {
      * @return Set<SysRoleDO>
      */
     public static List<SysRoleDO> getCurrentUserRoles() {
-        return RC.get() == null ? null : RC.get().getRoles();
+        return RC.get() == null ? new ArrayList<>() : RC.get().getRoles();
     }
 
     /**
@@ -53,7 +54,7 @@ public class SecurityUtils {
      * @return Set<SysRoleDO>
      */
     public static List<SysPermissionDO> getCurrentUserPermissions() {
-        return RC.get() == null ? null : RC.get().getPermissions();
+        return RC.get() == null ? new ArrayList<>() : RC.get().getPermissions();
     }
 
 }

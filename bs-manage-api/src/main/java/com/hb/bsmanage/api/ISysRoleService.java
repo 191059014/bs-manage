@@ -3,6 +3,9 @@ package com.hb.bsmanage.api;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.mybatis.base.IDmlMapper;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * 角色service接口
  *
@@ -10,6 +13,12 @@ import com.hb.mybatis.base.IDmlMapper;
  */
 public interface ISysRoleService extends IDmlMapper<SysRoleDO, Integer, String> {
 
-
+    /**
+     * 通过角色ID集合查询角色信息集合
+     *
+     * @param roleIdSet 角色ID集合
+     * @return 角色信息集合
+     */
+    List<SysRoleDO> getRoleListByRoleIdSet(Set<String> roleIdSet);
 
 }

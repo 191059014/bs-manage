@@ -81,6 +81,7 @@ CREATE TABLE `sys_merchant` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `merchant_id` varchar(32) NOT NULL COMMENT '商户ID',
   `merchant_name` varchar(256) NOT NULL COMMENT '商户名称',
+  `parent_id_path` varchar(1024) NOT NULL DEFAULT '' COMMENT '父级id路径',
   `create_by` varchar(32) NOT NULL DEFAULT '' COMMENT '创建人',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(32) NOT NULL DEFAULT '' COMMENT '更新人',
