@@ -22,20 +22,29 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table("sys_user")
 public class SysUserDO extends CommonDO {
+
     // serialVersionUID
     private static final long serialVersionUID = -2355680884700265496L;
+
     // 用户标识
     @Column(value = "user_id", isBk = true)
     private String userId;
+
     // 用户名
     @Column("user_name")
     private String userName;
+
     // 密码
     @Column("password")
     private String password;
+
     // 手机号
     @Column("mobile")
     private String mobile;
+
+    // 父级ID路径
+    @Column("parent_id_path")
+    private String parentIdPath;
 
     @Override
     public String toString() {

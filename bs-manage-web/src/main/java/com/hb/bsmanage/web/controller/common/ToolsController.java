@@ -131,9 +131,8 @@ public class ToolsController {
         SysMerchantDO merchant = SysMerchantDO.builder()
                 .merchantId(KeyUtils.getTenantId())
                 .merchantName("一级商户")
+                .parentIdPath("0")
                 .build();
-        merchant.setParentIdPath("0");
-        merchant.setTenantId(merchant.getMerchantId());
         iSysMerchantService.insert(merchant);
         LOGGER.info("{}添加商户成功={}", baseLog, merchant.getMerchantId());
         // 新增系统管理员用户
@@ -142,6 +141,7 @@ public class ToolsController {
                 .userName("admin")
                 .password(new BCryptPasswordEncoder().encode("123456"))
                 .mobile("12345678900")
+                .parentIdPath("0")
                 .build();
         user.setTenantId(merchant.getMerchantId());
         iSysUserService.insert(user);

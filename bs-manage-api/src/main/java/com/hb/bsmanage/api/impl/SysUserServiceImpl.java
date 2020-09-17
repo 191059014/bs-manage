@@ -20,6 +20,7 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserDO, Integer, String
     @InOutLog("通过用户ID或者手机号查询用户")
     public SysUserDO findByUsernameOrMobile(String usernameOrMobile) {
         Where where = Where.build()
+                .and()
                 .leftBracket()
                 .add(QueryType.EQUAL, "user_name", usernameOrMobile)
                 .or()

@@ -22,7 +22,7 @@ public class SysRoleServiceImpl extends DmlMapperImpl<SysRoleDO, Integer, String
     @Override
     @InOutLog("通过角色ID集合查询角色信息集合")
     public List<SysRoleDO> getRoleListByRoleIdSet(Set<String> roleIdSet) {
-        return selectList(Where.build().add(QueryType.IN, "role_id", roleIdSet));
+        return selectList(Where.build().and().add(QueryType.IN, "role_id", roleIdSet));
     }
 
 }

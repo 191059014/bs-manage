@@ -32,7 +32,7 @@ public class SysUserRoleServiceImpl extends DmlMapperImpl<SysUserRoleDO, Integer
     @InOutLog("通过用户ID查询角色ID集合")
     public Set<String> getRoleIdSetByUserId(String userId) {
         // 查询用户角色关联信息
-        List<SysUserRoleDO> userRoleList = selectList(Where.build().add(QueryType.EQUAL, "user_id", userId));
+        List<SysUserRoleDO> userRoleList = selectList(Where.build().and().add(QueryType.EQUAL, "user_id", userId));
         if (CollectionUtils.isEmpty(userRoleList)) {
             return null;
         }

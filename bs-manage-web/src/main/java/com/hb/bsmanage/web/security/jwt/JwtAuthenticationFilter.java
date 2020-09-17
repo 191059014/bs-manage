@@ -81,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         } catch (Exception e) {
             LOGGER.info("{}系统异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
-            ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.ERROR)));
+            ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.FAIL.getCode(), "token认证失败")));
             return;
         }
         //放行

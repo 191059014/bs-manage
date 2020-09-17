@@ -24,7 +24,7 @@ public class SysRoleAccessServiceImpl extends DmlMapperImpl<SysRolePermissionDO,
     @Override
     @InOutLog("通过角色ID集合查询角色权限关系集合")
     public Set<String> getPermissionIdSetByRoleIdSet(Set<String> roleIdSet) {
-        List<SysRolePermissionDO> rolePermissionList = selectList(Where.build().add(QueryType.IN, "role_id", roleIdSet));
+        List<SysRolePermissionDO> rolePermissionList = selectList(Where.build().and().add(QueryType.IN, "role_id", roleIdSet));
         if (CollectionUtils.isEmpty(rolePermissionList)) {
             return null;
         }

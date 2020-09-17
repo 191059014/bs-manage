@@ -24,7 +24,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * 用户controller
+ * 权限controller
  *
  * @version v0.1, 2020/7/24 15:05, create by huangbiao.
  */

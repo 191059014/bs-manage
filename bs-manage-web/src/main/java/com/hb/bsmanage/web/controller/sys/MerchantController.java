@@ -11,6 +11,7 @@ import com.hb.mybatis.helper.Where;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.easybuild.MapBuilder;
 import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
 import org.apache.commons.lang3.StringUtils;
@@ -62,14 +63,14 @@ public class MerchantController extends BaseController {
         int startRow = Pagination.getStartRow(pageNum, pageSize);
         Where where = Where.build();
         if (StringUtils.isNotBlank(merchant.getMerchantId())) {
-            where.add(QueryType.EQUAL, "merchant_id", merchant.getMerchantId());
+            where.and().add(QueryType.EQUAL, "merchant_id", merchant.getMerchantId());
         }
         if (StringUtils.isNotBlank(merchant.getMerchantName())) {
-            where.add(QueryType.LIKE, "merchant_name", merchant.getMerchantName());
+            where.and().add(QueryType.LIKE, "merchant_name", merchant.getMerchantName());
         }
         if (currentUserMerchant.getParentId() != null) {
             // 非最高系统管理员，只能查询下级
-            where.add(QueryType.LIKE, "parent_id_path", BsWebUtils.getParentIdPath(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
+            where.and().add(QueryType.LIKE, "parent_id_path", BsWebUtils.getParentIdPath(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
         }
         pagination = iSysMerchantService.selectPages(where, "create_time desc", startRow, pageSize);
         return Result.of(ResponseEnum.SUCCESS, pagination);
@@ -90,6 +91,8 @@ public class MerchantController extends BaseController {
         merchant.setParentIdPath(BsWebUtils.getParentIdPath(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
         merchant.setParentId(currentUserMerchant.getMerchantId());
         merchant.setMerchantId(KeyUtils.getTenantId());
+        merchant.setCreateBy(SecurityUtils.getCurrentUserId());
+        merchant.setUpdateBy(SecurityUtils.getCurrentUserId());
         iSysMerchantService.insert(merchant);
         return Result.of(ResponseEnum.SUCCESS);
     }
@@ -105,6 +108,7 @@ public class MerchantController extends BaseController {
         if (StringUtils.isBlank(merchantId)) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
+        merchant.setUpdateBy(SecurityUtils.getCurrentUserId());
         iSysMerchantService.updateByBk(merchantId, merchant);
         return Result.of(ResponseEnum.SUCCESS);
     }
@@ -120,7 +124,7 @@ public class MerchantController extends BaseController {
         if (StringUtils.isBlank(merchantId)) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
-        iSysMerchantService.logicDeleteByBk(merchantId);
+        iSysMerchantService.logicDeleteByBk(merchantId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         return Result.of(ResponseEnum.SUCCESS);
     }
 

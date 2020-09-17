@@ -58,6 +58,25 @@ public class SecurityUtils {
     }
 
     /**
+     * 获取当前用户的用户ID
+     *
+     * @return UserId
+     */
+    public static String getCurrentUserId() {
+        return getCurrentUser().getUserId();
+    }
+
+    /**
+     * 获取当前用户的用户名称
+     *
+     * @return UserId
+     */
+    public static String getCurrentUserName() {
+        return getCurrentUser().getUserName();
+    }
+
+
+    /**
      * 获取当前用户的TenantId
      *
      * @return TenantId
