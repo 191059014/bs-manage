@@ -3,21 +3,18 @@ package com.hb.bsmanage.web.controller.sys;
 import com.hb.bsmanage.api.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.enums.TableEnum;
-import com.hb.bsmanage.web.common.BaseController;
 import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * 用户controller
@@ -45,42 +42,6 @@ public class UserController extends BaseController {
      * @param userDO 用户信息
      * @return 结果
      */
-    @PostMapping("/findOne")
-    public Result<SysUserDO> findOne(@RequestBody SysUserDO userDO) {
-        SysUserDO one = iSysUserService.selectOne(userDO);
-        return Result.of(ResponseEnum.SUCCESS, one);
-    }
-
-    /**
-     * 添加用户
-     *
-     * @param userDO 用户信息
-     * @return 结果
-     */
-    @PostMapping("/findById")
-    public Result<SysUserDO> findById(@RequestBody SysUserDO userDO) {
-        SysUserDO one = iSysUserService.selectByPk(userDO.getId());
-        return Result.of(ResponseEnum.SUCCESS, one);
-    }
-
-    /**
-     * 通过用户ID或者手机号查询
-     *
-     * @param userIdOrMobile 用户ID或者手机号查询
-     * @return 用户信息
-     */
-    @GetMapping("/findByUserIdOrMobile")
-    public Result<SysUserDO> findByUserIdOrMobile(String userIdOrMobile) {
-        SysUserDO sysUserDO = iSysUserService.findByUsernameOrMobile(userIdOrMobile);
-        return Result.of(ResponseEnum.SUCCESS, sysUserDO);
-    }
-
-    /**
-     * 添加用户
-     *
-     * @param userDO 用户信息
-     * @return 结果
-     */
     @PostMapping("/addOne")
     public Result<Integer> addOne(@RequestBody SysUserDO userDO) {
         userDO.setUserId(KeyUtils.getUniqueKey(TableEnum.USER_ID.getIdPrefix()));
@@ -94,21 +55,9 @@ public class UserController extends BaseController {
      * @param userDO 用户信息
      * @return 结果
      */
-    @PostMapping("/findList")
-    public Result<Object> findList(@RequestBody SysUserDO userDO) {
-        List<SysUserDO> sysUserDOS = iSysUserService.selectList(userDO,"create_time desc",0,10);
-        return Result.of(ResponseEnum.SUCCESS, sysUserDOS);
-    }
-
-    /**
-     * 查询集合
-     *
-     * @param userDO 用户信息
-     * @return 结果
-     */
     @PostMapping("/findPages")
     public Result<Object> findPages(@RequestBody SysUserDO userDO) {
-        Pagination<SysUserDO> pageResult = iSysUserService.selectPages(userDO, "create_time desc",0, 10);
+        Pagination<SysUserDO> pageResult = iSysUserService.selectPages(null, "create_time desc", 0, 10);
         return Result.of(ResponseEnum.SUCCESS, pageResult);
     }
 

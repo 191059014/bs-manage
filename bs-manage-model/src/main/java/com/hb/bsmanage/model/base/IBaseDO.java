@@ -12,12 +12,12 @@ public interface IBaseDO extends Serializable, Cloneable {
     /**
      * 获取主键
      */
-    Object getId();
+    Integer getId();
 
     /**
      * 设置主键
      */
-    void setId(Object id);
+    void setId(Integer id);
 
 }
 

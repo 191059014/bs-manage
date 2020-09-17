@@ -5,7 +5,7 @@ import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.enums.AccessType;
 import com.hb.bsmanage.model.model.Menu;
 import com.hb.bsmanage.model.response.MenuDataResponse;
-import com.hb.bsmanage.web.common.BaseController;
+import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.unic.base.common.Result;

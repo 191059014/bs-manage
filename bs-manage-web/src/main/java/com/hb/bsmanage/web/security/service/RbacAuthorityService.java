@@ -47,9 +47,9 @@ public class RbacAuthorityService {
 //                    // 过滤页面权限
 //                    .filter(permission -> Objects.equals(permission.getType(), Consts.BUTTON))
 //                    // 过滤 URL 为空
-//                    .filter(permission -> !StringUtils.isEmpty(permission.getUrl()))
+//                    .filter(permission -> !StrUtils.isEmpty(permission.getUrl()))
 //                    // 过滤 METHOD 为空
-//                    .filter(permission -> !StringUtils.isEmpty(permission.getMethod()))
+//                    .filter(permission -> !StrUtils.isEmpty(permission.getMethod()))
 //                    .collect(Collectors.toList());
 //
 //            for (Permission btnPerm : btnPerms) {

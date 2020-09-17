@@ -2,7 +2,7 @@ package com.hb.bsmanage.web.common;
 
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.util.util.StringUtils;
+import com.hb.unic.util.util.StrUtils;
 
 /**
  * 工具类
@@ -24,7 +24,7 @@ public class BsWebUtils {
      * @return parentIdPath
      */
     public static String getParentIdPath(Object parentIdPathOfParent, Object idOfParent) {
-        return StringUtils.joint(parentIdPathOfParent, Consts.DOT, idOfParent);
+        return StrUtils.joint(parentIdPathOfParent, Consts.DOT, idOfParent);
     }
 
 }

@@ -38,8 +38,8 @@ public abstract class CommonDO extends AbstractBaseDO implements IStatusDO, IRel
     }
 
     @Override
-    public void setId(Object id) {
-        this.id = (Integer) id;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     @Override

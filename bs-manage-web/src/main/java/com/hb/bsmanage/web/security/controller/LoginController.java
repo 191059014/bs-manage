@@ -9,7 +9,7 @@ import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.request.LoginRequest;
-import com.hb.bsmanage.web.common.BaseController;
+import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.security.jwt.JwtUtils;
 import com.hb.bsmanage.web.security.model.UserPrincipal;

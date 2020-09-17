@@ -63,7 +63,7 @@ public class SecurityUtils {
      * @return TenantId
      */
     public static String getCurrentUserTenantId() {
-        return RC.get() == null ? null : RC.get().getUser() == null ? null : RC.get().getUser().getTenantId();
+        return RC.get() == null ? "" : RC.get().getUser() == null ? "" : RC.get().getUser().getTenantId();
     }
 
 }

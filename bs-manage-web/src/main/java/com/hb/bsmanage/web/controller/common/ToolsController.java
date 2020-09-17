@@ -132,6 +132,7 @@ public class ToolsController {
                 .merchantId(KeyUtils.getTenantId())
                 .merchantName("一级商户")
                 .build();
+        merchant.setParentIdPath("0");
         merchant.setTenantId(merchant.getMerchantId());
         iSysMerchantService.insert(merchant);
         LOGGER.info("{}添加商户成功={}", baseLog, merchant.getMerchantId());
