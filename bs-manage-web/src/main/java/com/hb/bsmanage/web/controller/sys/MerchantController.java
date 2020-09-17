@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * 商户controller
  *
@@ -56,7 +58,19 @@ public class MerchantController extends BaseController {
         if (!Pagination.verify(pageNum, pageSize)) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
-        return Result.of(ResponseEnum.SUCCESS, iSysMerchantService.selectPages(merchant, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize));
+        SysMerchantDO currentUserMerchant = iSysMerchantService.selectByBk(SecurityUtils.getCurrentUserTenantId());
+        Pagination<SysMerchantDO> pagination = null;
+        int startRow = Pagination.getStartRow(pageNum, pageSize);
+        if (currentUserMerchant.getParentId() == null) {
+            // 最高系统管理员
+            pagination = iSysMerchantService.selectPages(merchant, "create_time desc", startRow, pageSize);
+        } else {
+            List<SysMerchantDO> list = iSysMerchantService.selectList(merchant, "create_time desc");
+            pagination = Pagination.pagination(list, pageNum, pageSize);
+            // 普通商户
+            merchant.setTenantId(currentUserMerchant.getMerchantId());
+        }
+        return Result.of(ResponseEnum.SUCCESS, pagination);
     }
 
     /**

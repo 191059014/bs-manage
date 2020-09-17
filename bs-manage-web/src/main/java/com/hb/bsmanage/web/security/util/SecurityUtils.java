@@ -57,4 +57,13 @@ public class SecurityUtils {
         return RC.get() == null ? new ArrayList<>() : RC.get().getPermissions();
     }
 
+    /**
+     * 获取当前用户的TenantId
+     *
+     * @return TenantId
+     */
+    public static String getCurrentUserTenantId() {
+        return RC.get() == null ? null : RC.get().getUser() == null ? null : RC.get().getUser().getTenantId();
+    }
+
 }
