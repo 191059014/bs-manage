@@ -1,10 +1,15 @@
 package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.api.service.ISysMerchantService;
+import com.hb.bsmanage.api.service.ISysRoleService;
+import com.hb.bsmanage.api.service.ISysUserRoleService;
 import com.hb.bsmanage.api.service.ISysUserService;
+import com.hb.bsmanage.model.dobj.SysMerchantDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.dobj.SysUserRoleDO;
 import com.hb.bsmanage.model.enums.TableEnum;
+import com.hb.bsmanage.model.response.TreeDataResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -34,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 用户controller
@@ -60,6 +66,18 @@ public class UserController extends BaseController {
      */
     @Autowired
     private ISysMerchantService iSysMerchantService;
+
+    /**
+     * 角色service
+     */
+    @Autowired
+    private ISysRoleService iSysRoleService;
+
+    /**
+     * 用户角色关系service
+     */
+    @Autowired
+    private ISysUserRoleService iSysUserRoleService;
 
     /**
      * 条件分页查询
@@ -156,6 +174,32 @@ public class UserController extends BaseController {
             throw new BusinessException(ResponseEnum.FAIL);
         }
         return Result.of(ResponseEnum.SUCCESS);
+    }
+
+    /**
+     * 获取用户的角色集合
+     *
+     * @return 树数据
+     */
+    @GetMapping("/getRolesUnderUser")
+    public Result<Set<String>> getRolesUnderUser(@RequestParam("userId") String userId) {
+        SysUserDO sysUserDO = iSysUserService.selectByBk(userId);
+        List<SysUserRoleDO> userRoleList = iSysUserRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
+        Set<String> roleIdSet = userRoleList.stream().map(SysUserRoleDO::getRoleId).collect(Collectors.toSet());
+        List<SysRoleDO> roleList = iSysRoleService.selectList(Where.build().andAdd(QueryType.IN, "role_id", roleIdSet));
+        Set<String> collect = roleList.stream().map(SysRoleDO::getRoleId).collect(Collectors.toSet());
+        return Result.of(ResponseEnum.SUCCESS, collect);
+    }
+
+    /**
+     * 获取用户对应商户下所有角色集合
+     *
+     * @return 树数据
+     */
+    @GetMapping("/getRolesUnderMerchant")
+    public Result<List<SysRoleDO>> getRolesUnderMerchant(@RequestParam("userId") String userId) {
+        SysUserDO sysUserDO = iSysUserService.selectByBk(userId);
+        return Result.of(ResponseEnum.SUCCESS, iSysRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "tenant_id", sysUserDO.getTenantId())));
     }
 
 }
