@@ -1,12 +1,11 @@
 package com.hb.bsmanage.web.controller.sys;
 
-import com.hb.bsmanage.api.service.ISysMerchantService;
-import com.hb.bsmanage.api.service.ISysRoleService;
-import com.hb.bsmanage.api.service.ISysUserService;
+import com.hb.bsmanage.api.service.*;
+import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
+import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.enums.TableEnum;
-import com.hb.bsmanage.model.response.TreeDataResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -24,17 +23,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 角色controller
@@ -67,6 +62,18 @@ public class RoleController extends BaseController {
      */
     @Autowired
     private ISysMerchantService iSysMerchantService;
+
+    /**
+     * 角色service
+     */
+    @Autowired
+    private ISysRoleAccessService iSysRoleAccessService;
+
+    /**
+     * 权限service
+     */
+    @Autowired
+    private ISysPermissionService iSysPermissionService;
 
     /**
      * 条件分页查询
@@ -160,6 +167,58 @@ public class RoleController extends BaseController {
         if (deleteRows != 1) {
             throw new BusinessException(ResponseEnum.FAIL);
         }
+        return Result.of(ResponseEnum.SUCCESS);
+    }
+
+    /**
+     * 获取角色的权限集合
+     *
+     * @return 权限ID集合
+     */
+    @GetMapping("/getPermissionsUnderRole")
+    public Result<Set<String>> getPermissionsUnderRole(@RequestParam("roleId") String roleId) {
+        SysRoleDO sysRoleDO = iSysRoleService.selectByBk(roleId);
+        List<SysRolePermissionDO> rolePermissionList = iSysRoleAccessService.selectList(Where.build().andAdd(QueryType.EQUAL, "role_id", sysRoleDO.getRoleId()));
+        Set<String> permissionIdSet = rolePermissionList.stream().map(SysRolePermissionDO::getPermissionId).collect(Collectors.toSet());
+        return Result.of(ResponseEnum.SUCCESS, permissionIdSet);
+    }
+
+    /**
+     * 获取角色对应商户下所有权限集合
+     *
+     * @return 权限集合
+     */
+    @GetMapping("/getPermissionUnderMerchant")
+    public Result<List<SysPermissionDO>> getPermissionUnderMerchant(@RequestParam("roleId") String roleId) {
+        SysRoleDO sysRoleDO = iSysRoleService.selectByBk(roleId);
+        return Result.of(ResponseEnum.SUCCESS, iSysPermissionService.selectList(Where.build().andAdd(QueryType.EQUAL, "tenant_id", sysRoleDO.getTenantId())));
+    }
+
+    /**
+     * 更新用户的角色
+     *
+     * @param userId    用户id
+     * @param roleIdSet 角色集合
+     * @return 更新结果
+     */
+    @PostMapping("/updateRolePermission")
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Result updateRolePermission(@RequestParam("roleId") String roleId, @RequestBody Set<String> permissionIdSet) {
+        if (StringUtils.isBlank(roleId) || CollectionUtils.isEmpty(permissionIdSet)) {
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+        }
+        // 删除角色的权限信息
+        Where deleteWhere = Where.build().andAdd(QueryType.EQUAL, "role_id", roleId);
+        Map<String, Object> updateMap = MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get();
+        iSysRoleAccessService.logicDelete(deleteWhere, updateMap);
+        // 添加角色的权限信息
+        permissionIdSet.forEach(permissionId -> {
+            SysRolePermissionDO insert = SysRolePermissionDO.builder().roleId(roleId).permissionId(permissionId).build();
+            insert.setCreateBy(SecurityUtils.getCurrentUserId());
+            insert.setUpdateBy(SecurityUtils.getCurrentUserId());
+            insert.setTenantId(SecurityUtils.getCurrentUserTenantId());
+            iSysRoleAccessService.insert(insert);
+        });
         return Result.of(ResponseEnum.SUCCESS);
     }
 

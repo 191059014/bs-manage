@@ -4,12 +4,10 @@ import com.hb.bsmanage.api.service.ISysMerchantService;
 import com.hb.bsmanage.api.service.ISysRoleService;
 import com.hb.bsmanage.api.service.ISysUserRoleService;
 import com.hb.bsmanage.api.service.ISysUserService;
-import com.hb.bsmanage.model.dobj.SysMerchantDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.dobj.SysUserRoleDO;
 import com.hb.bsmanage.model.enums.TableEnum;
-import com.hb.bsmanage.model.response.TreeDataResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -28,12 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -186,9 +179,7 @@ public class UserController extends BaseController {
         SysUserDO sysUserDO = iSysUserService.selectByBk(userId);
         List<SysUserRoleDO> userRoleList = iSysUserRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
         Set<String> roleIdSet = userRoleList.stream().map(SysUserRoleDO::getRoleId).collect(Collectors.toSet());
-        List<SysRoleDO> roleList = iSysRoleService.selectList(Where.build().andAdd(QueryType.IN, "role_id", roleIdSet));
-        Set<String> collect = roleList.stream().map(SysRoleDO::getRoleId).collect(Collectors.toSet());
-        return Result.of(ResponseEnum.SUCCESS, collect);
+        return Result.of(ResponseEnum.SUCCESS, roleIdSet);
     }
 
     /**
@@ -200,6 +191,34 @@ public class UserController extends BaseController {
     public Result<List<SysRoleDO>> getRolesUnderMerchant(@RequestParam("userId") String userId) {
         SysUserDO sysUserDO = iSysUserService.selectByBk(userId);
         return Result.of(ResponseEnum.SUCCESS, iSysRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "tenant_id", sysUserDO.getTenantId())));
+    }
+
+    /**
+     * 更新用户的角色
+     *
+     * @param userId    用户id
+     * @param roleIdSet 角色集合
+     * @return 更新结果
+     */
+    @PostMapping("/updateUserRole")
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Result updateUserRole(@RequestParam("userId") String userId, @RequestBody Set<String> roleIdSet) {
+        if (StringUtils.isBlank(userId) || CollectionUtils.isEmpty(roleIdSet)) {
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+        }
+        // 删除用户的角色信息
+        Where deleteWhere = Where.build().andAdd(QueryType.EQUAL, "user_id", userId);
+        Map<String, Object> updateMap = MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get();
+        iSysUserRoleService.logicDelete(deleteWhere, updateMap);
+        // 添加用户的角色信息
+        roleIdSet.forEach(roleId -> {
+            SysUserRoleDO insert = SysUserRoleDO.builder().userId(userId).roleId(roleId).build();
+            insert.setCreateBy(SecurityUtils.getCurrentUserId());
+            insert.setUpdateBy(SecurityUtils.getCurrentUserId());
+            insert.setTenantId(SecurityUtils.getCurrentUserTenantId());
+            iSysUserRoleService.insert(insert);
+        });
+        return Result.of(ResponseEnum.SUCCESS);
     }
 
 }
