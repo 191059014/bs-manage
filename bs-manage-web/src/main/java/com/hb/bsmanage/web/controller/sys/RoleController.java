@@ -1,6 +1,7 @@
 package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.api.service.ISysMerchantService;
+import com.hb.bsmanage.api.service.ISysRoleService;
 import com.hb.bsmanage.api.service.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
@@ -20,7 +21,6 @@ import com.hb.unic.util.util.Pagination;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,18 +36,24 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 用户controller
+ * 角色controller
  *
  * @version v0.1, 2020/7/24 15:05, create by huangbiao.
  */
 @RestController
-@RequestMapping("bs/auth/user")
-public class UserController extends BaseController {
+@RequestMapping("bs/auth/role")
+public class RoleController extends BaseController {
 
     /**
      * 日志
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoleController.class);
+
+    /**
+     * 角色service
+     */
+    @Autowired
+    private ISysRoleService iSysRoleService;
 
     /**
      * 用户service
@@ -64,40 +70,39 @@ public class UserController extends BaseController {
     /**
      * 条件分页查询
      *
-     * @param user 用户信息
+     * @param role 角色信息
      * @return 结果
      */
     @PostMapping("/queryPages")
-    public Result<Pagination<SysUserDO>> findPages(@RequestBody SysUserDO user,
+    public Result<Pagination<SysRoleDO>> findPages(@RequestBody SysRoleDO role,
                                                    @RequestParam("pageNum") Integer pageNum,
                                                    @RequestParam("pageSize") Integer pageSize) {
         Where where = Where.build();
-        where.andAdd(QueryType.EQUAL, "user_id", user.getUserId());
-        where.andAdd(QueryType.LIKE, "user_name", user.getUserName());
-        where.andAdd(QueryType.LIKE, "mobile", user.getMobile());
-        where.andAdd(QueryType.EQUAL, "tenant_id", user.getTenantId());
+        where.andAdd(QueryType.EQUAL, "role_id", role.getRoleId());
+        where.andAdd(QueryType.LIKE, "role_name", role.getRoleName());
+        where.andAdd(QueryType.EQUAL, "tenant_id", role.getTenantId());
         SysUserDO currentUser = SecurityUtils.getCurrentUser();
         if (currentUser.getParentId() != null) {
-            // 非最高系统管理员，只能查询用户所属商户，及商户下的所有下级商户的用户
+            // 非最高系统管理员，只能查询角色所属商户，及商户下的所有下级商户的角色
             Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
             where.andAdd(QueryType.IN, "tenant_id", merchantIdSet);
         }
-        Pagination<SysUserDO> pageResult = iSysUserService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
+        Pagination<SysRoleDO> pageResult = iSysRoleService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
 
-        List<SysUserDO> userList = pageResult.getData();
-        if (CollectionUtils.isNotEmpty(userList)) {
+        List<SysRoleDO> roleList = pageResult.getData();
+        if (CollectionUtils.isNotEmpty(roleList)) {
             Set<String> userIdSet = new HashSet<>();
-            userList.forEach(userDO -> {
-                userIdSet.add(userDO.getCreateBy());
-                userIdSet.add(userDO.getUpdateBy());
+            roleList.forEach(roleDO -> {
+                userIdSet.add(roleDO.getCreateBy());
+                userIdSet.add(roleDO.getUpdateBy());
             });
             if (CollectionUtils.isNotEmpty(userIdSet)) {
                 Map<String, SysUserDO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
-                userList.forEach(userDO -> {
-                    SysUserDO createBy = userMap.get(userDO.getCreateBy());
-                    userDO.setCreateBy(createBy == null ? null : createBy.getUserName());
-                    SysUserDO updateBy = userMap.get(userDO.getUpdateBy());
-                    userDO.setUpdateBy(updateBy == null ? null : updateBy.getUserName());
+                roleList.forEach(roleDO -> {
+                    SysUserDO createBy = userMap.get(roleDO.getCreateBy());
+                    roleDO.setCreateBy(createBy == null ? null : createBy.getUserName());
+                    SysUserDO updateBy = userMap.get(roleDO.getUpdateBy());
+                    roleDO.setUpdateBy(updateBy == null ? null : updateBy.getUserName());
                 });
             }
         }
@@ -105,37 +110,36 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 添加用户
+     * 添加角色
      *
-     * @param user 用户信息
+     * @param role 角色信息
      * @return 结果
      */
     @PostMapping("/add")
-    public Result<Integer> add(@RequestBody SysUserDO user) {
-        if (StringUtils.isAnyBlank(user.getUserName(), user.getMobile(), user.getPassword())) {
+    public Result<Integer> add(@RequestBody SysRoleDO role) {
+        if (StringUtils.isAnyBlank(role.getRoleName())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
-        user.setUserId(KeyUtils.getUniqueKey(TableEnum.USER_ID.getIdPrefix()));
-        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-        user.setParentId(SecurityUtils.getCurrentUserId());
-        user.setTenantId(SecurityUtils.getCurrentUserTenantId());
-        user.setCreateBy(SecurityUtils.getCurrentUserId());
-        user.setUpdateBy(SecurityUtils.getCurrentUserId());
-        int addRows = iSysUserService.insert(user);
+        role.setRoleId(KeyUtils.getUniqueKey(TableEnum.ROLE_ID.getIdPrefix()));
+        role.setRoleName(role.getRoleName());
+        role.setTenantId(SecurityUtils.getCurrentUserTenantId());
+        role.setCreateBy(SecurityUtils.getCurrentUserId());
+        role.setUpdateBy(SecurityUtils.getCurrentUserId());
+        int addRows = iSysRoleService.insert(role);
         return Result.of(ResponseEnum.SUCCESS, addRows);
     }
 
     /**
-     * 修改用户
+     * 修改角色
      *
-     * @param user 用户信息
+     * @param role 角色
      * @return 结果
      */
     @PostMapping("/update")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result update(@RequestBody SysUserDO user, @RequestParam("userId") String userId) {
-        user.setUpdateBy(SecurityUtils.getCurrentUserId());
-        int updateRows = iSysUserService.updateByBk(userId, user);
+    public Result update(@RequestBody SysRoleDO role, @RequestParam("roleId") String roleId) {
+        role.setUpdateBy(SecurityUtils.getCurrentUserId());
+        int updateRows = iSysRoleService.updateByBk(roleId, role);
         if (updateRows != 1) {
             throw new BusinessException(ResponseEnum.FAIL);
         }
@@ -143,15 +147,15 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 删除用户
+     * 删除角色
      *
-     * @param userId 用户ID
+     * @param roleId 角色ID
      * @return 结果
      */
     @GetMapping("/delete")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result delete(@RequestParam("userId") String userId) {
-        int deleteRows = iSysUserService.logicDeleteByBk(userId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
+    public Result delete(@RequestParam("roleId") String roleId) {
+        int deleteRows = iSysRoleService.logicDeleteByBk(roleId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         if (deleteRows != 1) {
             throw new BusinessException(ResponseEnum.FAIL);
         }

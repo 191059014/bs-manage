@@ -42,10 +42,6 @@ public class SysUserDO extends CommonDO {
     @Column("mobile")
     private String mobile;
 
-    // 父级ID路径
-    @Column("parent_id_path")
-    private String parentIdPath;
-
     @Override
     public String toString() {
         return ToStringHelper.printJsonNoNull(this);

@@ -1,18 +1,18 @@
 package com.hb.bsmanage.web.controller.common;
 
-import com.hb.bsmanage.api.ISysPermissionService;
-import com.hb.bsmanage.api.ISysMerchantService;
-import com.hb.bsmanage.api.ISysRoleAccessService;
-import com.hb.bsmanage.api.ISysRoleService;
-import com.hb.bsmanage.api.ISysUserRoleService;
-import com.hb.bsmanage.api.ISysUserService;
+import com.hb.bsmanage.api.service.ISysMerchantService;
+import com.hb.bsmanage.api.service.ISysPermissionService;
+import com.hb.bsmanage.api.service.ISysRoleAccessService;
+import com.hb.bsmanage.api.service.ISysRoleService;
+import com.hb.bsmanage.api.service.ISysUserRoleService;
+import com.hb.bsmanage.api.service.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysMerchantDO;
 import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.dobj.SysUserRoleDO;
-import com.hb.bsmanage.model.enums.AccessType;
+import com.hb.bsmanage.model.enums.ResourceType;
 import com.hb.bsmanage.model.enums.TableEnum;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.common.ToolsWapper;
@@ -131,7 +131,7 @@ public class ToolsController {
         SysMerchantDO merchant = SysMerchantDO.builder()
                 .merchantId(KeyUtils.getTenantId())
                 .merchantName("一级商户")
-                .parentIdPath("0")
+                .level("0")
                 .build();
         iSysMerchantService.insert(merchant);
         LOGGER.info("{}添加商户成功={}", baseLog, merchant.getMerchantId());
@@ -141,7 +141,6 @@ public class ToolsController {
                 .userName("admin")
                 .password(new BCryptPasswordEncoder().encode("123456"))
                 .mobile("12345678900")
-                .parentIdPath("0")
                 .build();
         user.setTenantId(merchant.getMerchantId());
         iSysUserService.insert(user);
@@ -166,7 +165,7 @@ public class ToolsController {
         SysPermissionDO sysPermission = SysPermissionDO.builder()
                 .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
                 .permissionName("系统管理")
-                .resourceType(AccessType.PAGE.getValue())
+                .resourceType(ResourceType.PAGE.getValue())
                 .value("sys")
                 .url(null)
                 .icon("el-icon-setting")
@@ -191,7 +190,7 @@ public class ToolsController {
             SysPermissionDO permission = SysPermissionDO.builder()
                     .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
                     .permissionName(accessNameArr[i])
-                    .resourceType(AccessType.PAGE.getValue())
+                    .resourceType(ResourceType.PAGE.getValue())
                     .value(accessValueArr[i])
                     .url(urlArr[i])
                     .icon(iconArr[i])

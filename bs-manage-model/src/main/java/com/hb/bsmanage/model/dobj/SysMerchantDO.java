@@ -34,9 +34,9 @@ public class SysMerchantDO extends CommonDO {
     @Column("merchant_name")
     private String merchantName;
 
-    // 父级ID路径
-    @Column("parent_id_path")
-    private String parentIdPath;
+    // 等级
+    @Column("level")
+    private String level;
 
     @Override
     public String toString() {

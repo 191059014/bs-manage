@@ -31,7 +31,7 @@ public class SysRoleDO extends CommonDO {
 
     @Override
     public String toString() {
-        return ToStringHelper.printJsonNoNull(this);
+        return ToStringHelper.printNoNull(this);
     }
 }
 

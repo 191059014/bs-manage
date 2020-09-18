@@ -1,10 +1,10 @@
 package com.hb.bsmanage.web.security.controller;
 
-import com.hb.bsmanage.api.ISysPermissionService;
-import com.hb.bsmanage.api.ISysRoleAccessService;
-import com.hb.bsmanage.api.ISysRoleService;
-import com.hb.bsmanage.api.ISysUserRoleService;
-import com.hb.bsmanage.api.ISysUserService;
+import com.hb.bsmanage.api.service.ISysPermissionService;
+import com.hb.bsmanage.api.service.ISysRoleAccessService;
+import com.hb.bsmanage.api.service.ISysRoleService;
+import com.hb.bsmanage.api.service.ISysUserRoleService;
+import com.hb.bsmanage.api.service.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;

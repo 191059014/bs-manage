@@ -1,4 +1,4 @@
-package com.hb.bsmanage.api;
+package com.hb.bsmanage.api.service;
 
 import com.hb.bsmanage.model.dobj.SysPermissionDO;
 import com.hb.mybatis.base.IDmlMapper;

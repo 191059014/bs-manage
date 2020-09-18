@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.controller.common;
 
-import com.hb.bsmanage.model.enums.AccessType;
+import com.hb.bsmanage.model.enums.ResourceType;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
@@ -39,8 +39,8 @@ public class CommonController {
         String baseLog = "[ToolsController-getCombobox-获取下拉框]";
         List<Map<String, Object>> combobox = null;
         switch (type) {
-            case "AccessType":
-                combobox = EnumUtils.combobox(AccessType.class, EnumUtils.KeysEnum.name.toString(), EnumUtils.KeysEnum.value.toString());
+            case "ResourceType":
+                combobox = EnumUtils.combobox(ResourceType.class, EnumUtils.KeysEnum.name.toString(), EnumUtils.KeysEnum.value.toString());
                 break;
             default:
                 LOGGER.info("{}无此类型", baseLog);

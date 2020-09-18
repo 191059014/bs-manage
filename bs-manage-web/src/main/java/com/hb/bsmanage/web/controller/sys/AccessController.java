@@ -1,24 +1,41 @@
 package com.hb.bsmanage.web.controller.sys;
 
-import com.hb.bsmanage.api.ISysPermissionService;
+import com.hb.bsmanage.api.service.ISysMerchantService;
+import com.hb.bsmanage.api.service.ISysPermissionService;
+import com.hb.bsmanage.api.service.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.enums.AccessType;
+import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.enums.ResourceType;
+import com.hb.bsmanage.model.enums.TableEnum;
 import com.hb.bsmanage.model.model.Menu;
 import com.hb.bsmanage.model.response.MenuDataResponse;
-import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
+import com.hb.mybatis.enums.QueryType;
+import com.hb.mybatis.helper.Where;
 import com.hb.unic.base.common.Result;
+import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.easybuild.MapBuilder;
+import com.hb.unic.util.util.KeyUtils;
+import com.hb.unic.util.util.Pagination;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -44,6 +61,18 @@ public class AccessController extends BaseController {
     private ISysPermissionService iSysPermissionService;
 
     /**
+     * 商户service
+     */
+    @Autowired
+    private ISysMerchantService iSysMerchantService;
+
+    /**
+     * 用户service
+     */
+    @Autowired
+    private ISysUserService iSysUserService;
+
+    /**
      * 获取私人的所有菜单信息
      *
      * @return 菜单信息列表
@@ -52,7 +81,7 @@ public class AccessController extends BaseController {
     public Result<MenuDataResponse> getPrivateMenuDatas() {
         MenuDataResponse response = new MenuDataResponse();
         List<SysPermissionDO> currentUserAccesses = SecurityUtils.getCurrentUserPermissions();
-        Predicate<SysPermissionDO> predicate = access -> StringUtils.isBlank(access.getParentId()) && AccessType.PAGE.getValue().equals(access.getResourceType());
+        Predicate<SysPermissionDO> predicate = access -> StringUtils.isBlank(access.getParentId()) && ResourceType.PAGE.getValue().equals(access.getResourceType());
         Set<SysPermissionDO> firstLevelAccesses = currentUserAccesses.stream().filter(predicate).collect(Collectors.toSet());
         Set<Menu> menuSet = new HashSet<>();
         firstLevelAccesses.forEach(access -> {
@@ -91,6 +120,101 @@ public class AccessController extends BaseController {
             }
         });
         return menuSet.size() > 0 ? menuSet : null;
+    }
+
+    /**
+     * 条件分页查询
+     *
+     * @param permission 权限信息
+     * @return 结果
+     */
+    @PostMapping("/queryPages")
+    public Result<Pagination<SysPermissionDO>> findPages(@RequestBody SysPermissionDO permission,
+                                                         @RequestParam("pageNum") Integer pageNum,
+                                                         @RequestParam("pageSize") Integer pageSize) {
+        Where where = Where.build();
+        where.andAdd(QueryType.EQUAL, "permission_id", permission.getPermissionId());
+        where.andAdd(QueryType.LIKE, "permission_name", permission.getPermissionName());
+        where.andAdd(QueryType.EQUAL, "resource_type", permission.getResourceType());
+        where.andAdd(QueryType.EQUAL, "tenant_id", permission.getTenantId());
+        SysUserDO currentUser = SecurityUtils.getCurrentUser();
+        if (currentUser.getParentId() != null) {
+            // 非最高系统管理员，只能查询权限所属商户，及商户下的所有下级商户的权限
+            Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
+            where.andAdd(QueryType.IN, "tenant_id", merchantIdSet);
+        }
+        Pagination<SysPermissionDO> pageResult = iSysPermissionService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
+
+        List<SysPermissionDO> roleList = pageResult.getData();
+        if (CollectionUtils.isNotEmpty(roleList)) {
+            Set<String> userIdSet = new HashSet<>();
+            roleList.forEach(permissionDO -> {
+                userIdSet.add(permissionDO.getCreateBy());
+                userIdSet.add(permissionDO.getUpdateBy());
+            });
+            if (CollectionUtils.isNotEmpty(userIdSet)) {
+                Map<String, SysUserDO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
+                roleList.forEach(permissionDO -> {
+                    SysUserDO createBy = userMap.get(permissionDO.getCreateBy());
+                    permissionDO.setCreateBy(createBy == null ? null : createBy.getUserName());
+                    SysUserDO updateBy = userMap.get(permissionDO.getUpdateBy());
+                    permissionDO.setUpdateBy(updateBy == null ? null : updateBy.getUserName());
+                });
+            }
+        }
+        return Result.of(ResponseEnum.SUCCESS, pageResult);
+    }
+
+    /**
+     * 添加权限
+     *
+     * @param permission 权限信息
+     * @return 结果
+     */
+    @PostMapping("/add")
+    public Result<Integer> add(@RequestBody SysPermissionDO permission) {
+        if (StringUtils.isAnyBlank(permission.getPermissionName(), permission.getResourceType(), permission.getValue())) {
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+        }
+        permission.setPermissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()));
+        permission.setTenantId(SecurityUtils.getCurrentUserTenantId());
+        permission.setCreateBy(SecurityUtils.getCurrentUserId());
+        permission.setUpdateBy(SecurityUtils.getCurrentUserId());
+        int addRows = iSysPermissionService.insert(permission);
+        return Result.of(ResponseEnum.SUCCESS, addRows);
+    }
+
+    /**
+     * 修改权限
+     *
+     * @param permission 权限
+     * @return 结果
+     */
+    @PostMapping("/update")
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Result update(@RequestBody SysPermissionDO permission, @RequestParam("permissionId") String permissionId) {
+        permission.setUpdateBy(SecurityUtils.getCurrentUserId());
+        int updateRows = iSysPermissionService.updateByBk(permissionId, permission);
+        if (updateRows != 1) {
+            throw new BusinessException(ResponseEnum.FAIL);
+        }
+        return Result.of(ResponseEnum.SUCCESS);
+    }
+
+    /**
+     * 删除权限
+     *
+     * @param permissionId 权限ID
+     * @return 结果
+     */
+    @GetMapping("/delete")
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Result delete(@RequestParam("permissionId") String permissionId) {
+        int deleteRows = iSysPermissionService.logicDeleteByBk(permissionId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
+        if (deleteRows != 1) {
+            throw new BusinessException(ResponseEnum.FAIL);
+        }
+        return Result.of(ResponseEnum.SUCCESS);
     }
 
 }

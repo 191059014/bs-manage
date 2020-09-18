@@ -1,4 +1,4 @@
-package com.hb.bsmanage.web.common;
+package com.hb.bsmanage.api.common;
 
 /**
  * 常量类

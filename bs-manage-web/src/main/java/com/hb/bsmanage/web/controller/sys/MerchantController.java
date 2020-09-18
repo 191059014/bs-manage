@@ -1,8 +1,10 @@
 package com.hb.bsmanage.web.controller.sys;
 
-import com.hb.bsmanage.api.ISysMerchantService;
+import com.hb.bsmanage.api.common.BsApiUtils;
+import com.hb.bsmanage.api.service.ISysMerchantService;
+import com.hb.bsmanage.api.service.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysMerchantDO;
-import com.hb.bsmanage.web.common.BsWebUtils;
+import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -14,6 +16,7 @@ import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.easybuild.MapBuilder;
 import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +25,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 商户controller
@@ -44,6 +53,12 @@ public class MerchantController extends BaseController {
     private ISysMerchantService iSysMerchantService;
 
     /**
+     * 用户service
+     */
+    @Autowired
+    private ISysUserService iSysUserService;
+
+    /**
      * 分页条件查询商户列表
      *
      * @param merchant 查询条件
@@ -62,17 +77,28 @@ public class MerchantController extends BaseController {
         Pagination<SysMerchantDO> pagination = null;
         int startRow = Pagination.getStartRow(pageNum, pageSize);
         Where where = Where.build();
-        if (StringUtils.isNotBlank(merchant.getMerchantId())) {
-            where.and().add(QueryType.EQUAL, "merchant_id", merchant.getMerchantId());
-        }
-        if (StringUtils.isNotBlank(merchant.getMerchantName())) {
-            where.and().add(QueryType.LIKE, "merchant_name", merchant.getMerchantName());
-        }
+        where.andAdd(QueryType.EQUAL, "merchant_id", merchant.getMerchantId());
+        where.andAdd(QueryType.LIKE, "merchant_name", merchant.getMerchantName());
         if (currentUserMerchant.getParentId() != null) {
-            // 非最高系统管理员，只能查询下级
-            where.and().add(QueryType.LIKE, "parent_id_path", BsWebUtils.getSubParentIdPathPrefix(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
+            // 非最高系统管理员，只能查询下级（包含自己）
+            BsApiUtils.getSubLevelWhere(where, currentUserMerchant);
         }
         pagination = iSysMerchantService.selectPages(where, "create_time desc", startRow, pageSize);
+        List<SysMerchantDO> merchantList = pagination.getData();
+        if (CollectionUtils.isNotEmpty(merchantList)) {
+            Set<String> userIdSet = new HashSet<>();
+            merchantList.forEach(merchantDO -> {
+                userIdSet.add(merchantDO.getCreateBy());
+                userIdSet.add(merchantDO.getUpdateBy());
+            });
+            Map<String, SysUserDO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
+            merchantList.forEach(merchantDO -> {
+                SysUserDO createBy = userMap.get(merchantDO.getCreateBy());
+                merchantDO.setCreateBy(createBy == null ? null : createBy.getUserName());
+                SysUserDO updateBy = userMap.get(merchantDO.getUpdateBy());
+                merchantDO.setUpdateBy(updateBy == null ? null : updateBy.getUserName());
+            });
+        }
         return Result.of(ResponseEnum.SUCCESS, pagination);
     }
 
@@ -88,7 +114,7 @@ public class MerchantController extends BaseController {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         SysMerchantDO currentUserMerchant = iSysMerchantService.selectByBk(SecurityUtils.getCurrentUserTenantId());
-        merchant.setParentIdPath(BsWebUtils.getCurrentParentIdPath(currentUserMerchant.getParentIdPath(), currentUserMerchant.getId()));
+        merchant.setLevel(BsApiUtils.getCurrentLevel(currentUserMerchant.getLevel(), currentUserMerchant.getId()));
         merchant.setParentId(currentUserMerchant.getMerchantId());
         merchant.setMerchantId(KeyUtils.getTenantId());
         merchant.setCreateBy(SecurityUtils.getCurrentUserId());
@@ -126,6 +152,23 @@ public class MerchantController extends BaseController {
         }
         iSysMerchantService.logicDeleteByBk(merchantId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         return Result.of(ResponseEnum.SUCCESS);
+    }
+
+    /**
+     * 获取所有下级商户
+     *
+     * @return Result
+     */
+    @GetMapping("/getAllSubMerchants")
+    public Result<List> getAllSubMerchants() {
+        List<SysMerchantDO> merchantList = iSysMerchantService.getCurrentSubMerchantList(SecurityUtils.getCurrentUserTenantId());
+        List<SysMerchantDO> result = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(merchantList)) {
+            merchantList.forEach(merchantDO -> {
+                result.add(SysMerchantDO.builder().merchantId(merchantDO.getMerchantId()).merchantName(merchantDO.getMerchantName()).build());
+            });
+        }
+        return Result.of(ResponseEnum.SUCCESS, result);
     }
 
 }

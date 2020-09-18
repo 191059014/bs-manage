@@ -1,6 +1,6 @@
-package com.hb.bsmanage.api.impl;
+package com.hb.bsmanage.api.service.impl;
 
-import com.hb.bsmanage.api.ISysUserRoleService;
+import com.hb.bsmanage.api.service.ISysUserRoleService;
 import com.hb.bsmanage.model.dobj.SysUserRoleDO;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;

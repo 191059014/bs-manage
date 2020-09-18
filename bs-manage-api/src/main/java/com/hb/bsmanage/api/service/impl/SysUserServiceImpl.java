@@ -1,6 +1,6 @@
-package com.hb.bsmanage.api.impl;
+package com.hb.bsmanage.api.service.impl;
 
-import com.hb.bsmanage.api.ISysUserService;
+import com.hb.bsmanage.api.service.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;

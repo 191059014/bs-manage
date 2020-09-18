@@ -10,7 +10,6 @@ CREATE TABLE `sys_user` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `record_status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '记录有效状态',
   `parent_id` varchar(32) NOT NULL DEFAULT '' COMMENT '父级ID',
-  `parent_id_path` varchar(1024) NOT NULL DEFAULT '' COMMENT '父级ID路径',
   `tenant_id` varchar(32) NOT NULL DEFAULT '' COMMENT '多租户ID',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_user_id` (`user_id`)
@@ -82,7 +81,7 @@ CREATE TABLE `sys_merchant` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `merchant_id` varchar(32) NOT NULL COMMENT '商户ID',
   `merchant_name` varchar(256) NOT NULL COMMENT '商户名称',
-  `parent_id_path` varchar(1024) NOT NULL DEFAULT '' COMMENT '父级id路径',
+  `level` varchar(1024) NOT NULL DEFAULT '' COMMENT '等级',
   `create_by` varchar(32) NOT NULL DEFAULT '' COMMENT '创建人',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(32) NOT NULL DEFAULT '' COMMENT '更新人',

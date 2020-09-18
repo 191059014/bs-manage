@@ -75,6 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             RbacContext rbacContext = JwtUtils.parseJwtToken(request.getHeader(Consts.TOKEN));
             // 将rbac信息放入上下文
             SecurityUtils.setRbacContext(rbacContext);
+            LOGGER.info("{}用户信息已放入上下文，放行", baseLog);
         } catch (BusinessException e) {
             LOGGER.info("{}业务异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
             ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(e.getKey(), e.getMessage())));
