@@ -7,6 +7,7 @@ package com.hb.bsmanage.model.enums;
  */
 public enum ResourceType {
 
+    FOLDER("folder", "目录"),
     PAGE("page", "页面"),
     BUTTON("button", "按钮");
 

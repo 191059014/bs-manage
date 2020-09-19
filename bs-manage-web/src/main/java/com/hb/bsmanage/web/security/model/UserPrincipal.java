@@ -35,7 +35,7 @@ public class UserPrincipal implements UserDetails {
         this.password = password;
         if (CollectionUtils.isNotEmpty(permissions)) {
             this.authorities = permissions.stream()
-                    .map(permission -> new SimpleGrantedAuthority(permission))
+                    .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
         }
     }

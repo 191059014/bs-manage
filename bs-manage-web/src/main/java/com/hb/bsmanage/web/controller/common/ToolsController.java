@@ -161,13 +161,11 @@ public class ToolsController {
         iSysUserRoleService.insert(userRole);
         LOGGER.info("{}添加用户角色关系成功={}={}", baseLog, userRole.getUserId(), userRole.getRoleId());
         // 新增权限信息
-
         SysPermissionDO sysPermission = SysPermissionDO.builder()
                 .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
                 .permissionName("系统管理")
-                .resourceType(ResourceType.PAGE.getValue())
+                .resourceType(ResourceType.FOLDER.getValue())
                 .value("sys")
-                .url(null)
                 .icon("el-icon-setting")
                 .build();
         sysPermission.setTenantId(merchant.getMerchantId());
@@ -184,30 +182,51 @@ public class ToolsController {
 
         String[] accessNameArr = new String[]{"商户管理", "用户管理", "角色管理", "权限管理"};
         String[] urlArr = new String[]{"/merchantManage", "/userManage", "/roleManage", "/accessManage"};
-        String[] accessValueArr = new String[]{"sys_merchant", "sys_user", "sys_role", "sys_access"};
         String[] iconArr = new String[]{"el-icon-coin", "el-icon-s-custom", "el-icon-user", "el-icon-lock"};
+        String[] valuePrefixArr = new String[]{"sys_merchant", "sys_user", "sys_role", "sys_permission"};
         for (int i = 0; i < 4; i++) {
-            SysPermissionDO permission = SysPermissionDO.builder()
+            SysPermissionDO pagePermission = SysPermissionDO.builder()
                     .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
                     .permissionName(accessNameArr[i])
                     .resourceType(ResourceType.PAGE.getValue())
-                    .value(accessValueArr[i])
+                    .value(valuePrefixArr[i])
                     .url(urlArr[i])
                     .icon(iconArr[i])
                     .build();
-            permission.setTenantId(merchant.getMerchantId());
-            permission.setParentId(sysPermission.getPermissionId());
-            iSysPermissionService.insert(permission);
-            LOGGER.info("{}添加权限成功={}", baseLog, permission.getPermissionId());
+            pagePermission.setTenantId(merchant.getMerchantId());
+            pagePermission.setParentId(sysPermission.getPermissionId());
+            iSysPermissionService.insert(pagePermission);
+            LOGGER.info("{}添加权限成功={}", baseLog, pagePermission.getPermissionId());
             // 新增角色权限关系信息
-            SysRolePermissionDO rolePermission = SysRolePermissionDO.builder()
+            SysRolePermissionDO pageRolePermission = SysRolePermissionDO.builder()
                     .roleId(role.getRoleId())
-                    .permissionId(permission.getPermissionId())
+                    .permissionId(pagePermission.getPermissionId())
                     .build();
-            rolePermission.setTenantId(merchant.getMerchantId());
-            iSysRoleAccessService.insert(rolePermission);
-            LOGGER.info("{}添加角色权限关系成功={}={}", baseLog, role.getRoleId(), permission.getPermissionId());
-            Thread.sleep(1000);
+            pageRolePermission.setTenantId(merchant.getMerchantId());
+            iSysRoleAccessService.insert(pageRolePermission);
+            LOGGER.info("{}添加角色权限关系成功={}={}", baseLog, role.getRoleId(), pagePermission.getPermissionId());
+            String[] buttonName = new String[]{"新增", "修改", "删除"};
+            String[] valueSuffixArr = new String[]{"_add", "_update", "_delete"};
+            for (int j = 0; j < 3; j++) {
+                SysPermissionDO buttonPermission = SysPermissionDO.builder()
+                        .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
+                        .permissionName(buttonName[j])
+                        .resourceType(ResourceType.BUTTON.getValue())
+                        .value(valuePrefixArr[i] + valueSuffixArr[j])
+                        .build();
+                buttonPermission.setTenantId(merchant.getMerchantId());
+                buttonPermission.setParentId(pagePermission.getPermissionId());
+                iSysPermissionService.insert(buttonPermission);
+                LOGGER.info("{}添加按钮权限成功={}", baseLog, buttonPermission.getPermissionId());
+                // 新增角色权限关系信息
+                SysRolePermissionDO buttonRolePermission = SysRolePermissionDO.builder()
+                        .roleId(role.getRoleId())
+                        .permissionId(buttonPermission.getPermissionId())
+                        .build();
+                buttonRolePermission.setTenantId(merchant.getMerchantId());
+                iSysRoleAccessService.insert(buttonRolePermission);
+                Thread.sleep(500);
+            }
         }
         return Result.of(ResponseEnum.SUCCESS);
     }

@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Permission;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -215,6 +216,21 @@ public class AccessController extends BaseController {
             throw new BusinessException(ResponseEnum.FAIL);
         }
         return Result.of(ResponseEnum.SUCCESS);
+    }
+
+    /**
+     * 通过资源类型获取当前商户下的资源
+     *
+     * @param resourceType 资源类型
+     * @return 资源
+     */
+    @GetMapping("/getResourcesUnderMerchantByResourceType")
+    public Result<List<SysPermissionDO>> getResourcesUnderMerchantByResourceType(@RequestParam("resourceType") String resourceType) {
+        Where where = Where.build()
+                .andAdd(QueryType.EQUAL, "tenant_id", SecurityUtils.getCurrentUserTenantId())
+                .andAdd(QueryType.EQUAL, "resource_type", resourceType);
+        List<SysPermissionDO> list = iSysPermissionService.selectList(where, "create_time desc");
+        return Result.of(ResponseEnum.SUCCESS, list);
     }
 
 }
