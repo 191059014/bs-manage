@@ -34,7 +34,7 @@ public class Menu implements Serializable {
     // 父级页面索引
     private String parentIndex;
     // 下级页面集合
-    private Set<Menu> children;
+    private List<Menu> children;
 
     @Override
     public String toString() {

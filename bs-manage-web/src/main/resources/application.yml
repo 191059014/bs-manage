@@ -1,6 +1,5 @@
 server:
   port: 8080
-  max-http-header-size: 1024KB
 spring:
   application:
     name: bs-manage-web
@@ -24,6 +23,7 @@ jasypt:
 security:
   ignoreUrlPatterns: # springsecurity忽略的url
       - /bs/noauth/**
+      - /bs/test/**
 jwt:
   config:
     key: bs_manage_web  # jwt签名key

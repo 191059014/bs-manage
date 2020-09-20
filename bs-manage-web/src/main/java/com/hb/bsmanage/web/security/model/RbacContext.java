@@ -1,14 +1,12 @@
 package com.hb.bsmanage.web.security.model;
 
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * jwt包含的rbac信息
@@ -25,10 +23,10 @@ public class RbacContext {
     private SysUserDO user;
 
     // 角色信息
-    private List<SysRoleDO> roles;
+    private Set<String> roles;
 
     // 权限信息
-    private List<SysPermissionDO> permissions;
+    private Set<String> permissions;
 
 }
 

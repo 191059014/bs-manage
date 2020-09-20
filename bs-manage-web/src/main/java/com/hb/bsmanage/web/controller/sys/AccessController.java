@@ -2,13 +2,17 @@ package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.api.service.ISysMerchantService;
 import com.hb.bsmanage.api.service.ISysPermissionService;
+import com.hb.bsmanage.api.service.ISysRoleAccessService;
 import com.hb.bsmanage.api.service.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysPermissionDO;
+import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.enums.ResourceType;
 import com.hb.bsmanage.model.enums.TableEnum;
 import com.hb.bsmanage.model.model.Menu;
+import com.hb.bsmanage.model.model.TreeData;
 import com.hb.bsmanage.model.response.MenuDataResponse;
+import com.hb.bsmanage.model.response.TreeDataResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -19,6 +23,7 @@ import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.easybuild.MapBuilder;
+import com.hb.unic.util.easybuild.SetBuilder;
 import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
 import org.apache.commons.collections4.CollectionUtils;
@@ -26,18 +31,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.Permission;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -74,6 +70,12 @@ public class AccessController extends BaseController {
     private ISysUserService iSysUserService;
 
     /**
+     * 角色权限关系service
+     */
+    @Autowired
+    private ISysRoleAccessService iSysRoleAccessService;
+
+    /**
      * 获取私人的所有菜单信息
      *
      * @return 菜单信息列表
@@ -81,46 +83,41 @@ public class AccessController extends BaseController {
     @GetMapping("/getPrivateMenuDatas")
     public Result<MenuDataResponse> getPrivateMenuDatas() {
         MenuDataResponse response = new MenuDataResponse();
-        List<SysPermissionDO> currentUserAccesses = SecurityUtils.getCurrentUserPermissions();
-        Predicate<SysPermissionDO> predicate = access -> StringUtils.isBlank(access.getParentId()) && ResourceType.PAGE.getValue().equals(access.getResourceType());
-        Set<SysPermissionDO> firstLevelAccesses = currentUserAccesses.stream().filter(predicate).collect(Collectors.toSet());
-        Set<Menu> menuSet = new HashSet<>();
-        firstLevelAccesses.forEach(access -> {
-            Menu menu = Menu.builder().index(access.getPermissionId())
-                    .name(access.getPermissionName())
-                    .icon(access.getIcon())
-                    .url(access.getUrl())
-                    .parentIndex(access.getParentId())
-                    .children(findChildrenCycle(currentUserAccesses, access))
-                    .build();
-            menuSet.add(menu);
-        });
-        response.setMenuDatas(menuSet);
+        Set<String> permissionIdSet = SecurityUtils.getCurrentUserPermissions();
+        if (CollectionUtils.isEmpty(permissionIdSet)) {
+            return Result.of(ResponseEnum.SUCCESS, response);
+        }
+        Where where = Where.build().andAdd(QueryType.IN, "permission_id", permissionIdSet);
+        where.andAdd(QueryType.IN, "resource_type", SetBuilder.build().add(ResourceType.FOLDER.getValue(), ResourceType.PAGE.getValue()).get());
+        List<SysPermissionDO> allList = iSysPermissionService.selectList(where, "create_time asc");
+        List<SysPermissionDO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
+        List<Menu> menuList = findChildrenMenuCycle(allList, topList);
+        response.setMenuDatas(menuList);
         return Result.of(ResponseEnum.SUCCESS, response);
     }
 
     /**
      * 递归查找菜单
      *
-     * @param allAccess     所有权限
-     * @param currentAccess 当前权限信息
+     * @param allList   所有权限
+     * @param childList 当前权限信息
      * @return 菜单列表
      */
-    private Set<Menu> findChildrenCycle(List<SysPermissionDO> allAccess, SysPermissionDO currentAccess) {
-        Set<Menu> menuSet = new HashSet<>();
-        allAccess.forEach(access -> {
-            if (currentAccess.getPermissionId().equals(access.getParentId())) {
-                Menu menu = Menu.builder().index(access.getPermissionId())
-                        .name(access.getPermissionName())
-                        .icon(access.getIcon())
-                        .url(access.getUrl())
-                        .parentIndex(access.getParentId())
-                        .children(findChildrenCycle(allAccess, access))
-                        .build();
-                menuSet.add(menu);
-            }
+    private List<Menu> findChildrenMenuCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
+        List<Menu> menuList = new ArrayList<>();
+        childList.forEach(access -> {
+            Menu menu = Menu.builder().index(access.getPermissionId())
+                    .name(access.getPermissionName())
+                    .icon(access.getIcon())
+                    .url(access.getUrl())
+                    .parentIndex(access.getParentId())
+                    .build();
+            List<SysPermissionDO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
+            menu.setChildren(findChildrenMenuCycle(allList, cList));
+            menuList.add(menu);
+
         });
-        return menuSet.size() > 0 ? menuSet : null;
+        return menuList.size() > 0 ? menuList : null;
     }
 
     /**

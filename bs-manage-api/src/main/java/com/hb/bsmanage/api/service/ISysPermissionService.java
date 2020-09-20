@@ -21,4 +21,12 @@ public interface ISysPermissionService extends IDmlMapper<SysPermissionDO, Integ
      */
     List<SysPermissionDO> getPermissionListByPermissionIdSet(Set<String> permissionIdSet);
 
+    /**
+     * 查询商户下的权限列表
+     *
+     * @param merchantId 商户ID
+     * @return 权限id列表
+     */
+    Set<String> getPermissionSetByMerchantId(String merchantId);
+
 }

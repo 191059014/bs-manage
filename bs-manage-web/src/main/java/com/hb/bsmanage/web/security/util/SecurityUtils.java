@@ -1,12 +1,10 @@
 package com.hb.bsmanage.web.security.util;
 
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.web.security.model.RbacContext;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 工具类
@@ -42,19 +40,19 @@ public class SecurityUtils {
     /**
      * 获取当前用户的角色信息
      *
-     * @return Set<SysRoleDO>
+     * @return 角色id集合
      */
-    public static List<SysRoleDO> getCurrentUserRoles() {
-        return RC.get() == null ? new ArrayList<>() : RC.get().getRoles();
+    public static Set<String> getCurrentUserRoles() {
+        return RC.get() == null ? new HashSet<>() : RC.get().getRoles();
     }
 
     /**
      * 获取当前用户的权限信息
      *
-     * @return Set<SysRoleDO>
+     * @return 权限id集合
      */
-    public static List<SysPermissionDO> getCurrentUserPermissions() {
-        return RC.get() == null ? new ArrayList<>() : RC.get().getPermissions();
+    public static Set<String> getCurrentUserPermissions() {
+        return RC.get() == null ? new HashSet<>() : RC.get().getPermissions();
     }
 
     /**

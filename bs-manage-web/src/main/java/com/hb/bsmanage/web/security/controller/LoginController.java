@@ -1,16 +1,10 @@
 package com.hb.bsmanage.web.security.controller;
 
-import com.hb.bsmanage.api.service.ISysPermissionService;
-import com.hb.bsmanage.api.service.ISysRoleAccessService;
-import com.hb.bsmanage.api.service.ISysRoleService;
-import com.hb.bsmanage.api.service.ISysUserRoleService;
-import com.hb.bsmanage.api.service.ISysUserService;
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysRoleDO;
+import com.hb.bsmanage.api.service.*;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.request.LoginRequest;
-import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.jwt.JwtUtils;
 import com.hb.bsmanage.web.security.model.UserPrincipal;
 import com.hb.unic.base.common.Result;
@@ -29,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -102,17 +95,11 @@ public class LoginController extends BaseController {
             String username = userPrincipal.getUsername();
             SysUserDO user = iSysUserService.findByUsernameOrMobile(username);
             Set<String> roleIdSet = iSysUserRoleService.getRoleIdSetByUserId(user.getUserId());
-            List<SysRoleDO> roles = null;
             Set<String> permissionIdSet = null;
             if (CollectionUtils.isNotEmpty(roleIdSet)) {
-                roles = iSysRoleService.getRoleListByRoleIdSet(roleIdSet);
                 permissionIdSet = iSysRoleAccessService.getPermissionIdSetByRoleIdSet(roleIdSet);
             }
-            List<SysPermissionDO> permissions = null;
-            if (CollectionUtils.isNotEmpty(permissionIdSet)) {
-                permissions = iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
-            }
-            String jwt = JwtUtils.createToken(user, roles, permissions, req.isRememberMe());
+            String jwt = JwtUtils.createToken(user, roleIdSet, permissionIdSet, req.isRememberMe());
             return Result.of(ResponseEnum.SUCCESS, jwt);
         } catch (BadCredentialsException e) {
             if (LOGGER.isErrorEnabled()) {

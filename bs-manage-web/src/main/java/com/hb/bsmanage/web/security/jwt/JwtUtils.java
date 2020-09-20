@@ -13,7 +13,6 @@ import com.hb.unic.base.GlobalProperties;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.util.util.CloneUtils;
 import com.hb.unic.util.util.JsonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -21,10 +20,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * JWT工具类
@@ -79,11 +75,11 @@ public class JwtUtils {
      * 生成jwt（也可以和redis一起使用，将token放到redis里面）
      *
      * @param user        用户信息
-     * @param roles       角色列表
-     * @param permissions 权限列表
+     * @param roleIdSet 角色
+     * @param permissionIdSet 权限列表
      * @return jwt令牌
      */
-    public static String createToken(SysUserDO user, List<SysRoleDO> roles, List<SysPermissionDO> permissions, boolean rememberMe) {
+    public static String createToken(SysUserDO user, Set<String> roleIdSet, Set<String> permissionIdSet, boolean rememberMe) {
         if (user == null) {
             return null;
         }
@@ -95,9 +91,9 @@ public class JwtUtils {
                 // 设置用户
                 .claim(USER, user)
                 // 设置角色
-                .claim(ROLES, roles)
+                .claim(ROLES, roleIdSet)
                 // 设置权限
-                .claim(AUTHORITIES, permissions)
+                .claim(AUTHORITIES, permissionIdSet)
                 // 设置签发日期
                 .setIssuedAt(new Date())
                 // 签名方式
@@ -152,9 +148,9 @@ public class JwtUtils {
         if (!simpleToken.equals(redisToken)) {
             throw new BusinessException(ResponseEnum.ILLEGAL_TOKEN);
         }
-        List<SysRoleDO> roles = JsonUtils.toType(JsonUtils.toJson(claims.get(ROLES)), new TypeReference<List<SysRoleDO>>() {
+        Set<String> roles = JsonUtils.toType(JsonUtils.toJson(claims.get(ROLES)), new TypeReference<Set<String>>() {
         });
-        List<SysPermissionDO> permissions = JsonUtils.toType(JsonUtils.toJson(claims.get(AUTHORITIES)), new TypeReference<List<SysPermissionDO>>() {
+        Set<String> permissions = JsonUtils.toType(JsonUtils.toJson(claims.get(AUTHORITIES)), new TypeReference<Set<String>>() {
         });
         return RbacContext.builder().user(user).roles(roles).permissions(permissions).build();
     }

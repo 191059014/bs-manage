@@ -6,6 +6,8 @@ import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.enums.TableEnum;
+import com.hb.bsmanage.model.model.TreeData;
+import com.hb.bsmanage.model.response.TreeDataResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -25,10 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -177,9 +176,12 @@ public class RoleController extends BaseController {
      */
     @GetMapping("/getPermissionsUnderRole")
     public Result<Set<String>> getPermissionsUnderRole(@RequestParam("roleId") String roleId) {
-        SysRoleDO sysRoleDO = iSysRoleService.selectByBk(roleId);
-        List<SysRolePermissionDO> rolePermissionList = iSysRoleAccessService.selectList(Where.build().andAdd(QueryType.EQUAL, "role_id", sysRoleDO.getRoleId()));
+        List<SysRolePermissionDO> rolePermissionList = iSysRoleAccessService.selectList(Where.build().andAdd(QueryType.EQUAL, "role_id", roleId));
         Set<String> permissionIdSet = rolePermissionList.stream().map(SysRolePermissionDO::getPermissionId).collect(Collectors.toSet());
+        List<SysPermissionDO> permissionList = iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
+        Set<String> parentPermissionIdSet = permissionList.stream().map(SysPermissionDO::getParentId).collect(Collectors.toSet());
+        // 只返回叶子节点，防止父节点选中，导致子节点全部选中
+        permissionIdSet.removeAll(parentPermissionIdSet);
         return Result.of(ResponseEnum.SUCCESS, permissionIdSet);
     }
 
@@ -197,8 +199,8 @@ public class RoleController extends BaseController {
     /**
      * 更新用户的角色
      *
-     * @param userId    用户id
-     * @param roleIdSet 角色集合
+     * @param roleId          角色
+     * @param permissionIdSet 权限id集合
      * @return 更新结果
      */
     @PostMapping("/updateRolePermission")
@@ -222,6 +224,46 @@ public class RoleController extends BaseController {
         return Result.of(ResponseEnum.SUCCESS);
     }
 
+    /**
+     * 获取权限树
+     *
+     * @param roleId 权限id
+     * @return 权限树
+     */
+    @GetMapping("/getPermissionTreeUnderMerchant")
+    public Result<TreeDataResponse> getPermissionTreeUnderMerchant(@RequestParam("roleId") String roleId) {
+        TreeDataResponse response = new TreeDataResponse();
+        SysRoleDO sysRoleDO = iSysRoleService.selectByBk(roleId);
+        Set<String> permissionIdSet = iSysPermissionService.getPermissionSetByMerchantId(sysRoleDO.getTenantId());
+        if (CollectionUtils.isEmpty(permissionIdSet)) {
+            return Result.of(ResponseEnum.SUCCESS, response);
+        }
+        Where where = Where.build().andAdd(QueryType.IN, "permission_id", permissionIdSet);
+        List<SysPermissionDO> allList = iSysPermissionService.selectList(where, "create_time asc");
+        List<SysPermissionDO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
+        List<TreeData> treeDataList = findTreeCycle(allList, topList);
+        response.setTreeDataList(treeDataList);
+        return Result.of(ResponseEnum.SUCCESS, response);
+    }
+
+    /**
+     * 递归获取权限树
+     *
+     * @return 权限树
+     */
+    private List<TreeData> findTreeCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
+        List<TreeData> treeDataList = new ArrayList<>();
+        for (SysPermissionDO access : childList) {
+            TreeData treeData = TreeData.builder()
+                    .id(access.getPermissionId())
+                    .label(access.getPermissionName())
+                    .build();
+            List<SysPermissionDO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
+            treeData.setChildren(findTreeCycle(allList, cList));
+            treeDataList.add(treeData);
+        }
+        return treeDataList.size() > 0 ? treeDataList : null;
+    }
+
 }
 
-    
