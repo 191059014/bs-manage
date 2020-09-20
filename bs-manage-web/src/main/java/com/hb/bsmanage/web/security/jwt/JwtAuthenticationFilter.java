@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -60,13 +61,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String baseLog = "[JwtAuthenticationFilter-doFilterInternal-jwt认证过滤器]";
-        if ("options".equals(request.getMethod())) {
+        if (RequestMethod.OPTIONS.toString().equalsIgnoreCase(request.getMethod())) {
+            LOGGER.info("{}OPTIONS请求，直接放行[{}]", baseLog, request.getRequestURI());
             chain.doFilter(request, response);
             return;
         }
         if (checkIgnores(request)) {
-            LOGGER.info("{}无需拦截[{}]，放行", baseLog, request.getRequestURI());
-            //放行
+            LOGGER.info("{}忽略请求，直接放行[{}]", baseLog, request.getRequestURI());
             chain.doFilter(request, response);
             return;
         }
@@ -76,17 +77,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 将rbac信息放入上下文
             SecurityUtils.setRbacContext(rbacContext);
             LOGGER.info("{}用户信息已放入上下文，放行", baseLog);
+            //放行
+            chain.doFilter(request, response);
         } catch (BusinessException e) {
             LOGGER.info("{}业务异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
             ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(e.getKey(), e.getMessage())));
-            return;
         } catch (Exception e) {
             LOGGER.info("{}系统异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
             ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.FAIL.getCode(), "token认证失败")));
-            return;
         }
-        //放行
-        chain.doFilter(request, response);
     }
 
     /**

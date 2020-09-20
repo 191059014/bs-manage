@@ -16,24 +16,19 @@ package com.hb.bsmanage.web.common;
 public enum ResponseEnum {
 
     /**
-     * 最基本的三个状态：成功，异常，失败
+     * 最基本的三个状态：成功，异常，失败，参数非法
      */
-    SUCCESS("BMW_000", "成功"),
-    PARAM_ILLEGAL("BMW_001", "参数非法"),
-    FAIL("BMW_499", "失败"),
-    ERROR("BMW_500", "系统异常，请稍后再试"),
+    SUCCESS("10000", "成功"),
+    FAIL("10001", "失败"),
+    PARAM_ILLEGAL("10002", "参数非法"),
+    ERROR("10003", "系统异常，请稍后再试"),
     /**
-     * 第一个001代表“系统级别”的错误
+     * 20100-20199代表“系统级别”的错误
      */
-    ACCESS_DENY("BMW_SYS_P_001", "禁止访问"),
-    NULL_TOKEN("BMW_SYS_P_002", "token为空"),
-    ILLEGAL_TOKEN("BMW_SYS_P_002", "非法的token"),
-    EXPIRE_TOKEN("BMW_SYS_P_002", "过期的token"),
-    USERNAME_EMPTY("BMW_SYS_P_005", "用户名为空"),
-    PWD_EMPTY("BMW_SYS_P_006", "密码为空"),
-    PWD_ERROR("BMW_SYS_P_007", "密码错误"),
-    USERNAME_NOT_EXIST("BMW_SYS_P_008", "用户名不存在"),
-    BAD_CREDENTIALS("BMW_SYS_P_009", "用户名或密码不正确"),
+    ACCESS_DENY("20100", "禁止访问"),
+    ILLEGAL_TOKEN("20101", "非法的token"),
+    USER_NOT_EXIST("20102", "用户不存在"),
+    BAD_CREDENTIALS("20103", "用户名或密码不正确"),
 
     ;
 

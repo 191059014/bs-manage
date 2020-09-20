@@ -1,7 +1,7 @@
 package com.hb.bsmanage.model.response;
 
-import com.hb.bsmanage.model.common.ToStringHelper;
-import com.hb.bsmanage.model.model.Menu;
+import com.hb.bsmanage.model.model.ElementUIMenu;
+import com.hb.unic.util.helper.ToStringHelper;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,16 +14,16 @@ import java.util.List;
  * @date 2020/9/12
  */
 @Data
-public class MenuDataResponse implements Serializable {
+public class ElementUIMenuResponse implements Serializable {
 
     // serialVersionUID
     private static final long serialVersionUID = -1128889147856096856L;
 
     //  菜单列表
-    private List<Menu> menuDatas;
+    private List<ElementUIMenu> menuDatas;
 
     @Override
     public String toString() {
-        return ToStringHelper.printJsonNoNull(this);
+        return ToStringHelper.printNoNull(this);
     }
 }

@@ -3,8 +3,8 @@ package com.hb.bsmanage.model.base.impl;
 import com.hb.bsmanage.model.base.IRelationDO;
 import com.hb.bsmanage.model.base.IStatusDO;
 import com.hb.bsmanage.model.base.ITenantDO;
-import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
+import com.hb.unic.util.helper.ToStringHelper;
 
 /**
  * 通常的DO

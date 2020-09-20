@@ -5,14 +5,11 @@ import com.hb.bsmanage.api.service.ISysPermissionService;
 import com.hb.bsmanage.api.service.ISysRoleAccessService;
 import com.hb.bsmanage.api.service.ISysUserService;
 import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.enums.ResourceType;
 import com.hb.bsmanage.model.enums.TableEnum;
-import com.hb.bsmanage.model.model.Menu;
-import com.hb.bsmanage.model.model.TreeData;
-import com.hb.bsmanage.model.response.MenuDataResponse;
-import com.hb.bsmanage.model.response.TreeDataResponse;
+import com.hb.bsmanage.model.model.ElementUIMenu;
+import com.hb.bsmanage.model.response.ElementUIMenuResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -34,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -81,8 +77,8 @@ public class AccessController extends BaseController {
      * @return 菜单信息列表
      */
     @GetMapping("/getPrivateMenuDatas")
-    public Result<MenuDataResponse> getPrivateMenuDatas() {
-        MenuDataResponse response = new MenuDataResponse();
+    public Result<ElementUIMenuResponse> getPrivateMenuDatas() {
+        ElementUIMenuResponse response = new ElementUIMenuResponse();
         Set<String> permissionIdSet = SecurityUtils.getCurrentUserPermissions();
         if (CollectionUtils.isEmpty(permissionIdSet)) {
             return Result.of(ResponseEnum.SUCCESS, response);
@@ -91,7 +87,7 @@ public class AccessController extends BaseController {
         where.andAdd(QueryType.IN, "resource_type", SetBuilder.build().add(ResourceType.FOLDER.getValue(), ResourceType.PAGE.getValue()).get());
         List<SysPermissionDO> allList = iSysPermissionService.selectList(where, "create_time asc");
         List<SysPermissionDO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
-        List<Menu> menuList = findChildrenMenuCycle(allList, topList);
+        List<ElementUIMenu> menuList = findChildrenMenuCycle(allList, topList);
         response.setMenuDatas(menuList);
         return Result.of(ResponseEnum.SUCCESS, response);
     }
@@ -103,10 +99,10 @@ public class AccessController extends BaseController {
      * @param childList 当前权限信息
      * @return 菜单列表
      */
-    private List<Menu> findChildrenMenuCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
-        List<Menu> menuList = new ArrayList<>();
+    private List<ElementUIMenu> findChildrenMenuCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
+        List<ElementUIMenu> menuList = new ArrayList<>();
         childList.forEach(access -> {
-            Menu menu = Menu.builder().index(access.getPermissionId())
+            ElementUIMenu menu = ElementUIMenu.builder().index(access.getPermissionId())
                     .name(access.getPermissionName())
                     .icon(access.getIcon())
                     .url(access.getUrl())

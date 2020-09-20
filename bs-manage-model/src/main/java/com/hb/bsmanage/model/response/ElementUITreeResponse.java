@@ -1,6 +1,6 @@
 package com.hb.bsmanage.model.response;
 
-import com.hb.bsmanage.model.model.TreeData;
+import com.hb.bsmanage.model.model.ElementUITree;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,13 +18,13 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TreeDataResponse implements Serializable {
+public class ElementUITreeResponse implements Serializable {
 
     // serialVersionUID
     private static final long serialVersionUID = 6066278139558557896L;
 
     // 树所有数据
-    private List<TreeData> treeDataList;
+    private List<ElementUITree> treeDataList;
 
 }
 

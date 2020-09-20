@@ -2,8 +2,8 @@ package com.hb.bsmanage.model.base.impl;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hb.bsmanage.model.base.ITimestampDO;
-import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
+import com.hb.unic.util.helper.ToStringHelper;
 import com.hb.unic.util.util.DateUtils;
 
 import java.util.Date;

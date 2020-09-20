@@ -74,15 +74,12 @@ public class JwtUtils {
     /**
      * 生成jwt（也可以和redis一起使用，将token放到redis里面）
      *
-     * @param user        用户信息
-     * @param roleIdSet 角色
+     * @param user            用户信息
+     * @param roleIdSet       角色
      * @param permissionIdSet 权限列表
      * @return jwt令牌
      */
     public static String createToken(SysUserDO user, Set<String> roleIdSet, Set<String> permissionIdSet, boolean rememberMe) {
-        if (user == null) {
-            return null;
-        }
         JwtBuilder jwtBuilder = Jwts.builder()
                 // 设置jwt的id,防止jwt被重新发送
                 .setId(UUID.randomUUID().toString())
@@ -119,12 +116,16 @@ public class JwtUtils {
      * @return JwtInfo
      */
     public static RbacContext parseJwtToken(String token) {
+        String baseLog = "[JwtUtils-parseJwtToken-解析token]";
+        LOGGER.info("{}入参={}", baseLog, token);
         // 校验token是否为空
         if (StringUtils.isEmpty(token)) {
-            throw new BusinessException(ResponseEnum.NULL_TOKEN);
+            LOGGER.info("{}token为空", baseLog);
+            throw new BusinessException(ResponseEnum.ILLEGAL_TOKEN);
         }
         // 校验token是否以Bearer 开头
         if (!token.startsWith(Consts.TOKEN_BEARER)) {
+            LOGGER.info("{}token没有以Bearer 开头", baseLog);
             throw new BusinessException(ResponseEnum.ILLEGAL_TOKEN);
         }
         // 替换token中的Bearer
@@ -142,10 +143,12 @@ public class JwtUtils {
         String redisToken = ToolsWapper.redis().get(jwtKey);
         // 校验redis中的token是否过期
         if (redisToken == null) {
-            throw new BusinessException(ResponseEnum.EXPIRE_TOKEN);
+            LOGGER.info("{}redis中的token为空", baseLog);
+            throw new BusinessException(ResponseEnum.ILLEGAL_TOKEN);
         }
         // 校验浏览器传过来的token和缓存中的token是否相等
         if (!simpleToken.equals(redisToken)) {
+            LOGGER.info("{}request中的token和redis中的token不相等", baseLog);
             throw new BusinessException(ResponseEnum.ILLEGAL_TOKEN);
         }
         Set<String> roles = JsonUtils.toType(JsonUtils.toJson(claims.get(ROLES)), new TypeReference<Set<String>>() {

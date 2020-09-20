@@ -55,7 +55,7 @@ public abstract class BaseController {
     @ExceptionHandler(BusinessException.class)
     @ResponseBody
     public Result exception(BusinessException e) {
-        String baseLog = "[统一异常处理-业务异常]";
+        String baseLog = "[BaseController-exception-业务异常]";
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
         return Result.of(e.getKey(), e.getMessage());
     }
@@ -66,7 +66,7 @@ public abstract class BaseController {
     @ExceptionHandler(StandardRuntimeException.class)
     @ResponseBody
     public Result exception(StandardRuntimeException e) {
-        String baseLog = "[统一异常处理-标准异常]";
+        String baseLog = "[BaseController-exception-标准异常]";
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
         return Result.of(e.getKey(), e.getMessage());
     }
@@ -77,7 +77,7 @@ public abstract class BaseController {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Result exception(Exception e) {
-        String baseLog = "[统一异常处理-系统异常]";
+        String baseLog = "[BaseController-exception-系统异常]";
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
         return Result.of(ResponseEnum.ERROR);
     }

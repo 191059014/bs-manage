@@ -6,8 +6,8 @@ import com.hb.bsmanage.model.dobj.SysRoleDO;
 import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
 import com.hb.bsmanage.model.dobj.SysUserDO;
 import com.hb.bsmanage.model.enums.TableEnum;
-import com.hb.bsmanage.model.model.TreeData;
-import com.hb.bsmanage.model.response.TreeDataResponse;
+import com.hb.bsmanage.model.model.ElementUITree;
+import com.hb.bsmanage.model.response.ElementUITreeResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -231,8 +231,8 @@ public class RoleController extends BaseController {
      * @return 权限树
      */
     @GetMapping("/getPermissionTreeUnderMerchant")
-    public Result<TreeDataResponse> getPermissionTreeUnderMerchant(@RequestParam("roleId") String roleId) {
-        TreeDataResponse response = new TreeDataResponse();
+    public Result<ElementUITreeResponse> getPermissionTreeUnderMerchant(@RequestParam("roleId") String roleId) {
+        ElementUITreeResponse response = new ElementUITreeResponse();
         SysRoleDO sysRoleDO = iSysRoleService.selectByBk(roleId);
         Set<String> permissionIdSet = iSysPermissionService.getPermissionSetByMerchantId(sysRoleDO.getTenantId());
         if (CollectionUtils.isEmpty(permissionIdSet)) {
@@ -241,7 +241,7 @@ public class RoleController extends BaseController {
         Where where = Where.build().andAdd(QueryType.IN, "permission_id", permissionIdSet);
         List<SysPermissionDO> allList = iSysPermissionService.selectList(where, "create_time asc");
         List<SysPermissionDO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
-        List<TreeData> treeDataList = findTreeCycle(allList, topList);
+        List<ElementUITree> treeDataList = findTreeCycle(allList, topList);
         response.setTreeDataList(treeDataList);
         return Result.of(ResponseEnum.SUCCESS, response);
     }
@@ -251,10 +251,10 @@ public class RoleController extends BaseController {
      *
      * @return 权限树
      */
-    private List<TreeData> findTreeCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
-        List<TreeData> treeDataList = new ArrayList<>();
+    private List<ElementUITree> findTreeCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
+        List<ElementUITree> treeDataList = new ArrayList<>();
         for (SysPermissionDO access : childList) {
-            TreeData treeData = TreeData.builder()
+            ElementUITree treeData = ElementUITree.builder()
                     .id(access.getPermissionId())
                     .label(access.getPermissionName())
                     .build();

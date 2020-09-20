@@ -2,9 +2,9 @@ package com.hb.bsmanage.model.dobj;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hb.bsmanage.model.base.impl.CommonDO;
-import com.hb.bsmanage.model.common.ToStringHelper;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
+import com.hb.unic.util.helper.ToStringHelper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

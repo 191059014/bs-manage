@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TreeData implements Serializable {
+public class ElementUITree implements Serializable {
 
     // serialVersionUID
     private static final long serialVersionUID = -8867811043430366793L;
@@ -29,7 +29,7 @@ public class TreeData implements Serializable {
     private String label;
 
     // 子树
-    private List<TreeData> children;
+    private List<ElementUITree> children;
 
 }
 

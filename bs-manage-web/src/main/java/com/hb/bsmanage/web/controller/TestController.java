@@ -2,8 +2,8 @@ package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.api.service.ISysPermissionService;
 import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.model.TreeData;
-import com.hb.bsmanage.model.response.TreeDataResponse;
+import com.hb.bsmanage.model.model.ElementUITree;
+import com.hb.bsmanage.model.response.ElementUITreeResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.unic.base.common.Result;
 import org.apache.commons.lang3.StringUtils;
@@ -28,19 +28,19 @@ public class TestController {
     private ISysPermissionService iSysPermissionService;
 
     @GetMapping("/testGetPermissionTree")
-    public Result<TreeDataResponse> testGetPermissionTree() {
+    public Result<ElementUITreeResponse> testGetPermissionTree() {
         List<SysPermissionDO> list = iSysPermissionService.selectList(null);
-        TreeDataResponse response = new TreeDataResponse();
+        ElementUITreeResponse response = new ElementUITreeResponse();
         List<SysPermissionDO> topList = list.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
-        List<TreeData> treeDataList = findTreeCycle(list, topList);
+        List<ElementUITree> treeDataList = findTreeCycle(list, topList);
         response.setTreeDataList(treeDataList);
         return Result.of(ResponseEnum.SUCCESS, response);
     }
 
-    private List<TreeData> findTreeCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
-        List<TreeData> treeDataList = new ArrayList<>();
+    private List<ElementUITree> findTreeCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
+        List<ElementUITree> treeDataList = new ArrayList<>();
         for (SysPermissionDO access : childList) {
-            TreeData treeData = TreeData.builder()
+            ElementUITree treeData = ElementUITree.builder()
                     .id(access.getPermissionId())
                     .label(access.getPermissionName())
                     .build();

@@ -17,6 +17,7 @@ import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.logger.util.LogHelper;
 import com.hb.unic.util.easybuild.MapBuilder;
 import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
@@ -82,6 +83,8 @@ public class UserController extends BaseController {
     public Result<Pagination<SysUserDO>> findPages(@RequestBody SysUserDO user,
                                                    @RequestParam("pageNum") Integer pageNum,
                                                    @RequestParam("pageSize") Integer pageSize) {
+        String baseLog = LogHelper.getBaseLog("分页查询用户信息");
+        LOGGER.info("{}入参={}={}={}", baseLog, user, pageNum, pageSize);
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "user_id", user.getUserId());
         where.andAdd(QueryType.LIKE, "user_name", user.getUserName());
@@ -112,6 +115,7 @@ public class UserController extends BaseController {
                 });
             }
         }
+        LOGGER.info("{}出参={}", baseLog, pageResult);
         return Result.of(ResponseEnum.SUCCESS, pageResult);
     }
 

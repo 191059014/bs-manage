@@ -103,7 +103,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 // 权限不足异常处理
                 .accessDeniedHandler((request, response, e) -> {
-                    System.out.println("权限不足");
                     ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.ACCESS_DENY)));
                 });
 

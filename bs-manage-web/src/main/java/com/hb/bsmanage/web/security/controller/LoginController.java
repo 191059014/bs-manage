@@ -11,6 +11,7 @@ import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.logger.util.LogExceptionWapper;
+import com.hb.unic.logger.util.LogHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +84,8 @@ public class LoginController extends BaseController {
      */
     @PostMapping("/login")
     public Result<String> login(@RequestBody LoginRequest req) {
-        String baseLog = "[LoginController-login-登陆]";
+        String baseLog = LogHelper.getBaseLog("登录");
+        LOGGER.info("{}入参={}", baseLog, req);
         if (StringUtils.isAnyBlank(req.getUsernameOrMobile(), req.getPassword())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
@@ -94,6 +96,9 @@ public class LoginController extends BaseController {
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             String username = userPrincipal.getUsername();
             SysUserDO user = iSysUserService.findByUsernameOrMobile(username);
+            if (user == null) {
+                return Result.of(ResponseEnum.USER_NOT_EXIST);
+            }
             Set<String> roleIdSet = iSysUserRoleService.getRoleIdSetByUserId(user.getUserId());
             Set<String> permissionIdSet = null;
             if (CollectionUtils.isNotEmpty(roleIdSet)) {
@@ -107,8 +112,6 @@ public class LoginController extends BaseController {
             }
             return Result.of(ResponseEnum.BAD_CREDENTIALS);
         }
-
-
     }
 
 }
