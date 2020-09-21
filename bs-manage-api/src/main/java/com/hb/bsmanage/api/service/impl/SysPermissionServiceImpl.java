@@ -25,7 +25,7 @@ public class SysPermissionServiceImpl extends DmlMapperImpl<SysPermissionPO, Int
     @Override
     @InOutLog("通过权限id集合查询权限列表")
     public List<SysPermissionPO> getPermissionListByPermissionIdSet(Set<String> permissionIdSet) {
-        return selectList(Where.build().and().add(QueryType.IN, "permission_id", permissionIdSet));
+        return selectList(Where.build().andAdd(QueryType.IN, "permission_id", permissionIdSet));
     }
 
     @Override

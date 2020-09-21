@@ -124,12 +124,12 @@ public class RoleController extends BaseController {
      */
     @PostMapping("/add")
     public Result<Integer> add(@RequestBody SysRolePO role) {
-        if (StringUtils.isAnyBlank(role.getRoleName())) {
+        if (StringUtils.isAnyBlank(role.getTenantId(), role.getRoleName())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         role.setRoleId(KeyUtils.getUniqueKey(TableEnum.ROLE_ID.getIdPrefix()));
         role.setRoleName(role.getRoleName());
-        role.setTenantId(SecurityUtils.getCurrentUserTenantId());
+        role.setTenantId(role.getTenantId());
         role.setCreateBy(SecurityUtils.getCurrentUserId());
         role.setUpdateBy(SecurityUtils.getCurrentUserId());
         int addRows = iSysRoleService.insert(role);

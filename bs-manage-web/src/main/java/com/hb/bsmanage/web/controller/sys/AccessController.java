@@ -167,11 +167,11 @@ public class AccessController extends BaseController {
      */
     @PostMapping("/add")
     public Result<Integer> add(@RequestBody SysPermissionPO permission) {
-        if (StringUtils.isAnyBlank(permission.getPermissionName(), permission.getResourceType(), permission.getValue())) {
+        if (StringUtils.isAnyBlank(permission.getTenantId(), permission.getPermissionName(), permission.getResourceType(), permission.getValue())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         permission.setPermissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()));
-        permission.setTenantId(SecurityUtils.getCurrentUserTenantId());
+        permission.setTenantId(permission.getTenantId());
         permission.setCreateBy(SecurityUtils.getCurrentUserId());
         permission.setUpdateBy(SecurityUtils.getCurrentUserId());
         int addRows = iSysPermissionService.insert(permission);

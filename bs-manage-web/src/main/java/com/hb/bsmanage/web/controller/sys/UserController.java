@@ -127,13 +127,13 @@ public class UserController extends BaseController {
      */
     @PostMapping("/add")
     public Result<Integer> add(@RequestBody SysUserPO user) {
-        if (StringUtils.isAnyBlank(user.getUserName(), user.getMobile(), user.getPassword())) {
+        if (StringUtils.isAnyBlank(user.getTenantId(), user.getUserName(), user.getMobile(), user.getPassword())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         user.setUserId(KeyUtils.getUniqueKey(TableEnum.USER_ID.getIdPrefix()));
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         user.setParentId(SecurityUtils.getCurrentUserId());
-        user.setTenantId(SecurityUtils.getCurrentUserTenantId());
+        user.setTenantId(user.getTenantId());
         user.setCreateBy(SecurityUtils.getCurrentUserId());
         user.setUpdateBy(SecurityUtils.getCurrentUserId());
         int addRows = iSysUserService.insert(user);
