@@ -1,6 +1,6 @@
-package com.hb.bsmanage.model.dobj;
+package com.hb.bsmanage.model.po;
 
-import com.hb.bsmanage.model.base.impl.CommonDO;
+import com.hb.bsmanage.model.base.impl.CommonPO;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import com.hb.unic.util.helper.ToStringHelper;
@@ -18,16 +18,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("sys_user_role")
-public class SysUserRoleDO extends CommonDO {
+@Table("sys_role_permission")
+public class SysRolePermissionPO extends CommonPO {
     // 序列化ID
     private static final long serialVersionUID = 3873773717231088322L;
     // 用户ID
-    @Column("user_id")
-    private String userId;
-    // 角色ID
     @Column("role_id")
     private String roleId;
+    // 权限ID
+    @Column("permission_id")
+    private String permissionId;
 
     @Override
     public String toString() {

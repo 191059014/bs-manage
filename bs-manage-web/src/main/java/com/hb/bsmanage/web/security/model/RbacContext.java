@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.security.model;
 
-import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.po.SysUserPO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +20,7 @@ import java.util.Set;
 public class RbacContext {
 
     // 用户信息
-    private SysUserDO user;
+    private SysUserPO user;
 
     // 角色信息
     private Set<String> roles;

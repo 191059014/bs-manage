@@ -1,7 +1,7 @@
-package com.hb.bsmanage.model.dobj;
+package com.hb.bsmanage.model.po;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.hb.bsmanage.model.base.impl.CommonDO;
+import com.hb.bsmanage.model.base.impl.CommonPO;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import com.hb.unic.util.helper.ToStringHelper;
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table("sys_merchant")
-public class SysMerchantDO extends CommonDO {
+public class SysMerchantPO extends CommonPO {
 
     // serialVersionUID
     private static final long serialVersionUID = 5538623345484936541L;
@@ -33,10 +33,6 @@ public class SysMerchantDO extends CommonDO {
     // 商户名
     @Column("merchant_name")
     private String merchantName;
-
-    // 等级
-    @Column("level")
-    private String level;
 
     @Override
     public String toString() {

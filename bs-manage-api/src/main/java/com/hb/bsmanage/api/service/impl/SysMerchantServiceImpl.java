@@ -2,7 +2,7 @@ package com.hb.bsmanage.api.service.impl;
 
 import com.hb.bsmanage.api.common.BsApiUtils;
 import com.hb.bsmanage.api.service.ISysMerchantService;
-import com.hb.bsmanage.model.dobj.SysMerchantDO;
+import com.hb.bsmanage.model.po.SysMerchantPO;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.helper.Where;
 import com.hb.unic.logger.Logger;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @version v0.1, 2020/7/24 15:00, create by huangbiao.
  */
 @Service
-public class SysMerchantServiceImpl extends DmlMapperImpl<SysMerchantDO, Integer, String> implements ISysMerchantService {
+public class SysMerchantServiceImpl extends DmlMapperImpl<SysMerchantPO, Integer, String> implements ISysMerchantService {
 
     /**
      * 日志
@@ -30,19 +30,19 @@ public class SysMerchantServiceImpl extends DmlMapperImpl<SysMerchantDO, Integer
 
     @Override
     public Set<String> getCurrentSubMerchantIdSet(String currentUserTenantId) {
-        List<SysMerchantDO> list = getCurrentSubMerchantList(currentUserTenantId);
+        List<SysMerchantPO> list = getCurrentSubMerchantList(currentUserTenantId);
         Set<String> merchantIdSet = new HashSet<>();
         merchantIdSet.add(currentUserTenantId);
         if (CollectionUtils.isNotEmpty(list)) {
-            merchantIdSet.addAll(list.stream().map(SysMerchantDO::getMerchantId).collect(Collectors.toSet()));
+            merchantIdSet.addAll(list.stream().map(SysMerchantPO::getMerchantId).collect(Collectors.toSet()));
         }
         return merchantIdSet;
     }
 
     @Override
-    public List<SysMerchantDO> getCurrentSubMerchantList(String currentUserTenantId) {
-        SysMerchantDO currentUserMerchant = selectByBk(currentUserTenantId);
-        Where where = BsApiUtils.getSubLevelWhere(Where.build(), currentUserMerchant);
+    public List<SysMerchantPO> getCurrentSubMerchantList(String currentUserTenantId) {
+        SysMerchantPO currentUserMerchant = selectByBk(currentUserTenantId);
+        Where where = BsApiUtils.getSubPathWhere(Where.build(), currentUserMerchant);
         return selectList(where, "create_time desc");
     }
 }

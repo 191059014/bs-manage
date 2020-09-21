@@ -1,8 +1,8 @@
 package com.hb.bsmanage.model.base.impl;
 
-import com.hb.bsmanage.model.base.IRelationDO;
-import com.hb.bsmanage.model.base.IStatusDO;
-import com.hb.bsmanage.model.base.ITenantDO;
+import com.hb.bsmanage.model.base.IRelationPO;
+import com.hb.bsmanage.model.base.IStatusPO;
+import com.hb.bsmanage.model.base.ITenantPO;
 import com.hb.mybatis.annotation.Column;
 import com.hb.unic.util.helper.ToStringHelper;
 
@@ -11,7 +11,7 @@ import com.hb.unic.util.helper.ToStringHelper;
  *
  * @version v0.1, 2020/9/16 10:27, create by huangbiao.
  */
-public abstract class CommonDO extends AbstractBaseDO implements IStatusDO, IRelationDO, ITenantDO {
+public abstract class CommonPO extends AbstractBasePO implements IStatusPO, IRelationPO, ITenantPO {
 
     // serialVersionUID
     private static final long serialVersionUID = -6060485532902309L;
@@ -27,6 +27,10 @@ public abstract class CommonDO extends AbstractBaseDO implements IStatusDO, IRel
     // 父级ID
     @Column("parent_id")
     private String parentId;
+
+    // 关系路径
+    @Column("path")
+    private String path;
 
     // 多租户ID
     @Column("tenant_id")
@@ -60,6 +64,16 @@ public abstract class CommonDO extends AbstractBaseDO implements IStatusDO, IRel
     @Override
     public void setParentId(String parentId) {
         this.parentId = parentId;
+    }
+
+    @Override
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public void setPath(String path) {
+        this.path = path;
     }
 
     @Override

@@ -5,7 +5,7 @@ package com.hb.bsmanage.model.base;
  *
  * @version v0.1, 2020/9/16 10:32, create by huangbiao.
  */
-public interface IRelationDO extends ITimestampDO {
+public interface IRelationPO extends ITimestampPO {
 
     /**
      * 获取ParentId
@@ -16,6 +16,16 @@ public interface IRelationDO extends ITimestampDO {
      * 设置ParentId
      */
     void setParentId(String parentId);
+
+    /**
+     * 获取Path
+     */
+    String getPath();
+
+    /**
+     * 设置Path
+     */
+    void setPath(String path);
 
 }
 

@@ -1,6 +1,6 @@
 package com.hb.bsmanage.api.service;
 
-import com.hb.bsmanage.model.dobj.SysUserRoleDO;
+import com.hb.bsmanage.model.po.SysUserRolePO;
 import com.hb.mybatis.base.IDmlMapper;
 
 import java.util.Set;
@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @version v0.1, 2020/7/24 14:59, create by huangbiao.
  */
-public interface ISysUserRoleService extends IDmlMapper<SysUserRoleDO, Integer, String> {
+public interface ISysUserRoleService extends IDmlMapper<SysUserRolePO, Integer, String> {
 
     /**
      * 通过用户ID查询角色ID集合

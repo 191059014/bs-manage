@@ -4,12 +4,12 @@ import com.hb.bsmanage.api.service.ISysMerchantService;
 import com.hb.bsmanage.api.service.ISysPermissionService;
 import com.hb.bsmanage.api.service.ISysRoleAccessService;
 import com.hb.bsmanage.api.service.ISysUserService;
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.dto.ElementUIMenu;
 import com.hb.bsmanage.model.enums.ResourceType;
 import com.hb.bsmanage.model.enums.TableEnum;
-import com.hb.bsmanage.model.model.ElementUIMenu;
-import com.hb.bsmanage.model.response.ElementUIMenuResponse;
+import com.hb.bsmanage.model.po.SysPermissionPO;
+import com.hb.bsmanage.model.po.SysUserPO;
+import com.hb.bsmanage.model.vo.response.ElementUIMenuResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -85,8 +85,8 @@ public class AccessController extends BaseController {
         }
         Where where = Where.build().andAdd(QueryType.IN, "permission_id", permissionIdSet);
         where.andAdd(QueryType.IN, "resource_type", SetBuilder.build().add(ResourceType.FOLDER.getValue(), ResourceType.PAGE.getValue()).get());
-        List<SysPermissionDO> allList = iSysPermissionService.selectList(where, "create_time asc");
-        List<SysPermissionDO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
+        List<SysPermissionPO> allList = iSysPermissionService.selectList(where, "create_time asc");
+        List<SysPermissionPO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
         List<ElementUIMenu> menuList = findChildrenMenuCycle(allList, topList);
         response.setMenuDatas(menuList);
         return Result.of(ResponseEnum.SUCCESS, response);
@@ -99,7 +99,7 @@ public class AccessController extends BaseController {
      * @param childList 当前权限信息
      * @return 菜单列表
      */
-    private List<ElementUIMenu> findChildrenMenuCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
+    private List<ElementUIMenu> findChildrenMenuCycle(List<SysPermissionPO> allList, List<SysPermissionPO> childList) {
         List<ElementUIMenu> menuList = new ArrayList<>();
         childList.forEach(access -> {
             ElementUIMenu menu = ElementUIMenu.builder().index(access.getPermissionId())
@@ -108,7 +108,7 @@ public class AccessController extends BaseController {
                     .url(access.getUrl())
                     .parentIndex(access.getParentId())
                     .build();
-            List<SysPermissionDO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
+            List<SysPermissionPO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
             menu.setChildren(findChildrenMenuCycle(allList, cList));
             menuList.add(menu);
 
@@ -123,7 +123,7 @@ public class AccessController extends BaseController {
      * @return 结果
      */
     @PostMapping("/queryPages")
-    public Result<Pagination<SysPermissionDO>> findPages(@RequestBody SysPermissionDO permission,
+    public Result<Pagination<SysPermissionPO>> findPages(@RequestBody SysPermissionPO permission,
                                                          @RequestParam("pageNum") Integer pageNum,
                                                          @RequestParam("pageSize") Integer pageSize) {
         Where where = Where.build();
@@ -131,15 +131,15 @@ public class AccessController extends BaseController {
         where.andAdd(QueryType.LIKE, "permission_name", permission.getPermissionName());
         where.andAdd(QueryType.EQUAL, "resource_type", permission.getResourceType());
         where.andAdd(QueryType.EQUAL, "tenant_id", permission.getTenantId());
-        SysUserDO currentUser = SecurityUtils.getCurrentUser();
+        SysUserPO currentUser = SecurityUtils.getCurrentUser();
         if (currentUser.getParentId() != null) {
             // 非最高系统管理员，只能查询权限所属商户，及商户下的所有下级商户的权限
             Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
             where.andAdd(QueryType.IN, "tenant_id", merchantIdSet);
         }
-        Pagination<SysPermissionDO> pageResult = iSysPermissionService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
+        Pagination<SysPermissionPO> pageResult = iSysPermissionService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
 
-        List<SysPermissionDO> roleList = pageResult.getData();
+        List<SysPermissionPO> roleList = pageResult.getData();
         if (CollectionUtils.isNotEmpty(roleList)) {
             Set<String> userIdSet = new HashSet<>();
             roleList.forEach(permissionDO -> {
@@ -147,11 +147,11 @@ public class AccessController extends BaseController {
                 userIdSet.add(permissionDO.getUpdateBy());
             });
             if (CollectionUtils.isNotEmpty(userIdSet)) {
-                Map<String, SysUserDO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
+                Map<String, SysUserPO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
                 roleList.forEach(permissionDO -> {
-                    SysUserDO createBy = userMap.get(permissionDO.getCreateBy());
+                    SysUserPO createBy = userMap.get(permissionDO.getCreateBy());
                     permissionDO.setCreateBy(createBy == null ? null : createBy.getUserName());
-                    SysUserDO updateBy = userMap.get(permissionDO.getUpdateBy());
+                    SysUserPO updateBy = userMap.get(permissionDO.getUpdateBy());
                     permissionDO.setUpdateBy(updateBy == null ? null : updateBy.getUserName());
                 });
             }
@@ -166,7 +166,7 @@ public class AccessController extends BaseController {
      * @return 结果
      */
     @PostMapping("/add")
-    public Result<Integer> add(@RequestBody SysPermissionDO permission) {
+    public Result<Integer> add(@RequestBody SysPermissionPO permission) {
         if (StringUtils.isAnyBlank(permission.getPermissionName(), permission.getResourceType(), permission.getValue())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
@@ -186,7 +186,7 @@ public class AccessController extends BaseController {
      */
     @PostMapping("/update")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result update(@RequestBody SysPermissionDO permission, @RequestParam("permissionId") String permissionId) {
+    public Result update(@RequestBody SysPermissionPO permission, @RequestParam("permissionId") String permissionId) {
         permission.setUpdateBy(SecurityUtils.getCurrentUserId());
         int updateRows = iSysPermissionService.updateByBk(permissionId, permission);
         if (updateRows != 1) {
@@ -218,11 +218,11 @@ public class AccessController extends BaseController {
      * @return 资源
      */
     @GetMapping("/getResourcesUnderMerchantByResourceType")
-    public Result<List<SysPermissionDO>> getResourcesUnderMerchantByResourceType(@RequestParam("resourceType") String resourceType) {
+    public Result<List<SysPermissionPO>> getResourcesUnderMerchantByResourceType(@RequestParam("resourceType") String resourceType) {
         Where where = Where.build()
                 .andAdd(QueryType.EQUAL, "tenant_id", SecurityUtils.getCurrentUserTenantId())
                 .andAdd(QueryType.EQUAL, "resource_type", resourceType);
-        List<SysPermissionDO> list = iSysPermissionService.selectList(where, "create_time desc");
+        List<SysPermissionPO> list = iSysPermissionService.selectList(where, "create_time desc");
         return Result.of(ResponseEnum.SUCCESS, list);
     }
 

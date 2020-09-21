@@ -1,7 +1,7 @@
 package com.hb.bsmanage.api.service.impl;
 
 import com.hb.bsmanage.api.service.ISysRoleAccessService;
-import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
+import com.hb.bsmanage.model.po.SysRolePermissionPO;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
@@ -19,16 +19,16 @@ import java.util.stream.Collectors;
  * @version v0.1, 2020/7/24 15:00, create by huangbiao.
  */
 @Service
-public class SysRoleAccessServiceImpl extends DmlMapperImpl<SysRolePermissionDO, Integer, String> implements ISysRoleAccessService {
+public class SysRoleAccessServiceImpl extends DmlMapperImpl<SysRolePermissionPO, Integer, String> implements ISysRoleAccessService {
 
     @Override
     @InOutLog("通过角色ID集合查询角色权限关系集合")
     public Set<String> getPermissionIdSetByRoleIdSet(Set<String> roleIdSet) {
-        List<SysRolePermissionDO> rolePermissionList = selectList(Where.build().and().add(QueryType.IN, "role_id", roleIdSet));
+        List<SysRolePermissionPO> rolePermissionList = selectList(Where.build().and().add(QueryType.IN, "role_id", roleIdSet));
         if (CollectionUtils.isEmpty(rolePermissionList)) {
             return null;
         }
-        return rolePermissionList.stream().map(SysRolePermissionDO::getPermissionId).collect(Collectors.toSet());
+        return rolePermissionList.stream().map(SysRolePermissionPO::getPermissionId).collect(Collectors.toSet());
     }
 }
 

@@ -1,4 +1,4 @@
-package com.hb.bsmanage.model.request;
+package com.hb.bsmanage.model.vo.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

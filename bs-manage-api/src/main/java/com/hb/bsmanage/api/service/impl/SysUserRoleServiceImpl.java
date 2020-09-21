@@ -1,7 +1,7 @@
 package com.hb.bsmanage.api.service.impl;
 
 import com.hb.bsmanage.api.service.ISysUserRoleService;
-import com.hb.bsmanage.model.dobj.SysUserRoleDO;
+import com.hb.bsmanage.model.po.SysUserRolePO;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @version v0.1, 2020/7/24 15:00, create by huangbiao.
  */
 @Service
-public class SysUserRoleServiceImpl extends DmlMapperImpl<SysUserRoleDO, Integer, String> implements ISysUserRoleService {
+public class SysUserRoleServiceImpl extends DmlMapperImpl<SysUserRolePO, Integer, String> implements ISysUserRoleService {
 
     /**
      * 日志
@@ -32,11 +32,11 @@ public class SysUserRoleServiceImpl extends DmlMapperImpl<SysUserRoleDO, Integer
     @InOutLog("通过用户ID查询角色ID集合")
     public Set<String> getRoleIdSetByUserId(String userId) {
         // 查询用户角色关联信息
-        List<SysUserRoleDO> userRoleList = selectList(Where.build().and().add(QueryType.EQUAL, "user_id", userId));
+        List<SysUserRolePO> userRoleList = selectList(Where.build().and().add(QueryType.EQUAL, "user_id", userId));
         if (CollectionUtils.isEmpty(userRoleList)) {
             return null;
         }
-        return userRoleList.stream().map(SysUserRoleDO::getRoleId).collect(Collectors.toSet());
+        return userRoleList.stream().map(SysUserRolePO::getRoleId).collect(Collectors.toSet());
     }
 }
 

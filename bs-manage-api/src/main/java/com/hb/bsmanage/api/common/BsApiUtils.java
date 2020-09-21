@@ -1,6 +1,6 @@
 package com.hb.bsmanage.api.common;
 
-import com.hb.bsmanage.model.dobj.SysMerchantDO;
+import com.hb.bsmanage.model.po.SysMerchantPO;
 import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
 import com.hb.unic.logger.Logger;
@@ -20,40 +20,40 @@ public class BsApiUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(BsApiUtils.class);
 
     /**
-     * 获取当前level
+     * 获取当前Path
      *
-     * @param levelOfParent 父级的level
-     * @param idOfParent    父级的id
+     * @param pathOfParent 父级的level
+     * @param idOfParent   父级的id
      * @return level
      */
-    public static String getCurrentLevel(Object levelOfParent, Object idOfParent) {
-        return StrUtils.joint(levelOfParent, Consts.DOT, idOfParent);
+    public static String getCurrentPath(Object pathOfParent, Object idOfParent) {
+        return StrUtils.joint(pathOfParent, Consts.DOT, idOfParent);
     }
 
     /**
-     * 获取子级level的前缀
+     * 获取子级Path的前缀
      *
-     * @param levelOfCurrent 当前的level
+     * @param pathOfCurrent 当前的Path
      * @return level
      */
-    public static String getSubLevelPrefix(Object levelOfCurrent) {
-        return StrUtils.joint(levelOfCurrent, Consts.DOT);
+    public static String getSubPathPrefix(Object pathOfCurrent) {
+        return StrUtils.joint(pathOfCurrent, Consts.DOT);
     }
 
     /**
-     * 获取子级商户level的where条件
+     * 获取子级商户Path的where条件
      *
      * @param where               where条件
      * @param currentUserMerchant 当前的商户
      * @return Where
      */
-    public static Where getSubLevelWhere(Where where, SysMerchantDO currentUserMerchant) {
+    public static Where getSubPathWhere(Where where, SysMerchantPO currentUserMerchant) {
         where
                 .and()
                 .leftBracket()
                 .add(QueryType.EQUAL, "merchant_id", currentUserMerchant.getMerchantId())
                 .or()
-                .add(QueryType.LIKE, "level", getSubLevelPrefix(currentUserMerchant.getLevel()))
+                .add(QueryType.LIKE, "path", getSubPathPrefix(currentUserMerchant.getPath()))
                 .rightBracket();
         return where;
     }

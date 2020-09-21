@@ -1,4 +1,4 @@
-package com.hb.bsmanage.model.model;
+package com.hb.bsmanage.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

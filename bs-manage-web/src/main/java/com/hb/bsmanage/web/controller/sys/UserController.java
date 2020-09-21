@@ -4,10 +4,10 @@ import com.hb.bsmanage.api.service.ISysMerchantService;
 import com.hb.bsmanage.api.service.ISysRoleService;
 import com.hb.bsmanage.api.service.ISysUserRoleService;
 import com.hb.bsmanage.api.service.ISysUserService;
-import com.hb.bsmanage.model.dobj.SysRoleDO;
-import com.hb.bsmanage.model.dobj.SysUserDO;
-import com.hb.bsmanage.model.dobj.SysUserRoleDO;
 import com.hb.bsmanage.model.enums.TableEnum;
+import com.hb.bsmanage.model.po.SysRolePO;
+import com.hb.bsmanage.model.po.SysUserPO;
+import com.hb.bsmanage.model.po.SysUserRolePO;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -80,7 +80,7 @@ public class UserController extends BaseController {
      * @return 结果
      */
     @PostMapping("/queryPages")
-    public Result<Pagination<SysUserDO>> findPages(@RequestBody SysUserDO user,
+    public Result<Pagination<SysUserPO>> findPages(@RequestBody SysUserPO user,
                                                    @RequestParam("pageNum") Integer pageNum,
                                                    @RequestParam("pageSize") Integer pageSize) {
         String baseLog = LogHelper.getBaseLog("分页查询用户信息");
@@ -90,15 +90,15 @@ public class UserController extends BaseController {
         where.andAdd(QueryType.LIKE, "user_name", user.getUserName());
         where.andAdd(QueryType.LIKE, "mobile", user.getMobile());
         where.andAdd(QueryType.EQUAL, "tenant_id", user.getTenantId());
-        SysUserDO currentUser = SecurityUtils.getCurrentUser();
+        SysUserPO currentUser = SecurityUtils.getCurrentUser();
         if (currentUser.getParentId() != null) {
             // 非最高系统管理员，只能查询用户所属商户，及商户下的所有下级商户的用户
             Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
             where.andAdd(QueryType.IN, "tenant_id", merchantIdSet);
         }
-        Pagination<SysUserDO> pageResult = iSysUserService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
+        Pagination<SysUserPO> pageResult = iSysUserService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
 
-        List<SysUserDO> userList = pageResult.getData();
+        List<SysUserPO> userList = pageResult.getData();
         if (CollectionUtils.isNotEmpty(userList)) {
             Set<String> userIdSet = new HashSet<>();
             userList.forEach(userDO -> {
@@ -106,11 +106,11 @@ public class UserController extends BaseController {
                 userIdSet.add(userDO.getUpdateBy());
             });
             if (CollectionUtils.isNotEmpty(userIdSet)) {
-                Map<String, SysUserDO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
+                Map<String, SysUserPO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
                 userList.forEach(userDO -> {
-                    SysUserDO createBy = userMap.get(userDO.getCreateBy());
+                    SysUserPO createBy = userMap.get(userDO.getCreateBy());
                     userDO.setCreateBy(createBy == null ? null : createBy.getUserName());
-                    SysUserDO updateBy = userMap.get(userDO.getUpdateBy());
+                    SysUserPO updateBy = userMap.get(userDO.getUpdateBy());
                     userDO.setUpdateBy(updateBy == null ? null : updateBy.getUserName());
                 });
             }
@@ -126,7 +126,7 @@ public class UserController extends BaseController {
      * @return 结果
      */
     @PostMapping("/add")
-    public Result<Integer> add(@RequestBody SysUserDO user) {
+    public Result<Integer> add(@RequestBody SysUserPO user) {
         if (StringUtils.isAnyBlank(user.getUserName(), user.getMobile(), user.getPassword())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
@@ -148,7 +148,7 @@ public class UserController extends BaseController {
      */
     @PostMapping("/update")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result update(@RequestBody SysUserDO user, @RequestParam("userId") String userId) {
+    public Result update(@RequestBody SysUserPO user, @RequestParam("userId") String userId) {
         user.setUpdateBy(SecurityUtils.getCurrentUserId());
         int updateRows = iSysUserService.updateByBk(userId, user);
         if (updateRows != 1) {
@@ -180,9 +180,9 @@ public class UserController extends BaseController {
      */
     @GetMapping("/getRolesUnderUser")
     public Result<Set<String>> getRolesUnderUser(@RequestParam("userId") String userId) {
-        SysUserDO sysUserDO = iSysUserService.selectByBk(userId);
-        List<SysUserRoleDO> userRoleList = iSysUserRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
-        Set<String> roleIdSet = userRoleList.stream().map(SysUserRoleDO::getRoleId).collect(Collectors.toSet());
+        SysUserPO sysUserDO = iSysUserService.selectByBk(userId);
+        List<SysUserRolePO> userRoleList = iSysUserRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
+        Set<String> roleIdSet = userRoleList.stream().map(SysUserRolePO::getRoleId).collect(Collectors.toSet());
         return Result.of(ResponseEnum.SUCCESS, roleIdSet);
     }
 
@@ -192,8 +192,8 @@ public class UserController extends BaseController {
      * @return 树数据
      */
     @GetMapping("/getRolesUnderMerchant")
-    public Result<List<SysRoleDO>> getRolesUnderMerchant(@RequestParam("userId") String userId) {
-        SysUserDO sysUserDO = iSysUserService.selectByBk(userId);
+    public Result<List<SysRolePO>> getRolesUnderMerchant(@RequestParam("userId") String userId) {
+        SysUserPO sysUserDO = iSysUserService.selectByBk(userId);
         return Result.of(ResponseEnum.SUCCESS, iSysRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "tenant_id", sysUserDO.getTenantId())));
     }
 
@@ -216,7 +216,7 @@ public class UserController extends BaseController {
         iSysUserRoleService.logicDelete(deleteWhere, updateMap);
         // 添加用户的角色信息
         roleIdSet.forEach(roleId -> {
-            SysUserRoleDO insert = SysUserRoleDO.builder().userId(userId).roleId(roleId).build();
+            SysUserRolePO insert = SysUserRolePO.builder().userId(userId).roleId(roleId).build();
             insert.setCreateBy(SecurityUtils.getCurrentUserId());
             insert.setUpdateBy(SecurityUtils.getCurrentUserId());
             insert.setTenantId(SecurityUtils.getCurrentUserTenantId());

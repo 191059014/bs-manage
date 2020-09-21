@@ -1,7 +1,7 @@
 package com.hb.bsmanage.model.base.impl;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.hb.bsmanage.model.base.ITimestampDO;
+import com.hb.bsmanage.model.base.ITimestampPO;
 import com.hb.mybatis.annotation.Column;
 import com.hb.unic.util.helper.ToStringHelper;
 import com.hb.unic.util.util.DateUtils;
@@ -13,7 +13,7 @@ import java.util.Date;
  *
  * @version v0.1, 2020/7/24 13:53, create by huangbiao.
  */
-public abstract class AbstractBaseDO implements ITimestampDO {
+public abstract class AbstractBasePO implements ITimestampPO {
 
     // serialVersionUID
     private static final long serialVersionUID = 2134467222395310313L;

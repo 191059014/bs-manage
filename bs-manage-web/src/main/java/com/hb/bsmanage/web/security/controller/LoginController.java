@@ -1,8 +1,8 @@
 package com.hb.bsmanage.web.security.controller;
 
 import com.hb.bsmanage.api.service.*;
-import com.hb.bsmanage.model.dobj.SysUserDO;
-import com.hb.bsmanage.model.request.LoginRequest;
+import com.hb.bsmanage.model.po.SysUserPO;
+import com.hb.bsmanage.model.vo.request.LoginRequest;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.jwt.JwtUtils;
@@ -95,7 +95,7 @@ public class LoginController extends BaseController {
             // 从认证信息中获取用户信息
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             String username = userPrincipal.getUsername();
-            SysUserDO user = iSysUserService.findByUsernameOrMobile(username);
+            SysUserPO user = iSysUserService.findByUsernameOrMobile(username);
             if (user == null) {
                 return Result.of(ResponseEnum.USER_NOT_EXIST);
             }

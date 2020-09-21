@@ -6,7 +6,6 @@
     <modules>
         <module>bs-manage-web</module>
         <module>bs-manage-api</module>
-        <module>bs-manage-dao</module>
         <module>bs-manage-model</module>
     </modules>
     <parent>
@@ -55,12 +54,6 @@
             <dependency>
                 <groupId>com.hb</groupId>
                 <artifactId>bs-manage-api</artifactId>
-                <version>${bs.manage.version}</version>
-            </dependency>
-            <!-- bs-manage-dao -->
-            <dependency>
-                <groupId>com.hb</groupId>
-                <artifactId>bs-manage-dao</artifactId>
                 <version>${bs.manage.version}</version>
             </dependency>
             <!-- bs-manage-model -->

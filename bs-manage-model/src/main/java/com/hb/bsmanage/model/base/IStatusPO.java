@@ -5,7 +5,7 @@ package com.hb.bsmanage.model.base;
  *
  * @version v0.1, 2020/9/16 10:28, create by huangbiao.
  */
-public interface IStatusDO extends ITimestampDO{
+public interface IStatusPO extends ITimestampPO {
 
     /**
      * 获取数据记录状态

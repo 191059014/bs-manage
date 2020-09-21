@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.security.util;
 
-import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.po.SysUserPO;
 import com.hb.bsmanage.web.security.model.RbacContext;
 
 import java.util.HashSet;
@@ -33,8 +33,8 @@ public class SecurityUtils {
      *
      * @return SysUserDO
      */
-    public static SysUserDO getCurrentUser() {
-        return RC.get() == null ? new SysUserDO() : RC.get().getUser();
+    public static SysUserPO getCurrentUser() {
+        return RC.get() == null ? new SysUserPO() : RC.get().getUser();
     }
 
     /**

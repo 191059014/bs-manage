@@ -1,7 +1,7 @@
 package com.hb.bsmanage.api.service.impl;
 
 import com.hb.bsmanage.api.service.ISysUserService;
-import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.po.SysUserPO;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
  * @version v0.1, 2020/7/24 15:00, create by huangbiao.
  */
 @Service
-public class SysUserServiceImpl extends DmlMapperImpl<SysUserDO, Integer, String> implements ISysUserService {
+public class SysUserServiceImpl extends DmlMapperImpl<SysUserPO, Integer, String> implements ISysUserService {
 
     @Override
     @InOutLog("通过用户ID或者手机号查询用户")
-    public SysUserDO findByUsernameOrMobile(String usernameOrMobile) {
+    public SysUserPO findByUsernameOrMobile(String usernameOrMobile) {
         Where where = Where.build()
                 .and()
                 .leftBracket()
@@ -36,7 +36,7 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserDO, Integer, String
 
     @Override
     @InOutLog("通过用户ID集合查询用户信息")
-    public List<SysUserDO> getUserListByUserIdSet(Set<String> userIdSet) {
+    public List<SysUserPO> getUserListByUserIdSet(Set<String> userIdSet) {
         Where where = Where.build()
                 .and()
                 .add(QueryType.IN, "user_id", userIdSet);
@@ -44,9 +44,9 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserDO, Integer, String
     }
 
     @Override
-    public Map<String, SysUserDO> getUserMapByUserIdSet(Set<String> userIdSet) {
-        List<SysUserDO> list = getUserListByUserIdSet(userIdSet);
-        return list == null ? null : list.stream().collect(Collectors.toMap(SysUserDO::getUserId, v -> v, (k1, k2) -> k2));
+    public Map<String, SysUserPO> getUserMapByUserIdSet(Set<String> userIdSet) {
+        List<SysUserPO> list = getUserListByUserIdSet(userIdSet);
+        return list == null ? null : list.stream().collect(Collectors.toMap(SysUserPO::getUserId, v -> v, (k1, k2) -> k2));
     }
 
 }

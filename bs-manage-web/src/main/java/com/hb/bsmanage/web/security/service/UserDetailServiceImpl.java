@@ -4,8 +4,8 @@ import com.hb.bsmanage.api.service.ISysPermissionService;
 import com.hb.bsmanage.api.service.ISysRoleAccessService;
 import com.hb.bsmanage.api.service.ISysUserRoleService;
 import com.hb.bsmanage.api.service.ISysUserService;
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.po.SysPermissionPO;
+import com.hb.bsmanage.model.po.SysUserPO;
 import com.hb.bsmanage.web.security.model.UserPrincipal;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.logger.Logger;
@@ -69,7 +69,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @InOutLog("登陆认证")
     public UserDetails loadUserByUsername(String usernameOrMobile) throws UsernameNotFoundException {
         // 查询用户信息
-        SysUserDO user = iSysUserService.findByUsernameOrMobile(usernameOrMobile);
+        SysUserPO user = iSysUserService.findByUsernameOrMobile(usernameOrMobile);
         if (user == null) {
             LOGGER.info("无此用户={}", usernameOrMobile);
             throw new UsernameNotFoundException("无此用户：" + usernameOrMobile);
@@ -80,13 +80,13 @@ public class UserDetailServiceImpl implements UserDetailsService {
         if (CollectionUtils.isNotEmpty(roleIdSet)) {
             permissionIdSet = iSysRoleAccessService.getPermissionIdSetByRoleIdSet(roleIdSet);
         }
-        List<SysPermissionDO> permissionsList = null;
+        List<SysPermissionPO> permissionsList = null;
         if (CollectionUtils.isNotEmpty(permissionIdSet)) {
             permissionsList = iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
         }
         List<String> permissions = null;
         if (CollectionUtils.isNotEmpty(permissionsList)) {
-            permissions = permissionsList.stream().map(SysPermissionDO::getValue).collect(Collectors.toList());
+            permissions = permissionsList.stream().map(SysPermissionPO::getValue).collect(Collectors.toList());
         }
         return new UserPrincipal(user.getUserName(), user.getPassword(), permissions);
     }

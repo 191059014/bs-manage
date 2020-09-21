@@ -1,6 +1,6 @@
-package com.hb.bsmanage.model.response;
+package com.hb.bsmanage.model.vo.response;
 
-import com.hb.bsmanage.model.model.ElementUITree;
+import com.hb.bsmanage.model.dto.ElementUITree;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

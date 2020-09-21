@@ -1,6 +1,6 @@
-package com.hb.bsmanage.model.dobj;
+package com.hb.bsmanage.model.po;
 
-import com.hb.bsmanage.model.base.impl.CommonDO;
+import com.hb.bsmanage.model.base.impl.CommonPO;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import com.hb.unic.util.helper.ToStringHelper;
@@ -10,24 +10,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 角色表
+ * 用户角色表
  *
- * @version v0.1, 2020/7/29 11:05, create by huangbiao.
+ * @version v0.1, 2020/7/29 11:10, create by huangbiao.
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("sys_role")
-public class SysRoleDO extends CommonDO {
+@Table("sys_user_role")
+public class SysUserRolePO extends CommonPO {
     // 序列化ID
-    private static final long serialVersionUID = 8971646467070992455L;
+    private static final long serialVersionUID = 3873773717231088322L;
+    // 用户ID
+    @Column("user_id")
+    private String userId;
     // 角色ID
-    @Column(value = "role_id", isBk = true)
+    @Column("role_id")
     private String roleId;
-    // 角色名称
-    @Column("role_name")
-    private String roleName;
 
     @Override
     public String toString() {

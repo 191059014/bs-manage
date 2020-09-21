@@ -1,13 +1,13 @@
 package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.api.service.*;
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysRoleDO;
-import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
-import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.dto.ElementUITree;
 import com.hb.bsmanage.model.enums.TableEnum;
-import com.hb.bsmanage.model.model.ElementUITree;
-import com.hb.bsmanage.model.response.ElementUITreeResponse;
+import com.hb.bsmanage.model.po.SysPermissionPO;
+import com.hb.bsmanage.model.po.SysRolePO;
+import com.hb.bsmanage.model.po.SysRolePermissionPO;
+import com.hb.bsmanage.model.po.SysUserPO;
+import com.hb.bsmanage.model.vo.response.ElementUITreeResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -81,22 +81,22 @@ public class RoleController extends BaseController {
      * @return 结果
      */
     @PostMapping("/queryPages")
-    public Result<Pagination<SysRoleDO>> findPages(@RequestBody SysRoleDO role,
+    public Result<Pagination<SysRolePO>> findPages(@RequestBody SysRolePO role,
                                                    @RequestParam("pageNum") Integer pageNum,
                                                    @RequestParam("pageSize") Integer pageSize) {
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "role_id", role.getRoleId());
         where.andAdd(QueryType.LIKE, "role_name", role.getRoleName());
         where.andAdd(QueryType.EQUAL, "tenant_id", role.getTenantId());
-        SysUserDO currentUser = SecurityUtils.getCurrentUser();
+        SysUserPO currentUser = SecurityUtils.getCurrentUser();
         if (currentUser.getParentId() != null) {
             // 非最高系统管理员，只能查询角色所属商户，及商户下的所有下级商户的角色
             Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
             where.andAdd(QueryType.IN, "tenant_id", merchantIdSet);
         }
-        Pagination<SysRoleDO> pageResult = iSysRoleService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
+        Pagination<SysRolePO> pageResult = iSysRoleService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
 
-        List<SysRoleDO> roleList = pageResult.getData();
+        List<SysRolePO> roleList = pageResult.getData();
         if (CollectionUtils.isNotEmpty(roleList)) {
             Set<String> userIdSet = new HashSet<>();
             roleList.forEach(roleDO -> {
@@ -104,11 +104,11 @@ public class RoleController extends BaseController {
                 userIdSet.add(roleDO.getUpdateBy());
             });
             if (CollectionUtils.isNotEmpty(userIdSet)) {
-                Map<String, SysUserDO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
+                Map<String, SysUserPO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
                 roleList.forEach(roleDO -> {
-                    SysUserDO createBy = userMap.get(roleDO.getCreateBy());
+                    SysUserPO createBy = userMap.get(roleDO.getCreateBy());
                     roleDO.setCreateBy(createBy == null ? null : createBy.getUserName());
-                    SysUserDO updateBy = userMap.get(roleDO.getUpdateBy());
+                    SysUserPO updateBy = userMap.get(roleDO.getUpdateBy());
                     roleDO.setUpdateBy(updateBy == null ? null : updateBy.getUserName());
                 });
             }
@@ -123,7 +123,7 @@ public class RoleController extends BaseController {
      * @return 结果
      */
     @PostMapping("/add")
-    public Result<Integer> add(@RequestBody SysRoleDO role) {
+    public Result<Integer> add(@RequestBody SysRolePO role) {
         if (StringUtils.isAnyBlank(role.getRoleName())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
@@ -144,7 +144,7 @@ public class RoleController extends BaseController {
      */
     @PostMapping("/update")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result update(@RequestBody SysRoleDO role, @RequestParam("roleId") String roleId) {
+    public Result update(@RequestBody SysRolePO role, @RequestParam("roleId") String roleId) {
         role.setUpdateBy(SecurityUtils.getCurrentUserId());
         int updateRows = iSysRoleService.updateByBk(roleId, role);
         if (updateRows != 1) {
@@ -176,10 +176,10 @@ public class RoleController extends BaseController {
      */
     @GetMapping("/getPermissionsUnderRole")
     public Result<Set<String>> getPermissionsUnderRole(@RequestParam("roleId") String roleId) {
-        List<SysRolePermissionDO> rolePermissionList = iSysRoleAccessService.selectList(Where.build().andAdd(QueryType.EQUAL, "role_id", roleId));
-        Set<String> permissionIdSet = rolePermissionList.stream().map(SysRolePermissionDO::getPermissionId).collect(Collectors.toSet());
-        List<SysPermissionDO> permissionList = iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
-        Set<String> parentPermissionIdSet = permissionList.stream().map(SysPermissionDO::getParentId).collect(Collectors.toSet());
+        List<SysRolePermissionPO> rolePermissionList = iSysRoleAccessService.selectList(Where.build().andAdd(QueryType.EQUAL, "role_id", roleId));
+        Set<String> permissionIdSet = rolePermissionList.stream().map(SysRolePermissionPO::getPermissionId).collect(Collectors.toSet());
+        List<SysPermissionPO> permissionList = iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
+        Set<String> parentPermissionIdSet = permissionList.stream().map(SysPermissionPO::getParentId).collect(Collectors.toSet());
         // 只返回叶子节点，防止父节点选中，导致子节点全部选中
         permissionIdSet.removeAll(parentPermissionIdSet);
         return Result.of(ResponseEnum.SUCCESS, permissionIdSet);
@@ -191,8 +191,8 @@ public class RoleController extends BaseController {
      * @return 权限集合
      */
     @GetMapping("/getPermissionUnderMerchant")
-    public Result<List<SysPermissionDO>> getPermissionUnderMerchant(@RequestParam("roleId") String roleId) {
-        SysRoleDO sysRoleDO = iSysRoleService.selectByBk(roleId);
+    public Result<List<SysPermissionPO>> getPermissionUnderMerchant(@RequestParam("roleId") String roleId) {
+        SysRolePO sysRoleDO = iSysRoleService.selectByBk(roleId);
         return Result.of(ResponseEnum.SUCCESS, iSysPermissionService.selectList(Where.build().andAdd(QueryType.EQUAL, "tenant_id", sysRoleDO.getTenantId())));
     }
 
@@ -215,7 +215,7 @@ public class RoleController extends BaseController {
         iSysRoleAccessService.logicDelete(deleteWhere, updateMap);
         // 添加角色的权限信息
         permissionIdSet.forEach(permissionId -> {
-            SysRolePermissionDO insert = SysRolePermissionDO.builder().roleId(roleId).permissionId(permissionId).build();
+            SysRolePermissionPO insert = SysRolePermissionPO.builder().roleId(roleId).permissionId(permissionId).build();
             insert.setCreateBy(SecurityUtils.getCurrentUserId());
             insert.setUpdateBy(SecurityUtils.getCurrentUserId());
             insert.setTenantId(SecurityUtils.getCurrentUserTenantId());
@@ -233,14 +233,14 @@ public class RoleController extends BaseController {
     @GetMapping("/getPermissionTreeUnderMerchant")
     public Result<ElementUITreeResponse> getPermissionTreeUnderMerchant(@RequestParam("roleId") String roleId) {
         ElementUITreeResponse response = new ElementUITreeResponse();
-        SysRoleDO sysRoleDO = iSysRoleService.selectByBk(roleId);
+        SysRolePO sysRoleDO = iSysRoleService.selectByBk(roleId);
         Set<String> permissionIdSet = iSysPermissionService.getPermissionSetByMerchantId(sysRoleDO.getTenantId());
         if (CollectionUtils.isEmpty(permissionIdSet)) {
             return Result.of(ResponseEnum.SUCCESS, response);
         }
         Where where = Where.build().andAdd(QueryType.IN, "permission_id", permissionIdSet);
-        List<SysPermissionDO> allList = iSysPermissionService.selectList(where, "create_time asc");
-        List<SysPermissionDO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
+        List<SysPermissionPO> allList = iSysPermissionService.selectList(where, "create_time asc");
+        List<SysPermissionPO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
         List<ElementUITree> treeDataList = findTreeCycle(allList, topList);
         response.setTreeDataList(treeDataList);
         return Result.of(ResponseEnum.SUCCESS, response);
@@ -251,14 +251,14 @@ public class RoleController extends BaseController {
      *
      * @return 权限树
      */
-    private List<ElementUITree> findTreeCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
+    private List<ElementUITree> findTreeCycle(List<SysPermissionPO> allList, List<SysPermissionPO> childList) {
         List<ElementUITree> treeDataList = new ArrayList<>();
-        for (SysPermissionDO access : childList) {
+        for (SysPermissionPO access : childList) {
             ElementUITree treeData = ElementUITree.builder()
                     .id(access.getPermissionId())
                     .label(access.getPermissionName())
                     .build();
-            List<SysPermissionDO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
+            List<SysPermissionPO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
             treeData.setChildren(findTreeCycle(allList, cList));
             treeDataList.add(treeData);
         }

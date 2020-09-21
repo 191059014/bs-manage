@@ -1,6 +1,6 @@
-package com.hb.bsmanage.model.dobj;
+package com.hb.bsmanage.model.po;
 
-import com.hb.bsmanage.model.base.impl.CommonDO;
+import com.hb.bsmanage.model.base.impl.CommonPO;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import com.hb.unic.util.helper.ToStringHelper;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("sys_permission")
-public class SysPermissionDO extends CommonDO {
+public class SysPermissionPO extends CommonPO {
 
     // 序列化ID
     private static final long serialVersionUID = 4702444967524003359L;

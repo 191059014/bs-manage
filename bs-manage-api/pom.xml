@@ -14,15 +14,35 @@
     <url>http://www.example.com</url>
 
     <dependencies>
-        <!-- bs-manage-dao -->
+        <!-- bs-manage-model -->
         <dependency>
             <groupId>com.hb</groupId>
-            <artifactId>bs-manage-dao</artifactId>
+            <artifactId>bs-manage-model</artifactId>
+        </dependency>
+        <!-- unic-base -->
+        <dependency>
+            <groupId>com.hb.unic</groupId>
+            <artifactId>unic-base</artifactId>
         </dependency>
         <!-- unic-cache -->
         <dependency>
             <groupId>com.hb.unic</groupId>
             <artifactId>unic-cache</artifactId>
+        </dependency>
+        <!-- unic-logger -->
+        <dependency>
+            <groupId>com.hb.unic</groupId>
+            <artifactId>unic-logger</artifactId>
+        </dependency>
+        <!-- unic-util -->
+        <dependency>
+            <groupId>com.hb.unic</groupId>
+            <artifactId>unic-util</artifactId>
+        </dependency>
+        <!-- simple-mybatis -->
+        <dependency>
+            <groupId>com.hb.mybatis</groupId>
+            <artifactId>simple-mybatis</artifactId>
         </dependency>
     </dependencies>
 

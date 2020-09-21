@@ -7,7 +7,7 @@ import java.util.Date;
  *
  * @version v0.1, 2020/9/16 9:35, create by huangbiao.
  */
-public interface ITimestampDO extends IBaseDO {
+public interface ITimestampPO extends IBasePO {
 
     /**
      * 获取创建时间

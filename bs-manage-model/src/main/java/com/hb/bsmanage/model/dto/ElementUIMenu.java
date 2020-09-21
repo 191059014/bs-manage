@@ -1,4 +1,4 @@
-package com.hb.bsmanage.model.model;
+package com.hb.bsmanage.model.dto;
 
 import com.hb.unic.util.helper.ToStringHelper;
 import lombok.AllArgsConstructor;

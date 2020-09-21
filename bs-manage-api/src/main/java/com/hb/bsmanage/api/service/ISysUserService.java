@@ -1,6 +1,6 @@
 package com.hb.bsmanage.api.service;
 
-import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.po.SysUserPO;
 import com.hb.mybatis.base.IDmlMapper;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Set;
  *
  * @version v0.1, 2020/7/24 14:59, create by huangbiao.
  */
-public interface ISysUserService extends IDmlMapper<SysUserDO, Integer, String> {
+public interface ISysUserService extends IDmlMapper<SysUserPO, Integer, String> {
 
     /**
      * 通过用户ID或者手机号查询用户
@@ -20,7 +20,7 @@ public interface ISysUserService extends IDmlMapper<SysUserDO, Integer, String> 
      * @param usernameOrMobile 用户ID或者手机号查询
      * @return 用户信息
      */
-    SysUserDO findByUsernameOrMobile(String usernameOrMobile);
+    SysUserPO findByUsernameOrMobile(String usernameOrMobile);
 
     /**
      * 通过用户ID集合查询用户信息
@@ -28,7 +28,7 @@ public interface ISysUserService extends IDmlMapper<SysUserDO, Integer, String> 
      * @param userIdSet 用户ID集合
      * @return 用户信息集合
      */
-    List<SysUserDO> getUserListByUserIdSet(Set<String> userIdSet);
+    List<SysUserPO> getUserListByUserIdSet(Set<String> userIdSet);
 
     /**
      * 通过用户ID集合查询用户信息
@@ -36,6 +36,6 @@ public interface ISysUserService extends IDmlMapper<SysUserDO, Integer, String> 
      * @param userIdSet 用户ID集合
      * @return 用户信息集合
      */
-    Map<String, SysUserDO> getUserMapByUserIdSet(Set<String> userIdSet);
+    Map<String, SysUserPO> getUserMapByUserIdSet(Set<String> userIdSet);
 
 }

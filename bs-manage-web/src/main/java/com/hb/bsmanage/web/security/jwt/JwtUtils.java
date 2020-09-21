@@ -2,9 +2,7 @@ package com.hb.bsmanage.web.security.jwt;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hb.bsmanage.model.common.Consts;
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysRoleDO;
-import com.hb.bsmanage.model.dobj.SysUserDO;
+import com.hb.bsmanage.model.po.SysUserPO;
 import com.hb.bsmanage.web.common.RedisKeyFactory;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.common.ToolsWapper;
@@ -20,7 +18,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * JWT工具类
@@ -79,7 +79,7 @@ public class JwtUtils {
      * @param permissionIdSet 权限列表
      * @return jwt令牌
      */
-    public static String createToken(SysUserDO user, Set<String> roleIdSet, Set<String> permissionIdSet, boolean rememberMe) {
+    public static String createToken(SysUserPO user, Set<String> roleIdSet, Set<String> permissionIdSet, boolean rememberMe) {
         JwtBuilder jwtBuilder = Jwts.builder()
                 // 设置jwt的id,防止jwt被重新发送
                 .setId(UUID.randomUUID().toString())
@@ -137,7 +137,7 @@ public class JwtUtils {
                 .getBody();
 
         // 获取用户信息
-        SysUserDO user = JsonUtils.toBean(JsonUtils.toJson(claims.get(USER)), SysUserDO.class);
+        SysUserPO user = JsonUtils.toBean(JsonUtils.toJson(claims.get(USER)), SysUserPO.class);
         // 从redis缓存中拿到token
         String jwtKey = RedisKeyFactory.getJwtKey(user.getUserId());
         String redisToken = ToolsWapper.redis().get(jwtKey);

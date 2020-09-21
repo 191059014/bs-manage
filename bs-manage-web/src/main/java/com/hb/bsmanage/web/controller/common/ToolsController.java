@@ -1,19 +1,9 @@
 package com.hb.bsmanage.web.controller.common;
 
-import com.hb.bsmanage.api.service.ISysMerchantService;
-import com.hb.bsmanage.api.service.ISysPermissionService;
-import com.hb.bsmanage.api.service.ISysRoleAccessService;
-import com.hb.bsmanage.api.service.ISysRoleService;
-import com.hb.bsmanage.api.service.ISysUserRoleService;
-import com.hb.bsmanage.api.service.ISysUserService;
-import com.hb.bsmanage.model.dobj.SysMerchantDO;
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.dobj.SysRoleDO;
-import com.hb.bsmanage.model.dobj.SysRolePermissionDO;
-import com.hb.bsmanage.model.dobj.SysUserDO;
-import com.hb.bsmanage.model.dobj.SysUserRoleDO;
+import com.hb.bsmanage.api.service.*;
 import com.hb.bsmanage.model.enums.ResourceType;
 import com.hb.bsmanage.model.enums.TableEnum;
+import com.hb.bsmanage.model.po.*;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.common.ToolsWapper;
 import com.hb.unic.base.common.Result;
@@ -24,12 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 通用controller
@@ -128,15 +113,15 @@ public class ToolsController {
     public Result addHighestSys() throws Exception {
         String baseLog = "[ToolsController-addAdmin-添加最高级别系统用户信息]";
         // 新增商户
-        SysMerchantDO merchant = SysMerchantDO.builder()
+        SysMerchantPO merchant = SysMerchantPO.builder()
                 .merchantId(KeyUtils.getTenantId())
                 .merchantName("一级商户")
-                .level("0")
                 .build();
+        merchant.setPath("0");
         iSysMerchantService.insert(merchant);
         LOGGER.info("{}添加商户成功={}", baseLog, merchant.getMerchantId());
         // 新增系统管理员用户
-        SysUserDO user = SysUserDO.builder()
+        SysUserPO user = SysUserPO.builder()
                 .userId(KeyUtils.getUniqueKey(TableEnum.USER_ID.getIdPrefix()))
                 .userName("admin")
                 .password(new BCryptPasswordEncoder().encode("123456"))
@@ -146,7 +131,7 @@ public class ToolsController {
         iSysUserService.insert(user);
         LOGGER.info("{}添加用户成功={}", baseLog, user.getUserId());
         // 新增角色
-        SysRoleDO role = SysRoleDO.builder()
+        SysRolePO role = SysRolePO.builder()
                 .roleId(KeyUtils.getUniqueKey(TableEnum.ROLE_ID.getIdPrefix()))
                 .roleName("系统管理员")
                 .build();
@@ -154,14 +139,14 @@ public class ToolsController {
         iSysRoleService.insert(role);
         LOGGER.info("{}添加角色成功={}", baseLog, role.getRoleId());
         // 新增用户角色关系
-        SysUserRoleDO userRole = SysUserRoleDO.builder()
+        SysUserRolePO userRole = SysUserRolePO.builder()
                 .userId(user.getUserId())
                 .roleId(role.getRoleId())
                 .build();
         iSysUserRoleService.insert(userRole);
         LOGGER.info("{}添加用户角色关系成功={}={}", baseLog, userRole.getUserId(), userRole.getRoleId());
         // 新增权限信息
-        SysPermissionDO sysPermission = SysPermissionDO.builder()
+        SysPermissionPO sysPermission = SysPermissionPO.builder()
                 .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
                 .permissionName("系统管理")
                 .resourceType(ResourceType.FOLDER.getValue())
@@ -172,7 +157,7 @@ public class ToolsController {
         iSysPermissionService.insert(sysPermission);
         LOGGER.info("{}添加系统管理菜单成功={}", baseLog, sysPermission.getPermissionId());
         // 新增角色权限关系信息
-        SysRolePermissionDO sysRolePermission = SysRolePermissionDO.builder()
+        SysRolePermissionPO sysRolePermission = SysRolePermissionPO.builder()
                 .roleId(role.getRoleId())
                 .permissionId(sysPermission.getPermissionId())
                 .build();
@@ -185,7 +170,7 @@ public class ToolsController {
         String[] iconArr = new String[]{"el-icon-coin", "el-icon-s-custom", "el-icon-user", "el-icon-lock"};
         String[] valuePrefixArr = new String[]{"sys_merchant", "sys_user", "sys_role", "sys_permission"};
         for (int i = 0; i < 4; i++) {
-            SysPermissionDO pagePermission = SysPermissionDO.builder()
+            SysPermissionPO pagePermission = SysPermissionPO.builder()
                     .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
                     .permissionName(accessNameArr[i])
                     .resourceType(ResourceType.PAGE.getValue())
@@ -198,7 +183,7 @@ public class ToolsController {
             iSysPermissionService.insert(pagePermission);
             LOGGER.info("{}添加权限成功={}", baseLog, pagePermission.getPermissionId());
             // 新增角色权限关系信息
-            SysRolePermissionDO pageRolePermission = SysRolePermissionDO.builder()
+            SysRolePermissionPO pageRolePermission = SysRolePermissionPO.builder()
                     .roleId(role.getRoleId())
                     .permissionId(pagePermission.getPermissionId())
                     .build();
@@ -208,7 +193,7 @@ public class ToolsController {
             String[] buttonName = new String[]{"新增", "修改", "删除"};
             String[] valueSuffixArr = new String[]{"_add", "_update", "_delete"};
             for (int j = 0; j < 3; j++) {
-                SysPermissionDO buttonPermission = SysPermissionDO.builder()
+                SysPermissionPO buttonPermission = SysPermissionPO.builder()
                         .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
                         .permissionName(buttonName[j])
                         .resourceType(ResourceType.BUTTON.getValue())
@@ -219,7 +204,7 @@ public class ToolsController {
                 iSysPermissionService.insert(buttonPermission);
                 LOGGER.info("{}添加按钮权限成功={}", baseLog, buttonPermission.getPermissionId());
                 // 新增角色权限关系信息
-                SysRolePermissionDO buttonRolePermission = SysRolePermissionDO.builder()
+                SysRolePermissionPO buttonRolePermission = SysRolePermissionPO.builder()
                         .roleId(role.getRoleId())
                         .permissionId(buttonPermission.getPermissionId())
                         .build();

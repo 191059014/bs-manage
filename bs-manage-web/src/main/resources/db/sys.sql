@@ -10,6 +10,7 @@ CREATE TABLE `sys_user` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `record_status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '记录有效状态',
   `parent_id` varchar(32) NOT NULL DEFAULT '' COMMENT '父级ID',
+  `path` varchar(512) NOT NULL DEFAULT '' COMMENT '层级关系路径',
   `tenant_id` varchar(32) NOT NULL DEFAULT '' COMMENT '多租户ID',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_user_id` (`user_id`)
@@ -25,6 +26,7 @@ CREATE TABLE `sys_role` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `record_status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '记录有效状态',
   `parent_id` varchar(32) NOT NULL DEFAULT '' COMMENT '父级ID',
+  `path` varchar(512) NOT NULL DEFAULT '' COMMENT '层级关系路径',
   `tenant_id` varchar(32) NOT NULL DEFAULT '' COMMENT '多租户ID',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_role_id` (`role_id`) USING BTREE
@@ -44,6 +46,7 @@ CREATE TABLE `sys_permission` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `record_status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '记录有效状态',
   `parent_id` varchar(32) NOT NULL DEFAULT '' COMMENT '父级ID',
+  `path` varchar(512) NOT NULL DEFAULT '' COMMENT '层级关系路径',
   `tenant_id` varchar(32) NOT NULL DEFAULT '' COMMENT '多租户ID',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_permission_id` (`permission_id`) USING BTREE
@@ -59,6 +62,7 @@ CREATE TABLE `sys_user_role` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `record_status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '记录有效状态',
   `parent_id` varchar(32) NOT NULL DEFAULT '' COMMENT '父级ID',
+  `path` varchar(512) NOT NULL DEFAULT '' COMMENT '层级关系路径',
   `tenant_id` varchar(32) NOT NULL DEFAULT '' COMMENT '多租户ID',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关系表';
@@ -73,6 +77,7 @@ CREATE TABLE `sys_role_permission` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `record_status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '记录有效状态',
   `parent_id` varchar(32) NOT NULL DEFAULT '' COMMENT '父级ID',
+  `path` varchar(512) NOT NULL DEFAULT '' COMMENT '层级关系路径',
   `tenant_id` varchar(32) NOT NULL DEFAULT '' COMMENT '多租户ID',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色权限关系表';
@@ -81,13 +86,13 @@ CREATE TABLE `sys_merchant` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `merchant_id` varchar(32) NOT NULL COMMENT '商户ID',
   `merchant_name` varchar(256) NOT NULL COMMENT '商户名称',
-  `level` varchar(1024) NOT NULL DEFAULT '' COMMENT '等级',
   `create_by` varchar(32) NOT NULL DEFAULT '' COMMENT '创建人',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(32) NOT NULL DEFAULT '' COMMENT '更新人',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `record_status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '记录有效状态',
   `parent_id` varchar(32) NOT NULL DEFAULT '' COMMENT '父级ID',
+  `path` varchar(512) NOT NULL DEFAULT '' COMMENT '层级关系路径',
   `tenant_id` varchar(32) NOT NULL DEFAULT '' COMMENT '多租户ID',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商户表';

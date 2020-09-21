@@ -1,9 +1,9 @@
 package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.api.service.ISysPermissionService;
-import com.hb.bsmanage.model.dobj.SysPermissionDO;
-import com.hb.bsmanage.model.model.ElementUITree;
-import com.hb.bsmanage.model.response.ElementUITreeResponse;
+import com.hb.bsmanage.model.dto.ElementUITree;
+import com.hb.bsmanage.model.po.SysPermissionPO;
+import com.hb.bsmanage.model.vo.response.ElementUITreeResponse;
 import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.unic.base.common.Result;
 import org.apache.commons.lang3.StringUtils;
@@ -29,22 +29,22 @@ public class TestController {
 
     @GetMapping("/testGetPermissionTree")
     public Result<ElementUITreeResponse> testGetPermissionTree() {
-        List<SysPermissionDO> list = iSysPermissionService.selectList(null);
+        List<SysPermissionPO> list = iSysPermissionService.selectList(null);
         ElementUITreeResponse response = new ElementUITreeResponse();
-        List<SysPermissionDO> topList = list.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
+        List<SysPermissionPO> topList = list.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
         List<ElementUITree> treeDataList = findTreeCycle(list, topList);
         response.setTreeDataList(treeDataList);
         return Result.of(ResponseEnum.SUCCESS, response);
     }
 
-    private List<ElementUITree> findTreeCycle(List<SysPermissionDO> allList, List<SysPermissionDO> childList) {
+    private List<ElementUITree> findTreeCycle(List<SysPermissionPO> allList, List<SysPermissionPO> childList) {
         List<ElementUITree> treeDataList = new ArrayList<>();
-        for (SysPermissionDO access : childList) {
+        for (SysPermissionPO access : childList) {
             ElementUITree treeData = ElementUITree.builder()
                     .id(access.getPermissionId())
                     .label(access.getPermissionName())
                     .build();
-            List<SysPermissionDO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
+            List<SysPermissionPO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
             treeData.setChildren(findTreeCycle(allList, cList));
             treeDataList.add(treeData);
         }

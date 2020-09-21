@@ -1,6 +1,6 @@
-package com.hb.bsmanage.model.response;
+package com.hb.bsmanage.model.vo.response;
 
-import com.hb.bsmanage.model.model.ElementUIMenu;
+import com.hb.bsmanage.model.dto.ElementUIMenu;
 import com.hb.unic.util.helper.ToStringHelper;
 import lombok.Data;
 

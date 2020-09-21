@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @version v0.1, 2020/9/16 9:36, create by huangbiao.
  */
-public interface IBaseDO extends Serializable, Cloneable {
+public interface IBasePO extends Serializable, Cloneable {
 
     /**
      * 获取主键
