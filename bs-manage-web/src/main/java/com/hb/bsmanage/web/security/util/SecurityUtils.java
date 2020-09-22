@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.security.util;
 
-import com.hb.bsmanage.model.po.SysUserPO;
+import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.security.model.RbacContext;
 
 import java.util.HashSet;

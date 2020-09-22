@@ -1,18 +1,19 @@
 package com.hb.bsmanage.web.controller.sys;
 
-import com.hb.bsmanage.api.service.ISysMerchantService;
-import com.hb.bsmanage.api.service.ISysRoleService;
-import com.hb.bsmanage.api.service.ISysUserRoleService;
-import com.hb.bsmanage.api.service.ISysUserService;
-import com.hb.bsmanage.model.enums.TableEnum;
-import com.hb.bsmanage.model.po.SysRolePO;
-import com.hb.bsmanage.model.po.SysUserPO;
-import com.hb.bsmanage.model.po.SysUserRolePO;
-import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.TableEnum;
 import com.hb.bsmanage.web.controller.BaseController;
+import com.hb.bsmanage.web.dao.po.SysRolePO;
+import com.hb.bsmanage.web.dao.po.SysUserPO;
+import com.hb.bsmanage.web.dao.po.SysUserRolePO;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
+import com.hb.bsmanage.web.service.ISysMerchantService;
+import com.hb.bsmanage.web.service.ISysRoleService;
+import com.hb.bsmanage.web.service.ISysUserRoleService;
+import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
+import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
@@ -27,9 +28,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -99,22 +104,7 @@ public class UserController extends BaseController {
         Pagination<SysUserPO> pageResult = iSysUserService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
 
         List<SysUserPO> userList = pageResult.getData();
-        if (CollectionUtils.isNotEmpty(userList)) {
-            Set<String> userIdSet = new HashSet<>();
-            userList.forEach(userDO -> {
-                userIdSet.add(userDO.getCreateBy());
-                userIdSet.add(userDO.getUpdateBy());
-            });
-            if (CollectionUtils.isNotEmpty(userIdSet)) {
-                Map<String, SysUserPO> userMap = iSysUserService.getUserMapByUserIdSet(userIdSet);
-                userList.forEach(userDO -> {
-                    SysUserPO createBy = userMap.get(userDO.getCreateBy());
-                    userDO.setCreateBy(createBy == null ? null : createBy.getUserName());
-                    SysUserPO updateBy = userMap.get(userDO.getUpdateBy());
-                    userDO.setUpdateBy(updateBy == null ? null : updateBy.getUserName());
-                });
-            }
-        }
+        iSysUserService.formatCreateByAndUpdateBy(userList);
         LOGGER.info("{}出参={}", baseLog, pageResult);
         return Result.of(ResponseEnum.SUCCESS, pageResult);
     }
@@ -127,6 +117,8 @@ public class UserController extends BaseController {
      */
     @PostMapping("/add")
     public Result<Integer> add(@RequestBody SysUserPO user) {
+        String baseLog = LogHelper.getBaseLog("添加用户");
+        LOGGER.info("{}入参={}", baseLog, user);
         if (StringUtils.isAnyBlank(user.getTenantId(), user.getUserName(), user.getMobile(), user.getPassword())) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
@@ -136,7 +128,9 @@ public class UserController extends BaseController {
         user.setTenantId(user.getTenantId());
         user.setCreateBy(SecurityUtils.getCurrentUserId());
         user.setUpdateBy(SecurityUtils.getCurrentUserId());
+        LOGGER.info("{}准备入库={}", baseLog, user);
         int addRows = iSysUserService.insert(user);
+        LOGGER.info("{}出参={}", baseLog, addRows);
         return Result.of(ResponseEnum.SUCCESS, addRows);
     }
 
@@ -148,13 +142,16 @@ public class UserController extends BaseController {
      */
     @PostMapping("/update")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result update(@RequestBody SysUserPO user, @RequestParam("userId") String userId) {
+    public Result<Integer> update(@RequestBody SysUserPO user, @RequestParam("userId") String userId) {
+        String baseLog = LogHelper.getBaseLog("修改用户");
+        LOGGER.info("{}入参={}={}", baseLog, userId, user);
         user.setUpdateBy(SecurityUtils.getCurrentUserId());
         int updateRows = iSysUserService.updateByBk(userId, user);
         if (updateRows != 1) {
             throw new BusinessException(ResponseEnum.FAIL);
         }
-        return Result.of(ResponseEnum.SUCCESS);
+        LOGGER.info("{}出参={}={}", baseLog, updateRows);
+        return Result.of(ResponseEnum.SUCCESS, updateRows);
     }
 
     /**
@@ -165,12 +162,15 @@ public class UserController extends BaseController {
      */
     @GetMapping("/delete")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result delete(@RequestParam("userId") String userId) {
+    public Result<Integer> delete(@RequestParam("userId") String userId) {
+        String baseLog = LogHelper.getBaseLog("删除用户");
+        LOGGER.info("{}入参={}", baseLog, userId);
         int deleteRows = iSysUserService.logicDeleteByBk(userId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         if (deleteRows != 1) {
             throw new BusinessException(ResponseEnum.FAIL);
         }
-        return Result.of(ResponseEnum.SUCCESS);
+        LOGGER.info("{}出参={}", baseLog, deleteRows);
+        return Result.of(ResponseEnum.SUCCESS, deleteRows);
     }
 
     /**
@@ -179,6 +179,7 @@ public class UserController extends BaseController {
      * @return 树数据
      */
     @GetMapping("/getRolesUnderUser")
+    @InOutLog("获取用户的角色集合")
     public Result<Set<String>> getRolesUnderUser(@RequestParam("userId") String userId) {
         SysUserPO sysUserDO = iSysUserService.selectByBk(userId);
         List<SysUserRolePO> userRoleList = iSysUserRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
@@ -192,6 +193,7 @@ public class UserController extends BaseController {
      * @return 树数据
      */
     @GetMapping("/getRolesUnderMerchant")
+    @InOutLog("获取用户对应商户下所有角色集合")
     public Result<List<SysRolePO>> getRolesUnderMerchant(@RequestParam("userId") String userId) {
         SysUserPO sysUserDO = iSysUserService.selectByBk(userId);
         return Result.of(ResponseEnum.SUCCESS, iSysRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "tenant_id", sysUserDO.getTenantId())));
@@ -206,14 +208,17 @@ public class UserController extends BaseController {
      */
     @PostMapping("/updateUserRole")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result updateUserRole(@RequestParam("userId") String userId, @RequestBody Set<String> roleIdSet) {
+    public Result<Integer> updateUserRole(@RequestParam("userId") String userId, @RequestBody Set<String> roleIdSet) {
+        String baseLog = LogHelper.getBaseLog("更新用户的角色");
+        LOGGER.info("{}入参={}={}", baseLog, userId, roleIdSet);
         if (StringUtils.isBlank(userId) || CollectionUtils.isEmpty(roleIdSet)) {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         // 删除用户的角色信息
         Where deleteWhere = Where.build().andAdd(QueryType.EQUAL, "user_id", userId);
         Map<String, Object> updateMap = MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get();
-        iSysUserRoleService.logicDelete(deleteWhere, updateMap);
+        int deleteRows = iSysUserRoleService.logicDelete(deleteWhere, updateMap);
+        LOGGER.info("{}删除用户的角色信息={}", baseLog, deleteRows);
         // 添加用户的角色信息
         roleIdSet.forEach(roleId -> {
             SysUserRolePO insert = SysUserRolePO.builder().userId(userId).roleId(roleId).build();
@@ -222,7 +227,8 @@ public class UserController extends BaseController {
             insert.setTenantId(SecurityUtils.getCurrentUserTenantId());
             iSysUserRoleService.insert(insert);
         });
-        return Result.of(ResponseEnum.SUCCESS);
+        LOGGER.info("{}出参={}", baseLog, roleIdSet.size());
+        return Result.of(ResponseEnum.SUCCESS, roleIdSet.size());
     }
 
 }

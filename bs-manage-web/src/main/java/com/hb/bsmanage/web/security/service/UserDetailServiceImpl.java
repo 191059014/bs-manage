@@ -1,11 +1,11 @@
 package com.hb.bsmanage.web.security.service;
 
-import com.hb.bsmanage.api.service.ISysPermissionService;
-import com.hb.bsmanage.api.service.ISysRoleAccessService;
-import com.hb.bsmanage.api.service.ISysUserRoleService;
-import com.hb.bsmanage.api.service.ISysUserService;
-import com.hb.bsmanage.model.po.SysPermissionPO;
-import com.hb.bsmanage.model.po.SysUserPO;
+import com.hb.bsmanage.web.service.ISysPermissionService;
+import com.hb.bsmanage.web.service.ISysRoleAccessService;
+import com.hb.bsmanage.web.service.ISysUserRoleService;
+import com.hb.bsmanage.web.service.ISysUserService;
+import com.hb.bsmanage.web.dao.po.SysPermissionPO;
+import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.security.model.UserPrincipal;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.logger.Logger;

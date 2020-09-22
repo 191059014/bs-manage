@@ -1,10 +1,10 @@
 package com.hb.bsmanage.web.controller;
 
-import com.hb.bsmanage.api.service.ISysPermissionService;
-import com.hb.bsmanage.model.dto.ElementUITree;
-import com.hb.bsmanage.model.po.SysPermissionPO;
-import com.hb.bsmanage.model.vo.response.ElementUITreeResponse;
-import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.service.ISysPermissionService;
+import com.hb.bsmanage.web.model.dto.ElementUITree;
+import com.hb.bsmanage.web.dao.po.SysPermissionPO;
+import com.hb.bsmanage.web.model.vo.ElementUITreeResponse;
+import com.hb.bsmanage.web.common.enums.ResponseEnum;
 import com.hb.unic.base.common.Result;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

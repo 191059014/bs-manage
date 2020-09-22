@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.security.model;
 
-import com.hb.bsmanage.model.po.SysUserPO;
+import com.hb.bsmanage.web.dao.po.SysUserPO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -5,8 +5,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>bs-manage-web</module>
-        <module>bs-manage-api</module>
-        <module>bs-manage-model</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -48,18 +46,6 @@
             <dependency>
                 <groupId>com.hb</groupId>
                 <artifactId>bs-manage-web</artifactId>
-                <version>${bs.manage.version}</version>
-            </dependency>
-            <!-- bs-manage-api -->
-            <dependency>
-                <groupId>com.hb</groupId>
-                <artifactId>bs-manage-api</artifactId>
-                <version>${bs.manage.version}</version>
-            </dependency>
-            <!-- bs-manage-model -->
-            <dependency>
-                <groupId>com.hb</groupId>
-                <artifactId>bs-manage-model</artifactId>
                 <version>${bs.manage.version}</version>
             </dependency>
             <!-- unic-base -->

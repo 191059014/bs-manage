@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.controller;
 
-import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ResponseEnum;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.base.exception.StandardRuntimeException;

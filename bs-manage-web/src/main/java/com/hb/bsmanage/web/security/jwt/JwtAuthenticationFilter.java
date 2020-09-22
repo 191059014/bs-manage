@@ -1,7 +1,7 @@
 package com.hb.bsmanage.web.security.jwt;
 
-import com.hb.bsmanage.model.common.Consts;
-import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.common.constans.Consts;
+import com.hb.bsmanage.web.common.enums.ResponseEnum;
 import com.hb.bsmanage.web.security.config.SecurityProperties;
 import com.hb.bsmanage.web.security.model.RbacContext;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -13,11 +13,9 @@ import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.logger.util.LogExceptionWapper;
 import com.hb.unic.util.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -42,12 +40,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     /**
-     * 用户service
-     */
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    /**
      * security配置
      */
     @Autowired
@@ -61,11 +53,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String baseLog = "[JwtAuthenticationFilter-doFilterInternal-jwt认证过滤器]";
-        if (RequestMethod.OPTIONS.toString().equalsIgnoreCase(request.getMethod())) {
-            LOGGER.info("{}OPTIONS请求，直接放行[{}]", baseLog, request.getRequestURI());
-            chain.doFilter(request, response);
-            return;
-        }
         if (checkIgnores(request)) {
             LOGGER.info("{}忽略请求，直接放行[{}]", baseLog, request.getRequestURI());
             chain.doFilter(request, response);

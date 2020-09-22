@@ -1,11 +1,11 @@
 package com.hb.bsmanage.web.security.jwt;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.hb.bsmanage.model.common.Consts;
-import com.hb.bsmanage.model.po.SysUserPO;
 import com.hb.bsmanage.web.common.RedisKeyFactory;
-import com.hb.bsmanage.web.common.ResponseEnum;
 import com.hb.bsmanage.web.common.ToolsWapper;
+import com.hb.bsmanage.web.common.constans.Consts;
+import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.security.model.RbacContext;
 import com.hb.unic.base.GlobalProperties;
 import com.hb.unic.base.exception.BusinessException;

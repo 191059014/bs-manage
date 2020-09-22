@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.common;
 
-import com.hb.bsmanage.model.common.Consts;
+import com.hb.bsmanage.web.common.constans.Consts;
 
 /**
  * redis缓存key管理工厂

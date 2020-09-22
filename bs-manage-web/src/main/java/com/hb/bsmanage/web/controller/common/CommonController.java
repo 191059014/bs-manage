@@ -1,7 +1,7 @@
 package com.hb.bsmanage.web.controller.common;
 
-import com.hb.bsmanage.model.enums.ResourceType;
-import com.hb.bsmanage.web.common.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ResourceType;
+import com.hb.bsmanage.web.common.enums.ResponseEnum;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
