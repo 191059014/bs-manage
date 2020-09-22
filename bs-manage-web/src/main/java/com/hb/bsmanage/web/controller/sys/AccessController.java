@@ -230,12 +230,15 @@ public class AccessController extends BaseController {
      * @return 资源
      */
     @GetMapping("/getResourcesUnderMerchantByResourceType")
-    public Result<List<SysPermissionPO>> getResourcesUnderMerchantByResourceType(@RequestParam("resourceType") String resourceType) {
+    public Result<List<SysPermissionPO>> getResourcesUnderMerchantByResourceType(@RequestParam("resourceType") String resourceType, @RequestParam("tenantId") String tenantId) {
         String baseLog = LogHelper.getBaseLog("通过资源类型获取当前商户下的资源");
-        LOGGER.info("{}入参={}", baseLog, resourceType);
-        Where where = Where.build()
-                .andAdd(QueryType.EQUAL, "tenant_id", SecurityUtils.getCurrentUserTenantId())
-                .andAdd(QueryType.EQUAL, "resource_type", resourceType);
+        LOGGER.info("{}入参={}={}", baseLog, resourceType, tenantId);
+        if (StringUtils.isAnyBlank(resourceType, tenantId)) {
+            return Result.of(ResponseEnum.SUCCESS, null);
+        }
+        Where where = Where.build();
+        where.andAdd(QueryType.EQUAL, "resource_type", resourceType);
+        where.andAdd(QueryType.EQUAL, "tenant_id", tenantId);
         List<SysPermissionPO> list = iSysPermissionService.selectList(where, "create_time desc");
         LOGGER.info("{}出参={}", baseLog, list);
         return Result.of(ResponseEnum.SUCCESS, list);
