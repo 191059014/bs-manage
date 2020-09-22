@@ -193,10 +193,11 @@ public class UserController extends BaseController {
      * @return 树数据
      */
     @GetMapping("/getRolesUnderMerchant")
-    @InOutLog("获取用户对应商户下所有角色集合")
-    public Result<List<SysRolePO>> getRolesUnderMerchant(@RequestParam("userId") String userId) {
-        SysUserPO sysUserDO = iSysUserService.selectByBk(userId);
-        return Result.of(ResponseEnum.SUCCESS, iSysRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "tenant_id", sysUserDO.getTenantId())));
+    @InOutLog("获取当前用户对应商户下所有角色集合")
+    public Result<List<SysRolePO>> getRolesUnderMerchant() {
+        SysUserPO sysUserDO = iSysUserService.selectByBk(SecurityUtils.getCurrentUserId());
+        Set<String> subMerchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(sysUserDO.getTenantId());
+        return Result.of(ResponseEnum.SUCCESS, iSysRoleService.selectList(Where.build().andAdd(QueryType.IN, "tenant_id", subMerchantIdSet)));
     }
 
     /**

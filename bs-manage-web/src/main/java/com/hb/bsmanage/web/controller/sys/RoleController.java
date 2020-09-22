@@ -14,6 +14,7 @@ import com.hb.bsmanage.web.service.ISysMerchantService;
 import com.hb.bsmanage.web.service.ISysPermissionService;
 import com.hb.bsmanage.web.service.ISysRoleAccessService;
 import com.hb.bsmanage.web.service.ISysRoleService;
+import com.hb.bsmanage.web.service.ISysUserRoleService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
@@ -69,6 +70,12 @@ public class RoleController extends BaseController {
      */
     @Autowired
     private ISysUserService iSysUserService;
+
+    /**
+     * 用户角色关系service
+     */
+    @Autowired
+    private ISysUserRoleService iSysUserRoleService;
 
     /**
      * 商户service
@@ -244,17 +251,18 @@ public class RoleController extends BaseController {
     }
 
     /**
-     * 获取权限树
+     * 获取当前用户权限树
      *
-     * @param roleId 权限id
      * @return 权限树
      */
-    @InOutLog("获取权限树")
+    @InOutLog("获取当前用户权限树")
     @GetMapping("/getPermissionTreeUnderMerchant")
-    public Result<ElementUITreeResponse> getPermissionTreeUnderMerchant(@RequestParam("roleId") String roleId) {
+    public Result<ElementUITreeResponse> getPermissionTreeUnderMerchant() {
         ElementUITreeResponse response = new ElementUITreeResponse();
-        SysRolePO sysRoleDO = iSysRoleService.selectByBk(roleId);
-        Set<String> permissionIdSet = iSysPermissionService.getPermissionSetByMerchantId(sysRoleDO.getTenantId());
+        SysUserPO sysUserPO = iSysUserService.selectByBk(SecurityUtils.getCurrentUserId());
+        Set<String> subMerchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(sysUserPO.getTenantId());
+        List<SysPermissionPO> permissionList = iSysPermissionService.selectList(Where.build().andAdd(QueryType.IN, "tenant_id", subMerchantIdSet));
+        Set<String> permissionIdSet = permissionList.stream().map(SysPermissionPO::getPermissionId).collect(Collectors.toSet());
         if (CollectionUtils.isEmpty(permissionIdSet)) {
             return Result.of(ResponseEnum.SUCCESS, response);
         }
