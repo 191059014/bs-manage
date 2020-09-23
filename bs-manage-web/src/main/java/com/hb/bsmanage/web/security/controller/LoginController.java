@@ -1,5 +1,6 @@
 package com.hb.bsmanage.web.security.controller;
 
+import com.hb.bsmanage.web.model.vo.LoginResponse;
 import com.hb.bsmanage.web.service.*;
 import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.model.vo.LoginRequest;
@@ -83,7 +84,7 @@ public class LoginController extends BaseController {
      * @return jwt令牌
      */
     @PostMapping("/login")
-    public Result<String> login(@RequestBody LoginRequest req) {
+    public Result<LoginResponse> login(@RequestBody LoginRequest req) {
         String baseLog = LogHelper.getBaseLog("登录");
         LOGGER.info("{}入参={}", baseLog, req);
         if (StringUtils.isAnyBlank(req.getUsernameOrMobile(), req.getPassword())) {
@@ -105,7 +106,7 @@ public class LoginController extends BaseController {
                 permissionIdSet = iSysRoleAccessService.getPermissionIdSetByRoleIdSet(roleIdSet);
             }
             String jwt = JwtUtils.createToken(user, roleIdSet, permissionIdSet, req.isRememberMe());
-            return Result.of(ResponseEnum.SUCCESS, jwt);
+            return Result.of(ResponseEnum.SUCCESS, LoginResponse.builder().jwt(jwt).username(user.getUserName()).build());
         } catch (BadCredentialsException e) {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("{}用户名或密码错误={}", baseLog, LogExceptionWapper.getStackTrace(e));
