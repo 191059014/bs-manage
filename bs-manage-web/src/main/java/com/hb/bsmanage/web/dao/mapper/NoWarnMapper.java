@@ -1,4 +1,4 @@
-package com.hb.bsmanage.web;
+package com.hb.bsmanage.web.dao.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 

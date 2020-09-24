@@ -13,7 +13,7 @@
 
     <!-- mapper -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.hb.bsmanage.dao.mapper"/>
+        <property name="basePackage" value="com.hb.bsmanage.web.dao.mapper"/>
     </bean>
 
 </beans>
