@@ -22,6 +22,6 @@ public class LoginResponse implements Serializable {
     private static final long serialVersionUID = 4155694160627747205L;
     // 用户名
     private String username;
-    // jwt令牌
-    private String jwt;
+    // token令牌
+    private String token;
 }

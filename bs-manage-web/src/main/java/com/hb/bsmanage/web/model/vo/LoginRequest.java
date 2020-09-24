@@ -24,7 +24,5 @@ public class LoginRequest implements Serializable {
     private String usernameOrMobile;
     // 密码
     private String password;
-    // 记住我
-    private boolean rememberMe;
 
 }

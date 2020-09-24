@@ -8,6 +8,7 @@ import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -27,6 +28,9 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserPO, Integer, String
     @Override
     @InOutLog("通过用户ID或者手机号查询用户")
     public SysUserPO findByUsernameOrMobile(String usernameOrMobile) {
+        if (StringUtils.isBlank(usernameOrMobile)) {
+            return null;
+        }
         Where where = Where.build()
                 .and()
                 .leftBracket()

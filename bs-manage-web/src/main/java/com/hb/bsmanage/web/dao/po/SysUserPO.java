@@ -1,7 +1,7 @@
 package com.hb.bsmanage.web.dao.po;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.hb.bsmanage.web.dao.po.base.impl.AbstractCommonPO;
+import com.hb.bsmanage.web.dao.po.base.impl.AbstractComplexPO;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import com.hb.unic.util.helper.ToStringHelper;
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table("sys_user")
-public class SysUserPO extends AbstractCommonPO {
+public class SysUserPO extends AbstractComplexPO {
 
     // serialVersionUID
     private static final long serialVersionUID = -2355680884700265496L;

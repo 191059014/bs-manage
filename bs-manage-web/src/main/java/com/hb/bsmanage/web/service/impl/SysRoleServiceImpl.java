@@ -6,8 +6,10 @@ import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
 import com.hb.unic.base.annotation.InOutLog;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +24,9 @@ public class SysRoleServiceImpl extends DmlMapperImpl<SysRolePO, Integer, String
     @Override
     @InOutLog("通过角色ID集合查询角色信息集合")
     public List<SysRolePO> getRoleListByRoleIdSet(Set<String> roleIdSet) {
+        if (CollectionUtils.isEmpty(roleIdSet)) {
+            return new ArrayList<>();
+        }
         return selectList(Where.build().and().add(QueryType.IN, "role_id", roleIdSet));
     }
 

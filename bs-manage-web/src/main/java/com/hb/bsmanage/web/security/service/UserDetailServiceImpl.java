@@ -1,15 +1,14 @@
 package com.hb.bsmanage.web.security.service;
 
-import com.hb.bsmanage.web.service.ISysPermissionService;
+import com.hb.bsmanage.web.dao.po.SysUserPO;
+import com.hb.bsmanage.web.security.model.UserPrincipal;
 import com.hb.bsmanage.web.service.ISysRoleAccessService;
 import com.hb.bsmanage.web.service.ISysUserRoleService;
 import com.hb.bsmanage.web.service.ISysUserService;
-import com.hb.bsmanage.web.dao.po.SysPermissionPO;
-import com.hb.bsmanage.web.dao.po.SysUserPO;
-import com.hb.bsmanage.web.security.model.UserPrincipal;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.base.util.LogHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,9 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 用户信息
@@ -48,12 +45,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private ISysUserRoleService iSysUserRoleService;
 
     /**
-     * 权限service
-     */
-    @Autowired
-    private ISysPermissionService iSysPermissionService;
-
-    /**
      * 角色权限关系service
      */
     @Autowired
@@ -68,27 +59,25 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     @InOutLog("登陆认证")
     public UserDetails loadUserByUsername(String usernameOrMobile) throws UsernameNotFoundException {
-        // 查询用户信息
+        String baseLog = LogHelper.getBaseLog("登录认证");
+        /*
+         * 查询用户信息
+         */
         SysUserPO user = iSysUserService.findByUsernameOrMobile(usernameOrMobile);
+        LOGGER.info("{}用户信息={}", baseLog, user);
         if (user == null) {
-            LOGGER.info("无此用户={}", usernameOrMobile);
-            throw new UsernameNotFoundException("无此用户：" + usernameOrMobile);
+            return null;
         }
-        // 查询角色信息
+        /*
+         * 查询角色信息
+         */
         Set<String> roleIdSet = iSysUserRoleService.getRoleIdSetByUserId(user.getUserId());
         Set<String> permissionIdSet = null;
         if (CollectionUtils.isNotEmpty(roleIdSet)) {
             permissionIdSet = iSysRoleAccessService.getPermissionIdSetByRoleIdSet(roleIdSet);
         }
-        List<SysPermissionPO> permissionsList = null;
-        if (CollectionUtils.isNotEmpty(permissionIdSet)) {
-            permissionsList = iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
-        }
-        List<String> permissions = null;
-        if (CollectionUtils.isNotEmpty(permissionsList)) {
-            permissions = permissionsList.stream().map(SysPermissionPO::getValue).collect(Collectors.toList());
-        }
-        return new UserPrincipal(user.getUserName(), user.getPassword(), permissions);
+        LOGGER.info("{}角色信息={}", baseLog, permissionIdSet);
+        return new UserPrincipal(user.getUserName(), user.getPassword(), permissionIdSet);
     }
 
 }

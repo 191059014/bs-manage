@@ -9,8 +9,10 @@ import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,10 +33,13 @@ public class SysUserRoleServiceImpl extends DmlMapperImpl<SysUserRolePO, Integer
     @Override
     @InOutLog("通过用户ID查询角色ID集合")
     public Set<String> getRoleIdSetByUserId(String userId) {
+        if (StringUtils.isBlank(userId)) {
+            return new HashSet<>();
+        }
         // 查询用户角色关联信息
         List<SysUserRolePO> userRoleList = selectList(Where.build().and().add(QueryType.EQUAL, "user_id", userId));
         if (CollectionUtils.isEmpty(userRoleList)) {
-            return null;
+            return new HashSet<>();
         }
         return userRoleList.stream().map(SysUserRolePO::getRoleId).collect(Collectors.toSet());
     }

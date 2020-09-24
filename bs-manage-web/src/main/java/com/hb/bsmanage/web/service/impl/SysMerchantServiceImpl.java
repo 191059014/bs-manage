@@ -7,7 +7,7 @@ import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.helper.Where;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.logger.util.LogHelper;
+import com.hb.unic.base.util.LogHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +45,7 @@ public class SysMerchantServiceImpl extends DmlMapperImpl<SysMerchantPO, Integer
 
     @Override
     public List<SysMerchantPO> getCurrentSubMerchantList(String currentUserTenantId) {
-        String baseLog = LogHelper.getBaseLog("获取当前用户下所有下级商户集合");
+        String baseLog = LogHelper.getBaseLog("获取当前用户所有下级商户集合");
         LOGGER.info("{}入参={}", baseLog, currentUserTenantId);
         SysMerchantPO currentUserMerchant = selectByBk(currentUserTenantId);
         Where where = BsWebUtils.getSubPathWhere(Where.build(), currentUserMerchant);

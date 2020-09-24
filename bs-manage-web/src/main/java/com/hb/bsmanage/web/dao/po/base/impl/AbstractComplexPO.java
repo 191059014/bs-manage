@@ -11,7 +11,7 @@ import com.hb.unic.util.helper.ToStringHelper;
  *
  * @version v0.1, 2020/9/16 10:27, create by huangbiao.
  */
-public abstract class AbstractCommonPO extends AbstractBasePO implements IStatusPO, IRelationPO, ITenantPO {
+public abstract class AbstractComplexPO extends AbstractBasePO implements IStatusPO, IRelationPO, ITenantPO {
 
     // serialVersionUID
     private static final long serialVersionUID = -6060485532902309L;

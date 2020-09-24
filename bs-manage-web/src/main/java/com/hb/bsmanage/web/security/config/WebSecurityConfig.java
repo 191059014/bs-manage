@@ -1,7 +1,7 @@
 package com.hb.bsmanage.web.security.config;
 
 import com.hb.bsmanage.web.common.enums.ResponseEnum;
-import com.hb.bsmanage.web.security.jwt.JwtAuthenticationFilter;
+import com.hb.bsmanage.web.security.filter.AuthenticateFilter;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.util.util.JsonUtils;
@@ -39,10 +39,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
 
     /**
-     * jwt认证过滤器
+     * 认证过滤器
      */
     @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private AuthenticateFilter authenticateFilter;
 
     /**
      * security配置
@@ -96,7 +96,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 // Session 管理
                 .sessionManagement()
-                // 因为使用了JWT，所以这里不管理Session
+                // 不管理Session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http
                 // 异常处理
@@ -107,7 +107,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 });
 
         // 添加自定义 JWT 过滤器
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authenticateFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
 

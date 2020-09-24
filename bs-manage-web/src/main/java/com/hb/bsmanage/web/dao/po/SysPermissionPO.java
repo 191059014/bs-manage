@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.dao.po;
 
-import com.hb.bsmanage.web.dao.po.base.impl.AbstractCommonPO;
+import com.hb.bsmanage.web.dao.po.base.impl.AbstractComplexPO;
 import com.hb.mybatis.annotation.Column;
 import com.hb.mybatis.annotation.Table;
 import com.hb.unic.util.helper.ToStringHelper;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("sys_permission")
-public class SysPermissionPO extends AbstractCommonPO {
+public class SysPermissionPO extends AbstractComplexPO {
 
     // 序列化ID
     private static final long serialVersionUID = 4702444967524003359L;

@@ -7,7 +7,8 @@ import com.hb.unic.base.exception.StandardRuntimeException;
 import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.logger.util.LogExceptionWapper;
+import com.hb.unic.base.util.LogExceptionWapper;
+import com.hb.unic.base.util.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -55,7 +56,7 @@ public abstract class BaseController {
     @ExceptionHandler(BusinessException.class)
     @ResponseBody
     public Result exception(BusinessException e) {
-        String baseLog = "[BaseController-exception-业务异常]";
+        String baseLog = LogHelper.getBaseLog("业务异常");
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
         return Result.of(e.getKey(), e.getMessage());
     }
@@ -66,7 +67,7 @@ public abstract class BaseController {
     @ExceptionHandler(StandardRuntimeException.class)
     @ResponseBody
     public Result exception(StandardRuntimeException e) {
-        String baseLog = "[BaseController-exception-标准异常]";
+        String baseLog = LogHelper.getBaseLog("标准异常");
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
         return Result.of(e.getKey(), e.getMessage());
     }
@@ -77,7 +78,7 @@ public abstract class BaseController {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Result exception(Exception e) {
-        String baseLog = "[BaseController-exception-系统异常]";
+        String baseLog = LogHelper.getBaseLog("系统异常");
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
         return Result.of(ResponseEnum.ERROR);
     }

@@ -26,9 +26,10 @@ public enum ResponseEnum {
      * 20100-20199代表“系统级别”的错误
      */
     ACCESS_DENY("20100", "禁止访问"),
-    ILLEGAL_TOKEN("20101", "非法的token"),
+    TOKEN_IS_EMPTY("20110", "token为空"),
+    TOKEN_IS_EXPIRED("20111", "token过期"),
     USER_NOT_EXIST("20102", "用户不存在"),
-    BAD_CREDENTIALS("20103", "用户名或密码不正确"),
+    BAD_CREDENTIALS("20103", "认证失败"),
 
     ;
 

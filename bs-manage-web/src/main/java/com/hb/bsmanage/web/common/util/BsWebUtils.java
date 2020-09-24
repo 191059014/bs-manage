@@ -7,6 +7,7 @@ import com.hb.mybatis.helper.Where;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.util.StrUtils;
+import com.hb.unic.util.util.UuidUtils;
 
 /**
  * 工具类
@@ -57,6 +58,15 @@ public class BsWebUtils {
                 .add(QueryType.LIKE, "path", getSubPathPrefix(currentUserMerchant.getPath()))
                 .rightBracket();
         return where;
+    }
+
+    /**
+     * 创建token
+     *
+     * @return token
+     */
+    public static String createToken() {
+        return UuidUtils.uuidShort();
     }
 
 }

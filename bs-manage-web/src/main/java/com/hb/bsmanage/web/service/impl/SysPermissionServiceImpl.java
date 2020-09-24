@@ -9,6 +9,8 @@ import com.hb.unic.base.annotation.InOutLog;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,16 +27,19 @@ public class SysPermissionServiceImpl extends DmlMapperImpl<SysPermissionPO, Int
     @Override
     @InOutLog("通过权限id集合查询权限列表")
     public List<SysPermissionPO> getPermissionListByPermissionIdSet(Set<String> permissionIdSet) {
+        if (CollectionUtils.isEmpty(permissionIdSet)) {
+            return new ArrayList<>();
+        }
         return selectList(Where.build().andAdd(QueryType.IN, "permission_id", permissionIdSet));
     }
 
     @Override
     @InOutLog("获取商户下所有权限集合")
-    public Set<String> getPermissionSetByMerchantId(String merchantId) {
-        List<SysPermissionPO> sysPermissionList = selectList(Where.build().andAdd(QueryType.EQUAL, "tenant_id", merchantId));
-        if (CollectionUtils.isEmpty(sysPermissionList)) {
-            return null;
+    public Set<String> getPermissionIdSetByMerchantIdSet(Set<String> merchantIdSet) {
+        if (CollectionUtils.isEmpty(merchantIdSet)) {
+            return new HashSet<>();
         }
+        List<SysPermissionPO> sysPermissionList = selectList(Where.build().andAdd(QueryType.IN, "tenant_id", merchantIdSet));
         return sysPermissionList.stream().map(SysPermissionPO::getPermissionId).collect(Collectors.toSet());
     }
 }

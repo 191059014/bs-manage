@@ -1,20 +1,23 @@
-package com.hb.bsmanage.web.security.jwt;
+package com.hb.bsmanage.web.security.filter;
 
+import com.hb.bsmanage.web.common.RedisKeyFactory;
+import com.hb.bsmanage.web.common.ToolsWapper;
 import com.hb.bsmanage.web.common.constans.Consts;
 import com.hb.bsmanage.web.common.enums.ResponseEnum;
 import com.hb.bsmanage.web.security.config.SecurityProperties;
 import com.hb.bsmanage.web.security.model.RbacContext;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
+import com.hb.unic.base.GlobalProperties;
 import com.hb.unic.base.common.Result;
-import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.logger.util.LogExceptionWapper;
+import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.util.util.JsonUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -31,13 +34,13 @@ import java.util.Set;
  * @author Mr.Huang
  * @version v0.1, JWTAuthenticationFilter.java, 2020/6/18 13:23, create by huangbiao.
  */
-@Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+@Configuration
+public class AuthenticateFilter extends OncePerRequestFilter {
 
     /**
      * 日志
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticateFilter.class);
 
     /**
      * security配置
@@ -52,26 +55,46 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String baseLog = "[JwtAuthenticationFilter-doFilterInternal-jwt认证过滤器]";
+        String baseLog = LogHelper.getBaseLog("token认证");
         if (checkIgnores(request)) {
-            LOGGER.info("{}忽略请求，直接放行[{}]", baseLog, request.getRequestURI());
+            LOGGER.info("{}直接放行[{}]", baseLog, request.getRequestURI());
             chain.doFilter(request, response);
             return;
         }
         try {
-            // 解析jwt
-            RbacContext rbacContext = JwtUtils.parseJwtToken(request.getHeader(Consts.TOKEN));
-            // 将rbac信息放入上下文
+            /*
+             * 校验token
+             */
+            String token = request.getHeader(Consts.TOKEN);
+            LOGGER.info("{}token={}", baseLog, token);
+            if (StringUtils.isBlank(token)) {
+                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.TOKEN_IS_EMPTY)));
+                return;
+            }
+            /*
+             * 从缓存里获取rbac信息
+             */
+            String tokenKey = RedisKeyFactory.getTokenKey(token);
+            String json = ToolsWapper.redis().get(tokenKey);
+            RbacContext rbacContext = JsonUtils.toBean(json, RbacContext.class);
+            if (rbacContext == null) {
+                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.TOKEN_IS_EXPIRED)));
+                return;
+            }
+            /*
+             * 将rbac信息放入上下文
+             */
             SecurityUtils.setRbacContext(rbacContext);
-            LOGGER.info("{}用户信息已放入上下文，放行", baseLog);
+            /*
+             * 给token过期时间续航
+             */
+            ToolsWapper.redis().setExpire(tokenKey, GlobalProperties.getLong("token.defaultTtl"));
+
+            LOGGER.info("{}完毕，放行", baseLog);
             //放行
             chain.doFilter(request, response);
-        } catch (BusinessException e) {
-            LOGGER.info("{}业务异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
-            ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(e.getKey(), e.getMessage())));
-        } catch (Exception e) {
-            LOGGER.info("{}系统异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
-            ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.FAIL.getCode(), "token认证失败")));
+        } finally {
+            SecurityUtils.clearRbacContext();
         }
     }
 

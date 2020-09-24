@@ -1,10 +1,14 @@
 package com.hb.bsmanage.web.security.util;
 
+import com.hb.bsmanage.web.dao.po.SysPermissionPO;
+import com.hb.bsmanage.web.dao.po.SysRolePO;
 import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.security.model.RbacContext;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 工具类
@@ -29,6 +33,13 @@ public class SecurityUtils {
     }
 
     /**
+     * 清空当前线程绑定的rbac信息
+     */
+    public static void clearRbacContext() {
+        RC.remove();
+    }
+
+    /**
      * 获取当前用户信息
      *
      * @return SysUserDO
@@ -38,21 +49,39 @@ public class SecurityUtils {
     }
 
     /**
-     * 获取当前用户的角色信息
+     * 获取当前用户的角色集合
      *
      * @return 角色id集合
      */
-    public static Set<String> getCurrentUserRoles() {
-        return RC.get() == null ? new HashSet<>() : RC.get().getRoles();
+    public static List<SysRolePO> getCurrentUserRoles() {
+        return RC.get() == null ? new ArrayList<>() : RC.get().getRoles();
     }
 
     /**
-     * 获取当前用户的权限信息
+     * 获取当前用户的角色ID集合
+     *
+     * @return 角色id集合
+     */
+    public static Set<String> getCurrentUserRoleIdSet() {
+        return getCurrentUserRoles().stream().map(SysRolePO::getRoleId).collect(Collectors.toSet());
+    }
+
+    /**
+     * 获取当前用户的权限集合
      *
      * @return 权限id集合
      */
-    public static Set<String> getCurrentUserPermissions() {
-        return RC.get() == null ? new HashSet<>() : RC.get().getPermissions();
+    public static List<SysPermissionPO> getCurrentUserPermissions() {
+        return RC.get() == null ? new ArrayList<>() : RC.get().getPermissions();
+    }
+
+    /**
+     * 获取当前用户的权限ID集合
+     *
+     * @return 权限id集合
+     */
+    public static Set<String> getCurrentUserPermissionIdSet() {
+        return getCurrentUserPermissions().stream().map(SysPermissionPO::getPermissionId).collect(Collectors.toSet());
     }
 
     /**
@@ -81,6 +110,15 @@ public class SecurityUtils {
      */
     public static String getCurrentUserTenantId() {
         return RC.get() == null ? "" : RC.get().getUser() == null ? "" : RC.get().getUser().getTenantId();
+    }
+
+    /**
+     * 获取当前用户的ParentId
+     *
+     * @return ParentId
+     */
+    public static String getCurrentUserParentId() {
+        return RC.get() == null ? "" : RC.get().getUser() == null ? "" : RC.get().getUser().getParentId();
     }
 
 }

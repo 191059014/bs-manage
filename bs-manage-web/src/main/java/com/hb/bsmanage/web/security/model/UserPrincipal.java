@@ -1,5 +1,6 @@
 package com.hb.bsmanage.web.security.model;
 
+import com.hb.unic.util.helper.ToStringHelper;
 import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.core.GrantedAuthority;
@@ -7,7 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +31,7 @@ public class UserPrincipal implements UserDetails {
     // 权限信息
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(String userName, String password, List<String> permissions) {
+    public UserPrincipal(String userName, String password, Set<String> permissions) {
         this.userName = userName;
         this.password = password;
         if (CollectionUtils.isNotEmpty(permissions)) {
@@ -75,6 +76,10 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return ToStringHelper.printNoNull(this);
+    }
 }
 
     

@@ -5,13 +5,11 @@ import com.hb.bsmanage.web.common.enums.ResponseEnum;
 import com.hb.bsmanage.web.common.enums.TableEnum;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysPermissionPO;
-import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.model.dto.ElementUIMenu;
 import com.hb.bsmanage.web.model.vo.ElementUIMenuResponse;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.bsmanage.web.service.ISysMerchantService;
 import com.hb.bsmanage.web.service.ISysPermissionService;
-import com.hb.bsmanage.web.service.ISysRoleAccessService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
@@ -19,7 +17,7 @@ import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.logger.util.LogHelper;
+import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.util.easybuild.MapBuilder;
 import com.hb.unic.util.easybuild.SetBuilder;
 import com.hb.unic.util.util.KeyUtils;
@@ -37,9 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -76,12 +72,6 @@ public class AccessController extends BaseController {
     private ISysUserService iSysUserService;
 
     /**
-     * 角色权限关系service
-     */
-    @Autowired
-    private ISysRoleAccessService iSysRoleAccessService;
-
-    /**
      * 获取私人的所有菜单信息
      *
      * @return 菜单信息列表
@@ -90,7 +80,7 @@ public class AccessController extends BaseController {
     public Result<ElementUIMenuResponse> getPrivateMenuDatas() {
         String baseLog = LogHelper.getBaseLog("获取每个用户的所有菜单");
         ElementUIMenuResponse response = new ElementUIMenuResponse();
-        Set<String> permissionIdSet = SecurityUtils.getCurrentUserPermissions();
+        Set<String> permissionIdSet = SecurityUtils.getCurrentUserPermissionIdSet();
         LOGGER.info("{}当前用户权限ID集合={}", baseLog, permissionIdSet);
         if (CollectionUtils.isEmpty(permissionIdSet)) {
             return Result.of(ResponseEnum.SUCCESS, response);
@@ -125,7 +115,6 @@ public class AccessController extends BaseController {
             List<SysPermissionPO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
             menu.setChildren(findChildrenMenuCycle(allList, cList));
             menuList.add(menu);
-
         });
         return menuList.size() > 0 ? menuList : null;
     }
@@ -142,21 +131,21 @@ public class AccessController extends BaseController {
                                                          @RequestParam("pageSize") Integer pageSize) {
         String baseLog = LogHelper.getBaseLog("分页查询权限列表");
         LOGGER.info("{}入参={}={}={}", baseLog, permission, pageNum, pageSize);
+        if (!Pagination.verify(pageNum, pageSize)) {
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+        }
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "permission_id", permission.getPermissionId());
         where.andAdd(QueryType.LIKE, "permission_name", permission.getPermissionName());
         where.andAdd(QueryType.EQUAL, "resource_type", permission.getResourceType());
         where.andAdd(QueryType.EQUAL, "tenant_id", permission.getTenantId());
-        SysUserPO currentUser = SecurityUtils.getCurrentUser();
-        if (currentUser.getParentId() != null) {
-            LOGGER.info("{}非最高系统管理员，只能查询权限所属商户，及商户下的所有下级商户的权限={}", baseLog, currentUser.getParentId());
+        if (SecurityUtils.getCurrentUserParentId() != null) {
+            // 非最高系统管理员，只能查询权限所属商户，及商户下的所有下级商户的权限
             Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
             where.andAdd(QueryType.IN, "tenant_id", merchantIdSet);
         }
         Pagination<SysPermissionPO> pageResult = iSysPermissionService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
-
-        List<SysPermissionPO> permissionList = pageResult.getData();
-        iSysUserService.formatCreateByAndUpdateBy(permissionList);
+        iSysUserService.formatCreateByAndUpdateBy(pageResult.getData());
         LOGGER.info("{}出参={}", baseLog, pageResult);
         return Result.of(ResponseEnum.SUCCESS, pageResult);
     }
@@ -175,7 +164,6 @@ public class AccessController extends BaseController {
             return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         permission.setPermissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()));
-        permission.setTenantId(permission.getTenantId());
         permission.setCreateBy(SecurityUtils.getCurrentUserId());
         permission.setUpdateBy(SecurityUtils.getCurrentUserId());
         LOGGER.info("{}准备入库={}", baseLog, permission);
@@ -195,6 +183,9 @@ public class AccessController extends BaseController {
     public Result<Integer> update(@RequestBody SysPermissionPO permission, @RequestParam("permissionId") String permissionId) {
         String baseLog = LogHelper.getBaseLog("修改权限");
         LOGGER.info("{}入参={}={}", baseLog, permissionId, permission);
+        if (StringUtils.isBlank(permissionId)) {
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+        }
         permission.setUpdateBy(SecurityUtils.getCurrentUserId());
         int updateRows = iSysPermissionService.updateByBk(permissionId, permission);
         if (updateRows != 1) {
@@ -215,6 +206,9 @@ public class AccessController extends BaseController {
     public Result<Integer> delete(@RequestParam("permissionId") String permissionId) {
         String baseLog = LogHelper.getBaseLog("删除权限");
         LOGGER.info("{}入参={}", baseLog, permissionId);
+        if (StringUtils.isBlank(permissionId)) {
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+        }
         int deleteRows = iSysPermissionService.logicDeleteByBk(permissionId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         if (deleteRows != 1) {
             throw new BusinessException(ResponseEnum.FAIL);
@@ -234,7 +228,7 @@ public class AccessController extends BaseController {
         String baseLog = LogHelper.getBaseLog("通过资源类型获取当前商户下的资源");
         LOGGER.info("{}入参={}={}", baseLog, resourceType, tenantId);
         if (StringUtils.isAnyBlank(resourceType, tenantId)) {
-            return Result.of(ResponseEnum.SUCCESS, null);
+            return Result.of(ResponseEnum.PARAM_ILLEGAL);
         }
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "resource_type", resourceType);
