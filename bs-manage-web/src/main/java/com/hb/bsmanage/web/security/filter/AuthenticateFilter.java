@@ -9,12 +9,12 @@ import com.hb.bsmanage.web.security.model.RbacContext;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.unic.base.GlobalProperties;
 import com.hb.unic.base.common.Result;
+import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.util.util.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.hb.unic.util.util.StrUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -67,7 +67,7 @@ public class AuthenticateFilter extends OncePerRequestFilter {
              */
             String token = request.getHeader(Consts.TOKEN);
             LOGGER.info("{}token={}", baseLog, token);
-            if (StringUtils.isBlank(token)) {
+            if (StrUtils.isBlank(token)) {
                 ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.TOKEN_IS_EMPTY)));
                 return;
             }
