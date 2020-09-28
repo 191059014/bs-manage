@@ -76,6 +76,10 @@ public class AuthenticateFilter extends OncePerRequestFilter {
              */
             String tokenKey = RedisKeyFactory.getTokenKey(token);
             String json = ToolsWapper.redis().get(tokenKey);
+            if (json == null) {
+                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.TOKEN_IS_EXPIRED)));
+                return;
+            }
             RbacContext rbacContext = JsonUtils.toBean(json, RbacContext.class);
             if (rbacContext == null) {
                 ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.TOKEN_IS_EXPIRED)));
