@@ -1,16 +1,22 @@
 package com.hb.bsmanage.web.controller.common;
 
+import com.hb.bsmanage.web.common.ToolsWapper;
+import com.hb.bsmanage.web.common.enums.ResourceType;
+import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.TableEnum;
+import com.hb.bsmanage.web.common.util.BsWebUtils;
 import com.hb.bsmanage.web.dao.po.SysMerchantPO;
 import com.hb.bsmanage.web.dao.po.SysPermissionPO;
 import com.hb.bsmanage.web.dao.po.SysRolePO;
 import com.hb.bsmanage.web.dao.po.SysRolePermissionPO;
 import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.dao.po.SysUserRolePO;
-import com.hb.bsmanage.web.service.*;
-import com.hb.bsmanage.web.common.enums.ResourceType;
-import com.hb.bsmanage.web.common.enums.TableEnum;
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
-import com.hb.bsmanage.web.common.ToolsWapper;
+import com.hb.bsmanage.web.service.ISysMerchantService;
+import com.hb.bsmanage.web.service.ISysPermissionService;
+import com.hb.bsmanage.web.service.ISysRoleAccessService;
+import com.hb.bsmanage.web.service.ISysRoleService;
+import com.hb.bsmanage.web.service.ISysUserRoleService;
+import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -19,7 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 通用controller
@@ -119,7 +130,7 @@ public class ToolsController {
         String baseLog = "[ToolsController-addAdmin-添加最高级别系统用户信息]";
         // 新增商户
         SysMerchantPO merchant = SysMerchantPO.builder()
-                .merchantId(KeyUtils.getTenantId())
+                .merchantId(BsWebUtils.getTenantId())
                 .merchantName("一级商户")
                 .build();
         merchant.setPath("0");

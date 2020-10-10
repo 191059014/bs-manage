@@ -6,6 +6,8 @@ import com.hb.mybatis.enums.QueryType;
 import com.hb.mybatis.helper.Where;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.util.DateUtils;
+import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.StrUtils;
 import com.hb.unic.util.util.UuidUtils;
 
@@ -67,6 +69,13 @@ public class BsWebUtils {
      */
     public static String createToken() {
         return UuidUtils.uuidShort();
+    }
+
+    /**
+     * 获取多租户id
+     */
+    public static String getTenantId() {
+        return KeyUtils.getNowTimeKey(null, DateUtils.FORMAT_12, 0);
     }
 
 }
