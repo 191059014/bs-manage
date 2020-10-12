@@ -4,6 +4,7 @@ import com.hb.bsmanage.web.common.ToolsWapper;
 import com.hb.bsmanage.web.common.enums.ResourceType;
 import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.bsmanage.web.common.enums.PkPrefix;
+import com.hb.bsmanage.web.common.enums.YesOrNo;
 import com.hb.bsmanage.web.common.util.BsWebUtils;
 import com.hb.bsmanage.web.dao.po.SysMerchantPO;
 import com.hb.bsmanage.web.dao.po.SysPermissionPO;
@@ -193,6 +194,7 @@ public class ToolsController {
                     .value(valuePrefixArr[i])
                     .url(urlArr[i])
                     .icon(iconArr[i])
+                    .keepAlive(YesOrNo.YES.getValue())
                     .build();
             pagePermission.setTenantId(merchant.getMerchantId());
             pagePermission.setParentId(sysPermission.getPermissionId());

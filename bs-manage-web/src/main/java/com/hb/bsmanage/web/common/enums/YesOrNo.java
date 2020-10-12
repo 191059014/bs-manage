@@ -7,8 +7,8 @@ package com.hb.bsmanage.web.common.enums;
  */
 public enum YesOrNo {
 
-    yes("Y", "是"),
-    no("N", "否");
+    YES("Y", "是"),
+    NO("N", "否");
 
     // 值
     private String value;

@@ -22,6 +22,7 @@ import com.hb.unic.util.easybuild.MapBuilder;
 import com.hb.unic.util.easybuild.SetBuilder;
 import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
+import com.hb.unic.util.util.StrUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -228,8 +229,11 @@ public class AccessController extends BaseController {
     public Result<List<SysPermissionPO>> getResourcesUnderMerchantByResourceType(@RequestParam("resourceType") String resourceType, @RequestParam("tenantId") String tenantId) {
         String baseLog = LogHelper.getBaseLog("通过资源类型获取当前商户下的资源");
         LOGGER.info("{}入参={}={}", baseLog, resourceType, tenantId);
-        if (StringUtils.isAnyBlank(resourceType, tenantId)) {
+        if (StringUtils.isBlank(resourceType)) {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
+        }
+        if (StrUtils.isBlank(tenantId)) {
+            tenantId = SecurityUtils.getCurrentUserTenantId();
         }
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "resource_type", resourceType);
