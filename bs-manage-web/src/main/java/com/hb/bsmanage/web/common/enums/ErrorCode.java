@@ -13,7 +13,7 @@ package com.hb.bsmanage.web.common.enums;
  *
  * @version v0.1, 2020/7/24 15:35, create by huangbiao.
  */
-public enum ResponseEnum {
+public enum ErrorCode {
 
     /**
      * 最基本的三个状态：成功，异常，失败，参数非法
@@ -29,7 +29,7 @@ public enum ResponseEnum {
     TOKEN_IS_EMPTY("20110", "token为空"),
     TOKEN_IS_EXPIRED("20111", "token过期"),
     USER_NOT_EXIST("20102", "用户不存在"),
-    BAD_CREDENTIALS("20103", "认证失败"),
+    BAD_CREDENTIALS("20103", "用户名或密码错误"),
 
     ;
 
@@ -42,7 +42,7 @@ public enum ResponseEnum {
      */
     private String msg;
 
-    ResponseEnum(String code, String msg) {
+    ErrorCode(String code, String msg) {
         this.code = code;
         this.msg = msg;
     }

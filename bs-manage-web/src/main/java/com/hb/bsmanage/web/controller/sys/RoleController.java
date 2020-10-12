@@ -1,7 +1,7 @@
 package com.hb.bsmanage.web.controller.sys;
 
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
-import com.hb.bsmanage.web.common.enums.TableEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
+import com.hb.bsmanage.web.common.enums.PkPrefix;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysPermissionPO;
 import com.hb.bsmanage.web.dao.po.SysRolePO;
@@ -101,7 +101,7 @@ public class RoleController extends BaseController {
         String baseLog = LogHelper.getBaseLog("分页查询角色列表");
         LOGGER.info("{}入参={}={}={}", baseLog, role, pageNum, pageSize);
         if (!Pagination.verify(pageNum, pageSize)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "role_id", role.getRoleId());
@@ -115,7 +115,7 @@ public class RoleController extends BaseController {
         Pagination<SysRolePO> pageResult = iSysRoleService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pageResult.getData());
         LOGGER.info("{}出参={}", baseLog, pageResult);
-        return Result.of(ResponseEnum.SUCCESS, pageResult);
+        return Result.of(ErrorCode.SUCCESS, pageResult);
     }
 
     /**
@@ -129,15 +129,15 @@ public class RoleController extends BaseController {
         String baseLog = LogHelper.getBaseLog("添加角色");
         LOGGER.info("{}入参={}", baseLog, role);
         if (StringUtils.isAnyBlank(role.getTenantId(), role.getRoleName())) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
-        role.setRoleId(KeyUtils.getUniqueKey(TableEnum.ROLE_ID.getIdPrefix()));
+        role.setRoleId(KeyUtils.getUniqueKey(PkPrefix.ROLE_ID.getValue()));
         role.setCreateBy(SecurityUtils.getCurrentUserId());
         role.setUpdateBy(SecurityUtils.getCurrentUserId());
         LOGGER.info("{}准备入库={}", baseLog, role);
         int addRows = iSysRoleService.insert(role);
         LOGGER.info("{}出参={}", baseLog, addRows);
-        return Result.of(ResponseEnum.SUCCESS, addRows);
+        return Result.of(ErrorCode.SUCCESS, addRows);
     }
 
     /**
@@ -152,15 +152,15 @@ public class RoleController extends BaseController {
         String baseLog = LogHelper.getBaseLog("修改角色");
         LOGGER.info("{}入参={}={}", baseLog, roleId, role);
         if (StringUtils.isBlank(roleId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         role.setUpdateBy(SecurityUtils.getCurrentUserId());
         int updateRows = iSysRoleService.updateByBk(roleId, role);
         if (updateRows != 1) {
-            throw new BusinessException(ResponseEnum.FAIL);
+            throw new BusinessException(ErrorCode.FAIL);
         }
         LOGGER.info("{}出参={}", baseLog, updateRows);
-        return Result.of(ResponseEnum.SUCCESS, updateRows);
+        return Result.of(ErrorCode.SUCCESS, updateRows);
     }
 
     /**
@@ -175,14 +175,14 @@ public class RoleController extends BaseController {
         String baseLog = LogHelper.getBaseLog("删除角色");
         LOGGER.info("{}入参={}", baseLog, roleId);
         if (StringUtils.isBlank(roleId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         int deleteRows = iSysRoleService.logicDeleteByBk(roleId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         if (deleteRows != 1) {
-            throw new BusinessException(ResponseEnum.FAIL);
+            throw new BusinessException(ErrorCode.FAIL);
         }
         LOGGER.info("{}出参={}", baseLog, deleteRows);
-        return Result.of(ResponseEnum.SUCCESS, deleteRows);
+        return Result.of(ErrorCode.SUCCESS, deleteRows);
     }
 
     /**
@@ -200,7 +200,7 @@ public class RoleController extends BaseController {
         // 只返回叶子节点，防止父节点选中，导致子节点全部选中的问题
         permissionIdSet.removeAll(parentPermissionIdSet);
         LOGGER.info("{}出参={}", baseLog, permissionIdSet);
-        return Result.of(ResponseEnum.SUCCESS, permissionIdSet);
+        return Result.of(ErrorCode.SUCCESS, permissionIdSet);
     }
 
     /**
@@ -216,7 +216,7 @@ public class RoleController extends BaseController {
         String baseLog = LogHelper.getBaseLog("更新用户的角色");
         LOGGER.info("{}入参={}={}", baseLog, roleId, permissionIdSet);
         if (StringUtils.isBlank(roleId) || CollectionUtils.isEmpty(permissionIdSet)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         // 删除角色的权限信息
         Where deleteWhere = Where.build().andAdd(QueryType.EQUAL, "role_id", roleId);
@@ -234,11 +234,11 @@ public class RoleController extends BaseController {
         }
         if (addRows != permissionIdSet.size()) {
             LOGGER.info("{}新增的条数不正确={}={}", baseLog, addRows, permissionIdSet.size());
-            throw new BusinessException(ResponseEnum.FAIL);
+            throw new BusinessException(ErrorCode.FAIL);
         }
         LOGGER.info("{}新增角色的权限，共{}条", baseLog, addRows);
         LOGGER.info("{}出参={}", baseLog, addRows);
-        return Result.of(ResponseEnum.SUCCESS, permissionIdSet.size());
+        return Result.of(ErrorCode.SUCCESS, permissionIdSet.size());
     }
 
     /**
@@ -256,7 +256,7 @@ public class RoleController extends BaseController {
         List<SysPermissionPO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
         List<ElementUITree> treeDataList = findTreeCycle(allList, topList);
         response.setTreeDataList(treeDataList);
-        return Result.of(ResponseEnum.SUCCESS, response);
+        return Result.of(ErrorCode.SUCCESS, response);
     }
 
     /**

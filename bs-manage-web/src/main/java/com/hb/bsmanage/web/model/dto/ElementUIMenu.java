@@ -30,6 +30,8 @@ public class ElementUIMenu implements Serializable {
     private String icon;
     // 页面链接
     private String url;
+    // 针对页面类型，页面是否保持存活
+    private String keepAlive;
     // 父级页面索引
     private String parentIndex;
     // 下级页面集合

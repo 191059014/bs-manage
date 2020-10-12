@@ -3,7 +3,7 @@ package com.hb.bsmanage.web.security.filter;
 import com.hb.bsmanage.web.common.RedisKeyFactory;
 import com.hb.bsmanage.web.common.ToolsWapper;
 import com.hb.bsmanage.web.common.constans.Consts;
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.bsmanage.web.security.config.SecurityProperties;
 import com.hb.bsmanage.web.security.model.RbacContext;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
@@ -68,7 +68,7 @@ public class AuthenticateFilter extends OncePerRequestFilter {
             String token = request.getHeader(Consts.TOKEN);
             LOGGER.info("{}token={}", baseLog, token);
             if (StrUtils.isBlank(token)) {
-                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.TOKEN_IS_EMPTY)));
+                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.TOKEN_IS_EMPTY)));
                 return;
             }
             /*
@@ -77,12 +77,12 @@ public class AuthenticateFilter extends OncePerRequestFilter {
             String tokenKey = RedisKeyFactory.getTokenKey(token);
             String json = ToolsWapper.redis().get(tokenKey);
             if (json == null) {
-                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.TOKEN_IS_EXPIRED)));
+                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.TOKEN_IS_EXPIRED)));
                 return;
             }
             RbacContext rbacContext = JsonUtils.toBean(json, RbacContext.class);
             if (rbacContext == null) {
-                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.TOKEN_IS_EXPIRED)));
+                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.TOKEN_IS_EXPIRED)));
                 return;
             }
             /*

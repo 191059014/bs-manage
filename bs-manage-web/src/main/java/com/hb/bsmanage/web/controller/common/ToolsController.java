@@ -2,8 +2,8 @@ package com.hb.bsmanage.web.controller.common;
 
 import com.hb.bsmanage.web.common.ToolsWapper;
 import com.hb.bsmanage.web.common.enums.ResourceType;
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
-import com.hb.bsmanage.web.common.enums.TableEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
+import com.hb.bsmanage.web.common.enums.PkPrefix;
 import com.hb.bsmanage.web.common.util.BsWebUtils;
 import com.hb.bsmanage.web.dao.po.SysMerchantPO;
 import com.hb.bsmanage.web.dao.po.SysPermissionPO;
@@ -94,7 +94,7 @@ public class ToolsController {
                              @RequestParam(required = false, name = "value") String value,
                              @RequestBody(required = false) String json) {
         ToolsWapper.redis().set(key, value == null ? json : value, expire);
-        return Result.of(ResponseEnum.SUCCESS);
+        return Result.of(ErrorCode.SUCCESS);
     }
 
     /**
@@ -105,7 +105,7 @@ public class ToolsController {
      */
     @GetMapping("/redis/get/{key}")
     public Result<Object> getFromRedis(@PathVariable("key") String key) {
-        return Result.of(ResponseEnum.SUCCESS, ToolsWapper.redis().get(key));
+        return Result.of(ErrorCode.SUCCESS, ToolsWapper.redis().get(key));
     }
 
     /**
@@ -116,7 +116,7 @@ public class ToolsController {
      */
     @GetMapping("/redis/clear/{key}")
     public Result<Object> clearFromRedis(@PathVariable("key") String key) {
-        return Result.of(ResponseEnum.SUCCESS, ToolsWapper.redis().delete(key));
+        return Result.of(ErrorCode.SUCCESS, ToolsWapper.redis().delete(key));
     }
 
     /**
@@ -138,7 +138,7 @@ public class ToolsController {
         LOGGER.info("{}添加商户成功={}", baseLog, merchant.getMerchantId());
         // 新增系统管理员用户
         SysUserPO user = SysUserPO.builder()
-                .userId(KeyUtils.getUniqueKey(TableEnum.USER_ID.getIdPrefix()))
+                .userId(KeyUtils.getUniqueKey(PkPrefix.USER_ID.getValue()))
                 .userName("admin")
                 .password(new BCryptPasswordEncoder().encode("123456"))
                 .mobile("12345678900")
@@ -148,7 +148,7 @@ public class ToolsController {
         LOGGER.info("{}添加用户成功={}", baseLog, user.getUserId());
         // 新增角色
         SysRolePO role = SysRolePO.builder()
-                .roleId(KeyUtils.getUniqueKey(TableEnum.ROLE_ID.getIdPrefix()))
+                .roleId(KeyUtils.getUniqueKey(PkPrefix.ROLE_ID.getValue()))
                 .roleName("系统管理员")
                 .build();
         role.setTenantId(merchant.getMerchantId());
@@ -163,7 +163,7 @@ public class ToolsController {
         LOGGER.info("{}添加用户角色关系成功={}={}", baseLog, userRole.getUserId(), userRole.getRoleId());
         // 新增权限信息
         SysPermissionPO sysPermission = SysPermissionPO.builder()
-                .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
+                .permissionId(KeyUtils.getUniqueKey(PkPrefix.PERMISSION_ID.getValue()))
                 .permissionName("系统管理")
                 .resourceType(ResourceType.FOLDER.getValue())
                 .value("sys")
@@ -187,7 +187,7 @@ public class ToolsController {
         String[] valuePrefixArr = new String[]{"sys_merchant", "sys_user", "sys_role", "sys_permission"};
         for (int i = 0; i < 4; i++) {
             SysPermissionPO pagePermission = SysPermissionPO.builder()
-                    .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
+                    .permissionId(KeyUtils.getUniqueKey(PkPrefix.PERMISSION_ID.getValue()))
                     .permissionName(accessNameArr[i])
                     .resourceType(ResourceType.PAGE.getValue())
                     .value(valuePrefixArr[i])
@@ -210,7 +210,7 @@ public class ToolsController {
             String[] valueSuffixArr = new String[]{"_add", "_update", "_delete"};
             for (int j = 0; j < 3; j++) {
                 SysPermissionPO buttonPermission = SysPermissionPO.builder()
-                        .permissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()))
+                        .permissionId(KeyUtils.getUniqueKey(PkPrefix.PERMISSION_ID.getValue()))
                         .permissionName(buttonName[j])
                         .resourceType(ResourceType.BUTTON.getValue())
                         .value(valuePrefixArr[i] + valueSuffixArr[j])
@@ -229,7 +229,7 @@ public class ToolsController {
                 Thread.sleep(500);
             }
         }
-        return Result.of(ResponseEnum.SUCCESS);
+        return Result.of(ErrorCode.SUCCESS);
     }
 
 }

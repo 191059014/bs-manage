@@ -39,6 +39,8 @@ public class SysPermissionPO extends AbstractComplexPO {
     private String icon;
     // 链接
     private String url;
+    // 缓存页面
+    private String keepAlive;
 
     @Override
     public String toString() {

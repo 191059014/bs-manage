@@ -1,7 +1,7 @@
 package com.hb.bsmanage.web.controller.sys;
 
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
-import com.hb.bsmanage.web.common.enums.TableEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
+import com.hb.bsmanage.web.common.enums.PkPrefix;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysRolePO;
 import com.hb.bsmanage.web.dao.po.SysUserPO;
@@ -91,7 +91,7 @@ public class UserController extends BaseController {
         String baseLog = LogHelper.getBaseLog("分页查询用户信息");
         LOGGER.info("{}入参={}={}={}", baseLog, user, pageNum, pageSize);
         if (!Pagination.verify(pageNum, pageSize)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "user_id", user.getUserId());
@@ -106,7 +106,7 @@ public class UserController extends BaseController {
         Pagination<SysUserPO> pageResult = iSysUserService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pageResult.getData());
         LOGGER.info("{}出参={}", baseLog, pageResult);
-        return Result.of(ResponseEnum.SUCCESS, pageResult);
+        return Result.of(ErrorCode.SUCCESS, pageResult);
     }
 
     /**
@@ -120,9 +120,9 @@ public class UserController extends BaseController {
         String baseLog = LogHelper.getBaseLog("添加用户");
         LOGGER.info("{}入参={}", baseLog, user);
         if (StringUtils.isAnyBlank(user.getTenantId(), user.getUserName(), user.getMobile(), user.getPassword())) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
-        user.setUserId(KeyUtils.getUniqueKey(TableEnum.USER_ID.getIdPrefix()));
+        user.setUserId(KeyUtils.getUniqueKey(PkPrefix.USER_ID.getValue()));
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         user.setParentId(SecurityUtils.getCurrentUserId());
         user.setCreateBy(SecurityUtils.getCurrentUserId());
@@ -130,7 +130,7 @@ public class UserController extends BaseController {
         LOGGER.info("{}准备入库={}", baseLog, user);
         int addRows = iSysUserService.insert(user);
         LOGGER.info("{}出参={}", baseLog, addRows);
-        return Result.of(ResponseEnum.SUCCESS, addRows);
+        return Result.of(ErrorCode.SUCCESS, addRows);
     }
 
     /**
@@ -145,15 +145,15 @@ public class UserController extends BaseController {
         String baseLog = LogHelper.getBaseLog("修改用户");
         LOGGER.info("{}入参={}={}", baseLog, userId, user);
         if (StringUtils.isBlank(userId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         user.setUpdateBy(SecurityUtils.getCurrentUserId());
         int updateRows = iSysUserService.updateByBk(userId, user);
         if (updateRows != 1) {
-            throw new BusinessException(ResponseEnum.FAIL);
+            throw new BusinessException(ErrorCode.FAIL);
         }
         LOGGER.info("{}出参={}={}", baseLog, updateRows);
-        return Result.of(ResponseEnum.SUCCESS, updateRows);
+        return Result.of(ErrorCode.SUCCESS, updateRows);
     }
 
     /**
@@ -168,14 +168,14 @@ public class UserController extends BaseController {
         String baseLog = LogHelper.getBaseLog("删除用户");
         LOGGER.info("{}入参={}", baseLog, userId);
         if (StringUtils.isBlank(userId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         int deleteRows = iSysUserService.logicDeleteByBk(userId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         if (deleteRows != 1) {
-            throw new BusinessException(ResponseEnum.FAIL);
+            throw new BusinessException(ErrorCode.FAIL);
         }
         LOGGER.info("{}出参={}", baseLog, deleteRows);
-        return Result.of(ResponseEnum.SUCCESS, deleteRows);
+        return Result.of(ErrorCode.SUCCESS, deleteRows);
     }
 
     /**
@@ -187,12 +187,12 @@ public class UserController extends BaseController {
     @InOutLog("获取用户的角色集合")
     public Result<Set<String>> getRolesUnderUser(@RequestParam("userId") String userId) {
         if (StringUtils.isBlank(userId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         SysUserPO sysUserDO = iSysUserService.selectByBk(userId);
         List<SysUserRolePO> userRoleList = iSysUserRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
         Set<String> roleIdSet = userRoleList.stream().map(SysUserRolePO::getRoleId).collect(Collectors.toSet());
-        return Result.of(ResponseEnum.SUCCESS, roleIdSet);
+        return Result.of(ErrorCode.SUCCESS, roleIdSet);
     }
 
     /**
@@ -205,7 +205,7 @@ public class UserController extends BaseController {
     public Result<List<SysRolePO>> getRolesUnderMerchant() {
         SysUserPO sysUserDO = iSysUserService.selectByBk(SecurityUtils.getCurrentUserId());
         Set<String> subMerchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(sysUserDO.getTenantId());
-        return Result.of(ResponseEnum.SUCCESS, iSysRoleService.selectList(Where.build().andAdd(QueryType.IN, "tenant_id", subMerchantIdSet)));
+        return Result.of(ErrorCode.SUCCESS, iSysRoleService.selectList(Where.build().andAdd(QueryType.IN, "tenant_id", subMerchantIdSet)));
     }
 
     /**
@@ -221,7 +221,7 @@ public class UserController extends BaseController {
         String baseLog = LogHelper.getBaseLog("更新用户的角色");
         LOGGER.info("{}入参={}={}", baseLog, userId, roleIdSet);
         if (StringUtils.isBlank(userId) || CollectionUtils.isEmpty(roleIdSet)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         // 删除用户的角色信息
         Where deleteWhere = Where.build().andAdd(QueryType.EQUAL, "user_id", userId);
@@ -239,11 +239,11 @@ public class UserController extends BaseController {
         }
         if (addRows != roleIdSet.size()) {
             LOGGER.info("{}新增的条数不正确={}={}", baseLog, addRows, roleIdSet.size());
-            throw new BusinessException(ResponseEnum.FAIL);
+            throw new BusinessException(ErrorCode.FAIL);
         }
         LOGGER.info("{}新增用户的角色，共{}条", baseLog, addRows);
         LOGGER.info("{}出参={}", baseLog, addRows);
-        return Result.of(ResponseEnum.SUCCESS, roleIdSet.size());
+        return Result.of(ErrorCode.SUCCESS, roleIdSet.size());
     }
 
 }

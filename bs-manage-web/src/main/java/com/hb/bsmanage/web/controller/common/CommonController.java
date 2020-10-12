@@ -1,7 +1,8 @@
 package com.hb.bsmanage.web.controller.common;
 
 import com.hb.bsmanage.web.common.enums.ResourceType;
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
+import com.hb.bsmanage.web.common.enums.YesOrNo;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -42,12 +43,15 @@ public class CommonController {
             case "ResourceType":
                 combobox = EnumUtils.combobox(ResourceType.class, EnumUtils.KeysEnum.name.toString(), EnumUtils.KeysEnum.value.toString());
                 break;
+            case "YesOrNo":
+                combobox = EnumUtils.combobox(YesOrNo.class, EnumUtils.KeysEnum.name.toString(), EnumUtils.KeysEnum.value.toString());
+                break;
             default:
                 LOGGER.info("{}无此类型", baseLog);
                 break;
 
         }
-        return Result.of(ResponseEnum.SUCCESS, combobox);
+        return Result.of(ErrorCode.SUCCESS, combobox);
     }
 
 }

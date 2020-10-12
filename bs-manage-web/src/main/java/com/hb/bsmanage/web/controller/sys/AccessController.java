@@ -1,8 +1,8 @@
 package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.web.common.enums.ResourceType;
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
-import com.hb.bsmanage.web.common.enums.TableEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
+import com.hb.bsmanage.web.common.enums.PkPrefix;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysPermissionPO;
 import com.hb.bsmanage.web.model.dto.ElementUIMenu;
@@ -83,7 +83,7 @@ public class AccessController extends BaseController {
         Set<String> permissionIdSet = SecurityUtils.getCurrentUserPermissionIdSet();
         LOGGER.info("{}当前用户权限ID集合={}", baseLog, permissionIdSet);
         if (CollectionUtils.isEmpty(permissionIdSet)) {
-            return Result.of(ResponseEnum.SUCCESS, response);
+            return Result.of(ErrorCode.SUCCESS, response);
         }
         Where where = Where.build();
         where.andAdd(QueryType.IN, "permission_id", permissionIdSet);
@@ -93,7 +93,7 @@ public class AccessController extends BaseController {
         List<ElementUIMenu> menuList = findChildrenMenuCycle(allList, topList);
         response.setMenuDatas(menuList);
         LOGGER.info("{}出参={}", baseLog, response);
-        return Result.of(ResponseEnum.SUCCESS, response);
+        return Result.of(ErrorCode.SUCCESS, response);
     }
 
     /**
@@ -110,6 +110,7 @@ public class AccessController extends BaseController {
                     .name(access.getPermissionName())
                     .icon(access.getIcon())
                     .url(access.getUrl())
+                    .keepAlive(access.getKeepAlive())
                     .parentIndex(access.getParentId())
                     .build();
             List<SysPermissionPO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
@@ -132,7 +133,7 @@ public class AccessController extends BaseController {
         String baseLog = LogHelper.getBaseLog("分页查询权限列表");
         LOGGER.info("{}入参={}={}={}", baseLog, permission, pageNum, pageSize);
         if (!Pagination.verify(pageNum, pageSize)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "permission_id", permission.getPermissionId());
@@ -147,7 +148,7 @@ public class AccessController extends BaseController {
         Pagination<SysPermissionPO> pageResult = iSysPermissionService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pageResult.getData());
         LOGGER.info("{}出参={}", baseLog, pageResult);
-        return Result.of(ResponseEnum.SUCCESS, pageResult);
+        return Result.of(ErrorCode.SUCCESS, pageResult);
     }
 
     /**
@@ -161,15 +162,15 @@ public class AccessController extends BaseController {
         String baseLog = LogHelper.getBaseLog("添加权限");
         LOGGER.info("{}入参={}", baseLog, permission);
         if (StringUtils.isAnyBlank(permission.getTenantId(), permission.getPermissionName(), permission.getResourceType(), permission.getValue())) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
-        permission.setPermissionId(KeyUtils.getUniqueKey(TableEnum.PERMISSION_ID.getIdPrefix()));
+        permission.setPermissionId(KeyUtils.getUniqueKey(PkPrefix.PERMISSION_ID.getValue()));
         permission.setCreateBy(SecurityUtils.getCurrentUserId());
         permission.setUpdateBy(SecurityUtils.getCurrentUserId());
         LOGGER.info("{}准备入库={}", baseLog, permission);
         int addRows = iSysPermissionService.insert(permission);
         LOGGER.info("{}出参={}", baseLog, addRows);
-        return Result.of(ResponseEnum.SUCCESS, addRows);
+        return Result.of(ErrorCode.SUCCESS, addRows);
     }
 
     /**
@@ -184,15 +185,15 @@ public class AccessController extends BaseController {
         String baseLog = LogHelper.getBaseLog("修改权限");
         LOGGER.info("{}入参={}={}", baseLog, permissionId, permission);
         if (StringUtils.isBlank(permissionId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         permission.setUpdateBy(SecurityUtils.getCurrentUserId());
         int updateRows = iSysPermissionService.updateByBk(permissionId, permission);
         if (updateRows != 1) {
-            throw new BusinessException(ResponseEnum.FAIL);
+            throw new BusinessException(ErrorCode.FAIL);
         }
         LOGGER.info("{}出参={}", baseLog, updateRows);
-        return Result.of(ResponseEnum.SUCCESS, updateRows);
+        return Result.of(ErrorCode.SUCCESS, updateRows);
     }
 
     /**
@@ -207,14 +208,14 @@ public class AccessController extends BaseController {
         String baseLog = LogHelper.getBaseLog("删除权限");
         LOGGER.info("{}入参={}", baseLog, permissionId);
         if (StringUtils.isBlank(permissionId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         int deleteRows = iSysPermissionService.logicDeleteByBk(permissionId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         if (deleteRows != 1) {
-            throw new BusinessException(ResponseEnum.FAIL);
+            throw new BusinessException(ErrorCode.FAIL);
         }
         LOGGER.info("{}出参={}", baseLog, deleteRows);
-        return Result.of(ResponseEnum.SUCCESS);
+        return Result.of(ErrorCode.SUCCESS);
     }
 
     /**
@@ -228,14 +229,14 @@ public class AccessController extends BaseController {
         String baseLog = LogHelper.getBaseLog("通过资源类型获取当前商户下的资源");
         LOGGER.info("{}入参={}={}", baseLog, resourceType, tenantId);
         if (StringUtils.isAnyBlank(resourceType, tenantId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "resource_type", resourceType);
         where.andAdd(QueryType.EQUAL, "tenant_id", tenantId);
         List<SysPermissionPO> list = iSysPermissionService.selectList(where, "create_time desc");
         LOGGER.info("{}出参={}", baseLog, list);
-        return Result.of(ResponseEnum.SUCCESS, list);
+        return Result.of(ErrorCode.SUCCESS, list);
     }
 
 }

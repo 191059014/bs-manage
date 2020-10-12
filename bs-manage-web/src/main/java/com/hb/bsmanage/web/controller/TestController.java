@@ -4,7 +4,7 @@ import com.hb.bsmanage.web.service.ISysPermissionService;
 import com.hb.bsmanage.web.model.dto.ElementUITree;
 import com.hb.bsmanage.web.dao.po.SysPermissionPO;
 import com.hb.bsmanage.web.model.vo.ElementUITreeResponse;
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.unic.base.common.Result;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class TestController {
         List<SysPermissionPO> topList = list.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
         List<ElementUITree> treeDataList = findTreeCycle(list, topList);
         response.setTreeDataList(treeDataList);
-        return Result.of(ResponseEnum.SUCCESS, response);
+        return Result.of(ErrorCode.SUCCESS, response);
     }
 
     private List<ElementUITree> findTreeCycle(List<SysPermissionPO> allList, List<SysPermissionPO> childList) {

@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.security.config;
 
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.bsmanage.web.security.filter.AuthenticateFilter;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.util.ServletUtils;
@@ -103,7 +103,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 // 权限不足异常处理
                 .accessDeniedHandler((request, response, e) -> {
-                    ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ResponseEnum.ACCESS_DENY)));
+                    ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.ACCESS_DENY)));
                 });
 
         // 添加自定义 JWT 过滤器

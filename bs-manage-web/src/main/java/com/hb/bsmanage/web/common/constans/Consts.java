@@ -16,6 +16,12 @@ public class Consts {
     /* 点号 */
     public static final String DOT = ".";
 
+    /* Y */
+    public static final String Y = "Y";
+
+    /* N */
+    public static final String N = "N";
+
 }
 
     

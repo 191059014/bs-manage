@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.controller.sys;
 
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.bsmanage.web.common.util.BsWebUtils;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysMerchantPO;
@@ -70,7 +70,7 @@ public class MerchantController extends BaseController {
         String baseLog = LogHelper.getBaseLog("分页条件查询商户列表");
         LOGGER.info("{}入参={}={}={}", baseLog, merchant, pageNum, pageSize);
         if (!Pagination.verify(pageNum, pageSize)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Where where = Where.build();
         where.andAdd(QueryType.EQUAL, "merchant_id", merchant.getMerchantId());
@@ -83,7 +83,7 @@ public class MerchantController extends BaseController {
         Pagination<SysMerchantPO> pagination = iSysMerchantService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pagination.getData());
         LOGGER.info("{}出参={}", baseLog, pagination);
-        return Result.of(ResponseEnum.SUCCESS, pagination);
+        return Result.of(ErrorCode.SUCCESS, pagination);
     }
 
     /**
@@ -97,7 +97,7 @@ public class MerchantController extends BaseController {
         String baseLog = LogHelper.getBaseLog("添加商户");
         LOGGER.info("{}入参={}", baseLog, merchant);
         if (StringUtils.isBlank(merchant.getMerchantName())) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         SysMerchantPO currentUserMerchant = iSysMerchantService.selectByBk(SecurityUtils.getCurrentUserTenantId());
         merchant.setPath(BsWebUtils.getCurrentPath(currentUserMerchant.getPath(), currentUserMerchant.getId()));
@@ -108,7 +108,7 @@ public class MerchantController extends BaseController {
         LOGGER.info("{}准备入库={}", baseLog, merchant);
         int addRows = iSysMerchantService.insert(merchant);
         LOGGER.info("{}出参={}", baseLog, addRows);
-        return Result.of(ResponseEnum.SUCCESS, addRows);
+        return Result.of(ErrorCode.SUCCESS, addRows);
     }
 
     /**
@@ -121,11 +121,11 @@ public class MerchantController extends BaseController {
     @PostMapping("/update")
     public Result<Integer> update(@RequestBody SysMerchantPO merchant, @RequestParam("merchantId") String merchantId) {
         if (StringUtils.isBlank(merchantId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         merchant.setUpdateBy(SecurityUtils.getCurrentUserId());
         int updateRows = iSysMerchantService.updateByBk(merchantId, merchant);
-        return Result.of(ResponseEnum.SUCCESS, updateRows);
+        return Result.of(ErrorCode.SUCCESS, updateRows);
     }
 
     /**
@@ -138,10 +138,10 @@ public class MerchantController extends BaseController {
     @InOutLog("删除商户")
     public Result<Integer> delete(@RequestParam("merchantId") String merchantId) {
         if (StringUtils.isBlank(merchantId)) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         int deleteRows = iSysMerchantService.logicDeleteByBk(merchantId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
-        return Result.of(ResponseEnum.SUCCESS, deleteRows);
+        return Result.of(ErrorCode.SUCCESS, deleteRows);
     }
 
     /**
@@ -154,7 +154,7 @@ public class MerchantController extends BaseController {
     public Result<List> getAllSubMerchants() {
         List<SysMerchantPO> merchantList = iSysMerchantService.getCurrentSubMerchantList(SecurityUtils.getCurrentUserTenantId());
         List<SysMerchantPO> result = merchantList.stream().map(merchant -> SysMerchantPO.builder().merchantId(merchant.getMerchantId()).merchantName(merchant.getMerchantName()).build()).collect(Collectors.toList());
-        return Result.of(ResponseEnum.SUCCESS, result);
+        return Result.of(ErrorCode.SUCCESS, result);
     }
 
 }

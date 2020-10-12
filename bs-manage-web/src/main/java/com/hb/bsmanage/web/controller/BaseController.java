@@ -1,6 +1,6 @@
 package com.hb.bsmanage.web.controller;
 
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.base.exception.StandardRuntimeException;
@@ -80,7 +80,7 @@ public abstract class BaseController {
     public Result exception(Exception e) {
         String baseLog = LogHelper.getBaseLog("系统异常");
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
-        return Result.of(ResponseEnum.ERROR);
+        return Result.of(ErrorCode.ERROR);
     }
 
 }

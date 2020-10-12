@@ -2,7 +2,7 @@ package com.hb.bsmanage.web.security.controller;
 
 import com.hb.bsmanage.web.common.RedisKeyFactory;
 import com.hb.bsmanage.web.common.ToolsWapper;
-import com.hb.bsmanage.web.common.enums.ResponseEnum;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.bsmanage.web.common.util.BsWebUtils;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysPermissionPO;
@@ -19,16 +19,16 @@ import com.hb.bsmanage.web.service.ISysUserRoleService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.unic.base.GlobalProperties;
 import com.hb.unic.base.common.Result;
-import com.hb.unic.logger.Logger;
-import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.base.util.LogExceptionWapper;
 import com.hb.unic.base.util.LogHelper;
+import com.hb.unic.logger.Logger;
+import com.hb.unic.logger.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -98,15 +98,15 @@ public class LoginController extends BaseController {
         String baseLog = LogHelper.getBaseLog("登录");
         LOGGER.info("{}入参={}", baseLog, req);
         if (StringUtils.isAnyBlank(req.getUsernameOrMobile(), req.getPassword())) {
-            return Result.of(ResponseEnum.PARAM_ILLEGAL);
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Authentication authentication = null;
         try {
             // 登陆认证
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getUsernameOrMobile(), req.getPassword()));
-        } catch (BadCredentialsException e) {
+        } catch (AuthenticationException e) {
             LOGGER.error("{}登陆认证异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
-            return Result.of(ResponseEnum.BAD_CREDENTIALS);
+            return Result.of(ErrorCode.BAD_CREDENTIALS);
         }
         // 从认证信息中获取用户信息
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
@@ -117,7 +117,7 @@ public class LoginController extends BaseController {
         SysUserPO user = iSysUserService.findByUsernameOrMobile(username);
         LOGGER.info("{}用户信息={}", baseLog, user);
         if (user == null) {
-            return Result.of(ResponseEnum.USER_NOT_EXIST);
+            return Result.of(ErrorCode.USER_NOT_EXIST);
         }
         /*
          * 加载角色信息
@@ -147,7 +147,7 @@ public class LoginController extends BaseController {
          */
         LoginResponse response = LoginResponse.builder().token(token).username(user.getUserName()).build();
         LOGGER.info("{}出参={}", baseLog, response);
-        return Result.of(ResponseEnum.SUCCESS, response);
+        return Result.of(ErrorCode.SUCCESS, response);
     }
 
 }

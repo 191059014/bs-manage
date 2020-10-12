@@ -42,6 +42,14 @@ public class SysUserPO extends AbstractComplexPO {
     @Column("mobile")
     private String mobile;
 
+    // 性别
+    @Column("sex")
+    private String sex;
+
+    // 邮箱
+    @Column("email")
+    private String email;
+
     @Override
     public String toString() {
         return ToStringHelper.printNoNull(this);
