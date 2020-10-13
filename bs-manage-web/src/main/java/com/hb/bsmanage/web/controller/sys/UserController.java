@@ -2,10 +2,12 @@ package com.hb.bsmanage.web.controller.sys;
 
 import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.bsmanage.web.common.enums.PkPrefix;
+import com.hb.bsmanage.web.common.util.BsWebUtils;
 import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysRolePO;
 import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.dao.po.SysUserRolePO;
+import com.hb.bsmanage.web.model.vo.ModifyPasswordRequest;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.bsmanage.web.service.ISysMerchantService;
 import com.hb.bsmanage.web.service.ISysRoleService;
@@ -16,9 +18,9 @@ import com.hb.mybatis.helper.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
+import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.util.easybuild.MapBuilder;
 import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.Pagination;
@@ -251,10 +253,35 @@ public class UserController extends BaseController {
      *
      * @return SysUserPO
      */
-    @PostMapping("/getCurrentUser")
+    @GetMapping("/getCurrentUser")
     @InOutLog("获取当前用户信息")
     public Result<SysUserPO> getCurrentUser() {
         return Result.of(ErrorCode.SUCCESS, SecurityUtils.getCurrentUser());
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param request 密码信息
+     * @return 结果
+     */
+    @PostMapping("/updatePassword")
+    @InOutLog("修改密码")
+    public Result<Integer> updatePassword(@RequestBody ModifyPasswordRequest request) {
+        if (StringUtils.isAnyBlank(request.getOldPassword(), request.getNewPassword())) {
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
+        }
+        SysUserPO currentUser = SecurityUtils.getCurrentUser();
+        if (!BsWebUtils.bCryptMatches(request.getOldPassword(), currentUser.getPassword())) {
+            return Result.of(ErrorCode.ERROR_OLD_PASSWORD);
+        }
+        SysUserPO user = SysUserPO.builder().password(BsWebUtils.bCryptEncode(request.getNewPassword())).build();
+        user.setUpdateBy(SecurityUtils.getCurrentUserId());
+        int updateRows = iSysUserService.updateByBk(SecurityUtils.getCurrentUserId(), user);
+        if (updateRows != 1) {
+            throw new BusinessException(ErrorCode.FAIL);
+        }
+        return Result.of(ErrorCode.SUCCESS, updateRows);
     }
 
 }

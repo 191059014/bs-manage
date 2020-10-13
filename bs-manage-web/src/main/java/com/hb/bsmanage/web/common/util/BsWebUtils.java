@@ -10,6 +10,7 @@ import com.hb.unic.util.util.DateUtils;
 import com.hb.unic.util.util.KeyUtils;
 import com.hb.unic.util.util.StrUtils;
 import com.hb.unic.util.util.UuidUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * 工具类
@@ -76,6 +77,20 @@ public class BsWebUtils {
      */
     public static String getTenantId() {
         return KeyUtils.getNowTimeKey(null, DateUtils.FORMAT_12, 0);
+    }
+
+    /**
+     * bCrypt加密
+     */
+    public static String bCryptEncode(String str) {
+        return new BCryptPasswordEncoder().encode(str);
+    }
+
+    /**
+     * bCrypt判断字符串和加密后的字符串是否相等
+     */
+    public static boolean bCryptMatches(String str, String encodeStr) {
+        return new BCryptPasswordEncoder().matches(str, encodeStr);
     }
 
 }

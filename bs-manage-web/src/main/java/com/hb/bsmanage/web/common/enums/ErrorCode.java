@@ -30,6 +30,7 @@ public enum ErrorCode {
     TOKEN_IS_EXPIRED("20111", "token过期"),
     USER_NOT_EXIST("20102", "用户不存在"),
     BAD_CREDENTIALS("20103", "用户名或密码错误"),
+    ERROR_OLD_PASSWORD("20104", "旧密码输入不正确"),
 
     ;
 
