@@ -246,6 +246,17 @@ public class UserController extends BaseController {
         return Result.of(ErrorCode.SUCCESS, roleIdSet.size());
     }
 
+    /**
+     * 获取当前用户信息
+     *
+     * @return SysUserPO
+     */
+    @PostMapping("/getCurrentUser")
+    @InOutLog("获取当前用户信息")
+    public Result<SysUserPO> getCurrentUser() {
+        return Result.of(ErrorCode.SUCCESS, SecurityUtils.getCurrentUser());
+    }
+
 }
 
     
