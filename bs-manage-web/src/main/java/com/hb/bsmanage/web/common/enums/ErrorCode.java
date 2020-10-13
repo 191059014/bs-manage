@@ -26,8 +26,7 @@ public enum ErrorCode {
      * 20100-20199代表“系统级别”的错误
      */
     ACCESS_DENY("20100", "禁止访问"),
-    TOKEN_IS_EMPTY("20110", "token为空"),
-    TOKEN_IS_EXPIRED("20111", "token过期"),
+    TOKEN_ERROR("20110", "token为空或过期"),
     USER_NOT_EXIST("20102", "用户不存在"),
     BAD_CREDENTIALS("20103", "用户名或密码错误"),
     ERROR_OLD_PASSWORD("20104", "旧密码输入不正确"),

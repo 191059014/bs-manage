@@ -27,9 +27,9 @@ public class RbacAuthorityService {
      * @return true为有权限
      */
     public boolean hasPermission(Authentication authentication) {
-        if (WebApplication.openTestMode()) {
+        if (WebApplication.testModeIsOpen()) {
             System.out.println("RbacAuthorityService.hasPermission（模拟）");
-            return true;
+            return false;
         }
         Object userInfo = authentication.getPrincipal();
         boolean hasPermission = false;

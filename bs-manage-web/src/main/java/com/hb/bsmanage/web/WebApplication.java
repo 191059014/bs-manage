@@ -35,7 +35,7 @@ public class WebApplication {
      *
      * @return true为测试模式
      */
-    public static boolean openTestMode() {
+    public static boolean testModeIsOpen() {
         return true;
     }
 

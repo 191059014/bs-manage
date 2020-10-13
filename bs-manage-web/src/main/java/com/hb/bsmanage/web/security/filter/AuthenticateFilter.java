@@ -68,7 +68,7 @@ public class AuthenticateFilter extends OncePerRequestFilter {
             String token = request.getHeader(Consts.TOKEN);
             LOGGER.info("{}token={}", baseLog, token);
             if (StrUtils.isBlank(token)) {
-                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.TOKEN_IS_EMPTY)));
+                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.TOKEN_ERROR)));
                 return;
             }
             /*
@@ -77,12 +77,14 @@ public class AuthenticateFilter extends OncePerRequestFilter {
             String tokenKey = RedisKeyFactory.getTokenKey(token);
             String json = ToolsWapper.redis().get(tokenKey);
             if (json == null) {
-                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.TOKEN_IS_EXPIRED)));
+                LOGGER.info("{}json is null", baseLog);
+                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.TOKEN_ERROR)));
                 return;
             }
             RbacContext rbacContext = JsonUtils.toBean(json, RbacContext.class);
             if (rbacContext == null) {
-                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.TOKEN_IS_EXPIRED)));
+                LOGGER.info("{}rbacContext is null", baseLog);
+                ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.TOKEN_ERROR)));
                 return;
             }
             /*
