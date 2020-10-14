@@ -27,6 +27,7 @@ import com.hb.unic.util.util.Pagination;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,6 +119,7 @@ public class UserController extends BaseController {
      * @return 结果
      */
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('sys_user_add')")
     public Result<Integer> add(@RequestBody SysUserPO user) {
         String baseLog = LogHelper.getBaseLog("添加用户");
         LOGGER.info("{}入参={}", baseLog, user);

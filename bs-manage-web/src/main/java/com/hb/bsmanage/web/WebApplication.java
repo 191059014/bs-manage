@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 /**
  * 项目入口
@@ -13,6 +14,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @SpringBootApplication
 @ImportResource({"classpath*:META-INF/applicationContext-web.xml"})
 @EnableEncryptableProperties
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebApplication {
 
     /**

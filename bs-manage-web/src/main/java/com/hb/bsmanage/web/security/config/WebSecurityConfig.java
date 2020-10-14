@@ -92,7 +92,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 对请求授权
                 .authorizeRequests()
                 // 除了忽略的url, 其他所有请求进入动态认证
-                .anyRequest().access("@rbacAuthorityService.hasPermission(authentication)");
+                .anyRequest()
+//                .access("@rbacAuthorityService.hasPermission(authentication)");
+                .authenticated();
         http
                 // Session 管理
                 .sessionManagement()

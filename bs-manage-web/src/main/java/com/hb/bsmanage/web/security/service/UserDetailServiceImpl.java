@@ -1,14 +1,16 @@
 package com.hb.bsmanage.web.security.service;
 
+import com.hb.bsmanage.web.dao.po.SysPermissionPO;
 import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.security.model.UserPrincipal;
+import com.hb.bsmanage.web.service.ISysPermissionService;
 import com.hb.bsmanage.web.service.ISysRoleAccessService;
 import com.hb.bsmanage.web.service.ISysUserRoleService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.unic.base.annotation.InOutLog;
+import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.base.util.LogHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 用户信息
@@ -51,6 +55,12 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private ISysRoleAccessService iSysRoleAccessService;
 
     /**
+     * 权限service
+     */
+    @Autowired
+    private ISysPermissionService iSysPermissionService;
+
+    /**
      * 登录认证
      *
      * @param usernameOrMobile 用户名或手机号
@@ -72,12 +82,18 @@ public class UserDetailServiceImpl implements UserDetailsService {
          * 查询角色信息
          */
         Set<String> roleIdSet = iSysUserRoleService.getRoleIdSetByUserId(user.getUserId());
-        Set<String> permissionIdSet = null;
+        Set<String> permissionValues = null;
         if (CollectionUtils.isNotEmpty(roleIdSet)) {
-            permissionIdSet = iSysRoleAccessService.getPermissionIdSetByRoleIdSet(roleIdSet);
+            Set<String> permissionIdSet = iSysRoleAccessService.getPermissionIdSetByRoleIdSet(roleIdSet);
+            if (CollectionUtils.isNotEmpty(permissionIdSet)) {
+                List<SysPermissionPO> permissions = iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
+                if (CollectionUtils.isNotEmpty(permissions)) {
+                    permissionValues = permissions.stream().map(SysPermissionPO::getValue).collect(Collectors.toSet());
+                }
+            }
         }
-        LOGGER.info("{}角色信息={}", baseLog, permissionIdSet);
-        return new UserPrincipal(user.getUserName(), user.getPassword(), permissionIdSet);
+        LOGGER.info("{}权限信息={}", baseLog, permissionValues);
+        return new UserPrincipal(user.getUserName(), user.getPassword(), permissionValues);
     }
 
 }

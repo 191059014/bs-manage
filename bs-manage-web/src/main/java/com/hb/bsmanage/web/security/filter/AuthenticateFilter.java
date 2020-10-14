@@ -9,6 +9,7 @@ import com.hb.bsmanage.web.security.model.RbacContext;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.unic.base.GlobalProperties;
 import com.hb.unic.base.common.Result;
+import com.hb.unic.base.util.LogExceptionWapper;
 import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
@@ -17,6 +18,10 @@ import com.hb.unic.util.util.JsonUtils;
 import com.hb.unic.util.util.StrUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -47,6 +52,12 @@ public class AuthenticateFilter extends OncePerRequestFilter {
      */
     @Autowired
     private SecurityProperties securityProperties;
+
+    /**
+     * 认证管理器
+     */
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     /**
      * 在此方法中检验客户端请求头中的token,
@@ -95,6 +106,14 @@ public class AuthenticateFilter extends OncePerRequestFilter {
              * 给token过期时间续航
              */
             ToolsWapper.redis().setExpire(tokenKey, GlobalProperties.getLong("token.defaultTtl"));
+
+            try {
+                // 登陆认证
+                Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(rbacContext.getUser().getUserName(), rbacContext.getUser().getPassword()));
+                System.out.println(111);
+            } catch (AuthenticationException e) {
+                LOGGER.error("{}登陆认证异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
+            }
 
             LOGGER.info("{}完毕，放行", baseLog);
             //放行
