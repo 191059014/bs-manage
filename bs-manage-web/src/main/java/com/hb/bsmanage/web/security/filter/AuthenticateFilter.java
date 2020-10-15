@@ -107,16 +107,7 @@ public class AuthenticateFilter extends OncePerRequestFilter {
              */
             ToolsWapper.redis().setExpire(tokenKey, GlobalProperties.getLong("token.defaultTtl"));
 
-            try {
-                // 登陆认证
-                Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(rbacContext.getUser().getUserName(), rbacContext.getUser().getPassword()));
-                System.out.println(111);
-            } catch (AuthenticationException e) {
-                LOGGER.error("{}登陆认证异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
-            }
-
             LOGGER.info("{}完毕，放行", baseLog);
-            //放行
             chain.doFilter(request, response);
         } finally {
             SecurityUtils.clearRbacContext();

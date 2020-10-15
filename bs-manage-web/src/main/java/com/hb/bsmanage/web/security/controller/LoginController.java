@@ -29,6 +29,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -108,6 +109,9 @@ public class LoginController extends BaseController {
             LOGGER.error("{}登陆认证异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
             return Result.of(ErrorCode.BAD_CREDENTIALS);
         }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         // 从认证信息中获取用户信息
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         String username = userPrincipal.getUsername();

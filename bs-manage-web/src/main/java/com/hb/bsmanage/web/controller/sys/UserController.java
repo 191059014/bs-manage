@@ -119,7 +119,6 @@ public class UserController extends BaseController {
      * @return 结果
      */
     @PostMapping("/add")
-    @PreAuthorize("hasAuthority('sys_user_add')")
     public Result<Integer> add(@RequestBody SysUserPO user) {
         String baseLog = LogHelper.getBaseLog("添加用户");
         LOGGER.info("{}入参={}", baseLog, user);
@@ -145,6 +144,7 @@ public class UserController extends BaseController {
      */
     @PostMapping("/update")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @PreAuthorize("hasAuthority('sys_user_update')")
     public Result<Integer> update(@RequestBody SysUserPO user, @RequestParam("userId") String userId) {
         String baseLog = LogHelper.getBaseLog("修改用户");
         LOGGER.info("{}入参={}={}", baseLog, userId, user);

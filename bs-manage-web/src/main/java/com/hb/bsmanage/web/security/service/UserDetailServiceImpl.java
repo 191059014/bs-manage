@@ -7,7 +7,6 @@ import com.hb.bsmanage.web.service.ISysPermissionService;
 import com.hb.bsmanage.web.service.ISysRoleAccessService;
 import com.hb.bsmanage.web.service.ISysUserRoleService;
 import com.hb.bsmanage.web.service.ISysUserService;
-import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -67,7 +66,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
      * @return UserDetails
      */
     @Override
-    @InOutLog("登陆认证")
     public UserDetails loadUserByUsername(String usernameOrMobile) throws UsernameNotFoundException {
         String baseLog = LogHelper.getBaseLog("登录认证");
         /*
