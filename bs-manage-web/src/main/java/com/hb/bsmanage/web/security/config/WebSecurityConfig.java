@@ -1,23 +1,18 @@
 package com.hb.bsmanage.web.security.config;
 
-import com.hb.bsmanage.web.common.enums.ErrorCode;
-import com.hb.bsmanage.web.security.filter.AuthenticateFilter;
-import com.hb.unic.base.common.Result;
-import com.hb.unic.base.util.ServletUtils;
-import com.hb.unic.util.util.JsonUtils;
+import com.hb.bsmanage.web.security.service.CustomAccessDeniedHandler;
+import com.hb.bsmanage.web.security.service.CustomLogoutSuccessHandler;
+import com.hb.bsmanage.web.security.service.LoginFailureHandler;
+import com.hb.bsmanage.web.security.service.LoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
@@ -33,16 +28,10 @@ import java.util.Set;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
-     * userDetailsService
-     */
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    /**
      * 认证过滤器
      */
-    @Autowired
-    private AuthenticateFilter authenticateFilter;
+//    @Autowired
+//    private AuthenticateFilter authenticateFilter;
 
     /**
      * security配置
@@ -51,27 +40,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private SecurityProperties securityProperties;
 
     /**
-     * 密码加密器
-     *
-     * @return BCryptPasswordEncoder
+     * 自定义认证处理器
      */
-    @Bean
-    public BCryptPasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
+    @Autowired
+    private AuthenticationProvider customAuthenticationProvider;
 
     /**
-     * 密码加密
+     * 配置认证处理器
      */
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
-    }
-
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(customAuthenticationProvider);
     }
 
     @Override
@@ -83,18 +62,37 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 // 关闭http验证
                 .httpBasic().disable();
-        http
-                // 登入行为由自己实现
-                .formLogin().disable()
-                // 登出行为由自己实现
-                .logout().disable();
+
         http
                 // 对请求授权
                 .authorizeRequests()
-                // 除了忽略的url, 其他所有请求进入动态认证
-                .anyRequest()
-//                .access("@rbacAuthorityService.hasPermission(authentication)");
-                .authenticated();
+                // 忽略静态资源
+                .antMatchers("/static/**", "/favicon.ico").permitAll()
+                // 其他的需要登陆后才能访问
+                .anyRequest().authenticated();
+
+        http
+                // 表单登陆模式
+                .formLogin()
+                // 指定登陆url
+                .loginProcessingUrl("/doLogin")
+                // 允许所有用户
+                .permitAll()
+                // 登陆成功处理器
+                .successHandler(new LoginSuccessHandler())
+                // 登陆失败处理器
+                .failureHandler(new LoginFailureHandler());
+
+        http
+                // 登出行为由自己实现
+                .logout()
+                // 指定登陆url
+                .logoutUrl("/logout")
+                // 允许所有用户
+                .permitAll()
+                // 登出成功处理器
+                .logoutSuccessHandler(new CustomLogoutSuccessHandler());
+
         http
                 // Session 管理
                 .sessionManagement()
@@ -104,17 +102,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 异常处理
                 .exceptionHandling()
                 // 权限不足异常处理
-                .accessDeniedHandler((request, response, e) -> {
-                    ServletUtils.writeResponse(response, JsonUtils.toJson(Result.of(ErrorCode.ACCESS_DENY)));
-                });
+                .accessDeniedHandler(new CustomAccessDeniedHandler());
 
         // 添加自定义 JWT 过滤器
-        http.addFilterBefore(authenticateFilter, UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(authenticateFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         // 忽略请求
         WebSecurity ws = web.ignoring().and();
         // 按照请求url忽略

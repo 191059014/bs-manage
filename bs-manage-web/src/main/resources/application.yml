@@ -7,6 +7,8 @@ spring:
     active: test
   main:
     allow-bean-definition-overriding: true
+  mvc:
+    static-path-pattern: /static/**
 unicLogger:
   traceIdHttpFilterUrlPatterns: /bs/*,/app/* # traceId过滤器拦截路径
   traceIdFilterMode: common
@@ -24,6 +26,7 @@ security:
   ignoreUrlPatterns: # springsecurity忽略的url
       - /bs/noauth/**
       - /bs/test/**
+      - /login
 token:
   defaultTtl: 1800  # token默认过期时间
 mybatis:

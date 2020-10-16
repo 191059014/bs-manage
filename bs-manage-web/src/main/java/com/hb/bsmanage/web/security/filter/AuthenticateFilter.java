@@ -39,7 +39,7 @@ import java.util.Set;
  * @author Mr.Huang
  * @version v0.1, JWTAuthenticationFilter.java, 2020/6/18 13:23, create by huangbiao.
  */
-@Configuration
+//@Configuration
 public class AuthenticateFilter extends OncePerRequestFilter {
 
     /**
@@ -52,12 +52,6 @@ public class AuthenticateFilter extends OncePerRequestFilter {
      */
     @Autowired
     private SecurityProperties securityProperties;
-
-    /**
-     * 认证管理器
-     */
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     /**
      * 在此方法中检验客户端请求头中的token,

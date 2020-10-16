@@ -53,12 +53,6 @@ public class LoginController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
     /**
-     * 认证管理器
-     */
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    /**
      * 用户service
      */
     @Autowired
@@ -104,7 +98,7 @@ public class LoginController extends BaseController {
         Authentication authentication = null;
         try {
             // 登陆认证
-            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getUsernameOrMobile(), req.getPassword()));
+//            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getUsernameOrMobile(), req.getPassword()));
         } catch (AuthenticationException e) {
             LOGGER.error("{}登陆认证异常={}", baseLog, LogExceptionWapper.getStackTrace(e));
             return Result.of(ErrorCode.BAD_CREDENTIALS);
