@@ -8,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
@@ -25,11 +28,10 @@ import java.util.Set;
  */
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    /**
-     * 认证过滤器
-     */
+
 //    @Autowired
 //    private AuthenticateFilter authenticateFilter;
 
@@ -44,6 +46,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Autowired
     private AuthenticationProvider customAuthenticationProvider;
+
+    /**
+     * 未登录时处理器
+     */
+    @Autowired
+    private AuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    /**
+     * 登录成功处理器
+     */
+    @Autowired
+    private AuthenticationSuccessHandler loginSuccessHandler;
 
     /**
      * 配置认证处理器
@@ -64,24 +78,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable();
 
         http
-                // 对请求授权
-                .authorizeRequests()
-                // 忽略静态资源
-                .antMatchers("/static/**", "/favicon.ico").permitAll()
-                // 其他的需要登陆后才能访问
-                .anyRequest().authenticated();
-
-        http
                 // 表单登陆模式
                 .formLogin()
+                .loginPage("/static/views/login.html")
                 // 指定登陆url
-                .loginProcessingUrl("/doLogin")
+//                .loginProcessingUrl("/login")
                 // 允许所有用户
                 .permitAll()
                 // 登陆成功处理器
                 .successHandler(new LoginSuccessHandler())
                 // 登陆失败处理器
                 .failureHandler(new LoginFailureHandler());
+
+        http
+                // 对请求授权
+                .authorizeRequests()
+                // 忽略静态资源
+                .antMatchers("/static/**", "/favicon.ico").permitAll()
+                // 其他的需要登陆后才能访问
+                .anyRequest().authenticated();
 
         http
                 // 登出行为由自己实现
@@ -101,6 +116,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 // 异常处理
                 .exceptionHandling()
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
                 // 权限不足异常处理
                 .accessDeniedHandler(new CustomAccessDeniedHandler());
 

@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 /**
  * 项目入口
@@ -14,7 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @SpringBootApplication
 @ImportResource({"classpath*:META-INF/applicationContext-web.xml"})
 @EnableEncryptableProperties
-@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebApplication {
 
     /**
@@ -28,7 +26,7 @@ public class WebApplication {
         String host = env.getProperty("server.address");
         String port = env.getProperty("server.port");
         System.out.println("===========================================================================");
-        System.out.println(String.format(" you can enjoy yourself, more please see: http://%s:%s/index.html", host == null ? "localhost" : host, port));
+        System.out.println(String.format(" you can enjoy yourself, more please see: http://%s:%s/static/index.html", host == null ? "localhost" : host, port));
         System.out.println("===========================================================================");
     }
 

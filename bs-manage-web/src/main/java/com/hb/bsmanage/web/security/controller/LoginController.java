@@ -30,10 +30,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
@@ -44,7 +41,7 @@ import java.util.Set;
  * @version v0.1, 2020/9/4 14:51, create by huangbiao.
  */
 @RestController
-@RequestMapping("bs/noauth/login")
+//@RequestMapping("bs/noauth/login")
 public class LoginController extends BaseController {
 
     /**
@@ -82,13 +79,18 @@ public class LoginController extends BaseController {
     @Autowired
     private ISysRoleAccessService iSysRoleAccessService;
 
+//    @PostMapping("/login")
+    public void login() {
+        System.out.println("login");
+    }
+
     /**
      * 登陆
      *
      * @param req 登录参数
      * @return LoginResponse
      */
-    @PostMapping("/login")
+//    @PostMapping("/login")
     public Result<LoginResponse> login(@RequestBody LoginRequest req) {
         String baseLog = LogHelper.getBaseLog("登录");
         LOGGER.info("{}入参={}", baseLog, req);
