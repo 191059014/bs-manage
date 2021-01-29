@@ -3,12 +3,11 @@ package com.hb.bsmanage.web.controller;
 import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
-import com.hb.unic.base.exception.StandardRuntimeException;
+import com.hb.unic.base.util.LogExceptionWapper;
+import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.base.util.ServletUtils;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.base.util.LogExceptionWapper;
-import com.hb.unic.base.util.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -57,17 +56,6 @@ public abstract class BaseController {
     @ResponseBody
     public Result exception(BusinessException e) {
         String baseLog = LogHelper.getBaseLog("业务异常");
-        LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
-        return Result.of(e.getKey(), e.getMessage());
-    }
-
-    /**
-     * 标准异常
-     */
-    @ExceptionHandler(StandardRuntimeException.class)
-    @ResponseBody
-    public Result exception(StandardRuntimeException e) {
-        String baseLog = LogHelper.getBaseLog("标准异常");
         LOGGER.error("{}{}", baseLog, LogExceptionWapper.getStackTrace(e));
         return Result.of(e.getKey(), e.getMessage());
     }
