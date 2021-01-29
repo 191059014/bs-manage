@@ -1,5 +1,9 @@
 package com.hb.bsmanage.web.security.service;
 
+import com.hb.bsmanage.web.common.enums.ErrorCode;
+import com.hb.unic.base.common.Result;
+import com.hb.unic.base.util.ServletUtils;
+import com.hb.unic.util.util.JsonUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -19,7 +23,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        System.out.println("LoginFailureHandler");
+        ServletUtils.writeResponse(httpServletResponse, JsonUtils.toJson(Result.of(ErrorCode.BAD_CREDENTIALS)));
     }
 
 }
