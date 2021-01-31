@@ -2,8 +2,7 @@ package com.hb.bsmanage.web.common.util;
 
 import com.hb.bsmanage.web.common.constans.Consts;
 import com.hb.bsmanage.web.dao.po.SysMerchantPO;
-import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.util.DateUtils;
@@ -56,9 +55,9 @@ public class BsWebUtils {
         where
                 .and()
                 .leftBracket()
-                .add(QueryType.EQUAL, "merchant_id", currentUserMerchant.getMerchantId())
+                .equal("merchant_id", currentUserMerchant.getMerchantId())
                 .or()
-                .add(QueryType.LIKE, "path", getSubPathPrefix(currentUserMerchant.getPath()))
+                .like("path", getSubPathPrefix(currentUserMerchant.getPath()))
                 .rightBracket();
         return where;
     }

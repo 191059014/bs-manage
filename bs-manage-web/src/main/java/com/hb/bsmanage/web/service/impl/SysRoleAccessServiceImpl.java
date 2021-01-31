@@ -4,7 +4,7 @@ import com.hb.bsmanage.web.service.ISysRoleAccessService;
 import com.hb.bsmanage.web.dao.po.SysRolePermissionPO;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class SysRoleAccessServiceImpl extends DmlMapperImpl<SysRolePermissionPO,
         if (CollectionUtils.isEmpty(roleIdSet)) {
             return new HashSet<>();
         }
-        List<SysRolePermissionPO> rolePermissionList = selectList(Where.build().andAdd(QueryType.IN, "role_id", roleIdSet));
+        List<SysRolePermissionPO> rolePermissionList = selectList(Where.build().andCondition(QueryType.IN, "role_id", roleIdSet));
         if (CollectionUtils.isEmpty(rolePermissionList)) {
             return new HashSet<>();
         }

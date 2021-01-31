@@ -8,7 +8,7 @@ import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.bsmanage.web.service.ISysMerchantService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.util.LogHelper;
@@ -73,12 +73,12 @@ public class MerchantController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Where where = Where.build();
-        where.andAdd(QueryType.EQUAL, "merchant_id", merchant.getMerchantId());
-        where.andAdd(QueryType.LIKE, "merchant_name", merchant.getMerchantName());
+        where.andCondition(QueryType.EQUAL, "merchant_id", merchant.getMerchantId());
+        where.andCondition(QueryType.LIKE, "merchant_name", merchant.getMerchantName());
         if (SecurityUtils.getCurrentUserParentId() != null) {
             // 非最高系统管理员，只能查询用户所属商户，及商户下的所有下级商户
             Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
-            where.andAdd(QueryType.IN, "merchant_id", merchantIdSet);
+            where.andCondition(QueryType.IN, "merchant_id", merchantIdSet);
         }
         Pagination<SysMerchantPO> pagination = iSysMerchantService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pagination.getData());

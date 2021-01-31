@@ -12,7 +12,7 @@ import com.hb.bsmanage.web.service.ISysMerchantService;
 import com.hb.bsmanage.web.service.ISysPermissionService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
 import com.hb.unic.logger.Logger;
@@ -87,8 +87,8 @@ public class AccessController extends BaseController {
             return Result.of(ErrorCode.SUCCESS, response);
         }
         Where where = Where.build();
-        where.andAdd(QueryType.IN, "permission_id", permissionIdSet);
-        where.andAdd(QueryType.IN, "resource_type", SetBuilder.build().add(ResourceType.FOLDER.getValue(), ResourceType.PAGE.getValue()).get());
+        where.andCondition(QueryType.IN, "permission_id", permissionIdSet);
+        where.andCondition(QueryType.IN, "resource_type", SetBuilder.build().add(ResourceType.FOLDER.getValue(), ResourceType.PAGE.getValue()).get());
         List<SysPermissionPO> allList = iSysPermissionService.selectList(where, "create_time asc");
         List<SysPermissionPO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
         List<ElementUIMenu> menuList = findChildrenMenuCycle(allList, topList);
@@ -137,14 +137,14 @@ public class AccessController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Where where = Where.build();
-        where.andAdd(QueryType.EQUAL, "permission_id", permission.getPermissionId());
-        where.andAdd(QueryType.LIKE, "permission_name", permission.getPermissionName());
-        where.andAdd(QueryType.EQUAL, "resource_type", permission.getResourceType());
-        where.andAdd(QueryType.EQUAL, "tenant_id", permission.getTenantId());
+        where.andCondition(QueryType.EQUAL, "permission_id", permission.getPermissionId());
+        where.andCondition(QueryType.LIKE, "permission_name", permission.getPermissionName());
+        where.andCondition(QueryType.EQUAL, "resource_type", permission.getResourceType());
+        where.andCondition(QueryType.EQUAL, "tenant_id", permission.getTenantId());
         if (SecurityUtils.getCurrentUserParentId() != null) {
             // 非最高系统管理员，只能查询权限所属商户，及商户下的所有下级商户的权限
             Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
-            where.andAdd(QueryType.IN, "tenant_id", merchantIdSet);
+            where.andCondition(QueryType.IN, "tenant_id", merchantIdSet);
         }
         Pagination<SysPermissionPO> pageResult = iSysPermissionService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pageResult.getData());
@@ -236,8 +236,8 @@ public class AccessController extends BaseController {
             tenantId = SecurityUtils.getCurrentUserTenantId();
         }
         Where where = Where.build();
-        where.andAdd(QueryType.EQUAL, "resource_type", resourceType);
-        where.andAdd(QueryType.EQUAL, "tenant_id", tenantId);
+        where.andCondition(QueryType.EQUAL, "resource_type", resourceType);
+        where.andCondition(QueryType.EQUAL, "tenant_id", tenantId);
         List<SysPermissionPO> list = iSysPermissionService.selectList(where, "create_time desc");
         LOGGER.info("{}出参={}", baseLog, list);
         return Result.of(ErrorCode.SUCCESS, list);

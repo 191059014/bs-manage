@@ -1,10 +1,10 @@
 package com.hb.bsmanage.web.service.impl;
 
-import com.hb.bsmanage.web.service.ISysRoleService;
 import com.hb.bsmanage.web.dao.po.SysRolePO;
+import com.hb.bsmanage.web.service.ISysRoleService;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class SysRoleServiceImpl extends DmlMapperImpl<SysRolePO, Integer, String
         if (CollectionUtils.isEmpty(roleIdSet)) {
             return new ArrayList<>();
         }
-        return selectList(Where.build().and().add(QueryType.IN, "role_id", roleIdSet));
+        return selectList(Where.build().andCondition(QueryType.IN, "role_id", roleIdSet));
     }
 
 }

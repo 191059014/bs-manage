@@ -4,7 +4,7 @@ import com.hb.bsmanage.web.dao.po.SysPermissionPO;
 import com.hb.bsmanage.web.service.ISysPermissionService;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class SysPermissionServiceImpl extends DmlMapperImpl<SysPermissionPO, Int
         if (CollectionUtils.isEmpty(permissionIdSet)) {
             return new ArrayList<>();
         }
-        return selectList(Where.build().andAdd(QueryType.IN, "permission_id", permissionIdSet));
+        return selectList(Where.build().andCondition(QueryType.IN, "permission_id", permissionIdSet));
     }
 
     @Override
@@ -39,7 +39,7 @@ public class SysPermissionServiceImpl extends DmlMapperImpl<SysPermissionPO, Int
         if (CollectionUtils.isEmpty(merchantIdSet)) {
             return new HashSet<>();
         }
-        List<SysPermissionPO> sysPermissionList = selectList(Where.build().andAdd(QueryType.IN, "tenant_id", merchantIdSet));
+        List<SysPermissionPO> sysPermissionList = selectList(Where.build().andCondition(QueryType.IN, "tenant_id", merchantIdSet));
         return sysPermissionList.stream().map(SysPermissionPO::getPermissionId).collect(Collectors.toSet());
     }
 }

@@ -1,10 +1,10 @@
 package com.hb.bsmanage.web.service.impl;
 
-import com.hb.bsmanage.web.service.ISysUserRoleService;
 import com.hb.bsmanage.web.dao.po.SysUserRolePO;
+import com.hb.bsmanage.web.service.ISysUserRoleService;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -37,7 +37,7 @@ public class SysUserRoleServiceImpl extends DmlMapperImpl<SysUserRolePO, Integer
             return new HashSet<>();
         }
         // 查询用户角色关联信息
-        List<SysUserRolePO> userRoleList = selectList(Where.build().and().add(QueryType.EQUAL, "user_id", userId));
+        List<SysUserRolePO> userRoleList = selectList(Where.build().andCondition(QueryType.EQUAL, "user_id", userId));
         if (CollectionUtils.isEmpty(userRoleList)) {
             return new HashSet<>();
         }

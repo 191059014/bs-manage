@@ -15,7 +15,7 @@ import com.hb.bsmanage.web.service.ISysRoleAccessService;
 import com.hb.bsmanage.web.service.ISysRoleService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
@@ -104,13 +104,13 @@ public class RoleController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Where where = Where.build();
-        where.andAdd(QueryType.EQUAL, "role_id", role.getRoleId());
-        where.andAdd(QueryType.LIKE, "role_name", role.getRoleName());
-        where.andAdd(QueryType.EQUAL, "tenant_id", role.getTenantId());
+        where.andCondition(QueryType.EQUAL, "role_id", role.getRoleId());
+        where.andCondition(QueryType.LIKE, "role_name", role.getRoleName());
+        where.andCondition(QueryType.EQUAL, "tenant_id", role.getTenantId());
         if (SecurityUtils.getCurrentUserParentId() != null) {
             // 非最高系统管理员，只能查询角色所属商户，及商户下的所有下级商户的角色
             Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
-            where.andAdd(QueryType.IN, "tenant_id", merchantIdSet);
+            where.andCondition(QueryType.IN, "tenant_id", merchantIdSet);
         }
         Pagination<SysRolePO> pageResult = iSysRoleService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pageResult.getData());
@@ -219,7 +219,7 @@ public class RoleController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         // 删除角色的权限信息
-        Where deleteWhere = Where.build().andAdd(QueryType.EQUAL, "role_id", roleId);
+        Where deleteWhere = Where.build().andCondition(QueryType.EQUAL, "role_id", roleId);
         Map<String, Object> updateMap = MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get();
         int deleteRows = iSysRoleAccessService.logicDelete(deleteWhere, updateMap);
         LOGGER.info("{}删除角色的权限，共{}条", baseLog, deleteRows);

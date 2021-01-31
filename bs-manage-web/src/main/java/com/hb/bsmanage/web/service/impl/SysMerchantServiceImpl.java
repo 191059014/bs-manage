@@ -4,7 +4,7 @@ import com.hb.bsmanage.web.common.util.BsWebUtils;
 import com.hb.bsmanage.web.dao.po.SysMerchantPO;
 import com.hb.bsmanage.web.service.ISysMerchantService;
 import com.hb.mybatis.base.DmlMapperImpl;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.base.util.LogHelper;

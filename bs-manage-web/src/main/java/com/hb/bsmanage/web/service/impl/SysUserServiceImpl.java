@@ -5,7 +5,7 @@ import com.hb.bsmanage.web.dao.po.base.impl.AbstractBasePO;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,9 +34,9 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserPO, Integer, String
         Where where = Where.build()
                 .and()
                 .leftBracket()
-                .add(QueryType.EQUAL, "user_name", usernameOrMobile)
+                .equal("user_name", usernameOrMobile)
                 .or()
-                .add(QueryType.EQUAL, "mobile", usernameOrMobile)
+                .equal("mobile", usernameOrMobile)
                 .rightBracket();
         return selectOne(where);
     }
@@ -45,8 +45,7 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserPO, Integer, String
     @InOutLog("通过用户ID集合查询用户list")
     public List<SysUserPO> getUserListByUserIdSet(Set<String> userIdSet) {
         Where where = Where.build()
-                .and()
-                .add(QueryType.IN, "user_id", userIdSet);
+                .andCondition(QueryType.IN, "user_id", userIdSet);
         return selectList(where);
     }
 

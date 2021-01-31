@@ -14,7 +14,7 @@ import com.hb.bsmanage.web.service.ISysRoleService;
 import com.hb.bsmanage.web.service.ISysUserRoleService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.helper.Where;
+import com.hb.mybatis.tool.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
@@ -96,14 +96,14 @@ public class UserController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         Where where = Where.build();
-        where.andAdd(QueryType.EQUAL, "user_id", user.getUserId());
-        where.andAdd(QueryType.LIKE, "user_name", user.getUserName());
-        where.andAdd(QueryType.LIKE, "mobile", user.getMobile());
-        where.andAdd(QueryType.EQUAL, "tenant_id", user.getTenantId());
+        where.andCondition(QueryType.EQUAL, "user_id", user.getUserId());
+        where.andCondition(QueryType.LIKE, "user_name", user.getUserName());
+        where.andCondition(QueryType.LIKE, "mobile", user.getMobile());
+        where.andCondition(QueryType.EQUAL, "tenant_id", user.getTenantId());
         if (SecurityUtils.getCurrentUserParentId() != null) {
             // 非最高系统管理员，只能查询用户所属商户，及商户下的所有下级商户的用户
             Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
-            where.andAdd(QueryType.IN, "tenant_id", merchantIdSet);
+            where.andCondition(QueryType.IN, "tenant_id", merchantIdSet);
         }
         Pagination<SysUserPO> pageResult = iSysUserService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pageResult.getData());
@@ -192,7 +192,7 @@ public class UserController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         SysUserPO sysUserDO = iSysUserService.selectByBk(userId);
-        List<SysUserRolePO> userRoleList = iSysUserRoleService.selectList(Where.build().andAdd(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
+        List<SysUserRolePO> userRoleList = iSysUserRoleService.selectList(Where.build().andCondition(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
         Set<String> roleIdSet = userRoleList.stream().map(SysUserRolePO::getRoleId).collect(Collectors.toSet());
         return Result.of(ErrorCode.SUCCESS, roleIdSet);
     }
@@ -207,7 +207,7 @@ public class UserController extends BaseController {
     public Result<List<SysRolePO>> getRolesUnderMerchant() {
         SysUserPO sysUserDO = iSysUserService.selectByBk(SecurityUtils.getCurrentUserId());
         Set<String> subMerchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(sysUserDO.getTenantId());
-        return Result.of(ErrorCode.SUCCESS, iSysRoleService.selectList(Where.build().andAdd(QueryType.IN, "tenant_id", subMerchantIdSet)));
+        return Result.of(ErrorCode.SUCCESS, iSysRoleService.selectList(Where.build().andCondition(QueryType.IN, "tenant_id", subMerchantIdSet)));
     }
 
     /**
@@ -226,7 +226,7 @@ public class UserController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         // 删除用户的角色信息
-        Where deleteWhere = Where.build().andAdd(QueryType.EQUAL, "user_id", userId);
+        Where deleteWhere = Where.build().andCondition(QueryType.EQUAL, "user_id", userId);
         Map<String, Object> updateMap = MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get();
         int deleteRows = iSysUserRoleService.logicDelete(deleteWhere, updateMap);
         LOGGER.info("{}删除用户的角色，共{}条", baseLog, deleteRows);
