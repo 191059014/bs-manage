@@ -1,7 +1,7 @@
 package com.hb.bsmanage.web.service;
 
+import com.hb.bsmanage.web.dao.base.IBaseDao;
 import com.hb.bsmanage.web.dao.po.SysMerchantPO;
-import com.hb.mybatis.base.IDmlMapper;
 
 import java.util.List;
 import java.util.Set;
@@ -11,7 +11,7 @@ import java.util.Set;
  *
  * @version v0.1, 2020/7/24 14:59, create by huangbiao.
  */
-public interface ISysMerchantService extends IDmlMapper<SysMerchantPO, Integer, String> {
+public interface ISysMerchantService extends IBaseDao<SysMerchantPO> {
 
     /**
      * 获取当前商户所有下级的商户ID集合

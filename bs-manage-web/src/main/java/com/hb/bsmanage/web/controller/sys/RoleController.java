@@ -15,13 +15,13 @@ import com.hb.bsmanage.web.service.ISysRoleAccessService;
 import com.hb.bsmanage.web.service.ISysRoleService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.tool.Where;
+import com.hb.mybatis.toolkit.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
+import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.base.util.LogHelper;
 import com.hb.unic.util.easybuild.MapBuilder;
 import com.hb.unic.util.easybuild.SetBuilder;
 import com.hb.unic.util.util.KeyUtils;
@@ -91,13 +91,13 @@ public class RoleController extends BaseController {
     /**
      * 条件分页查询
      *
-     * @param role 角色信息
+     * @param role
+     *            角色信息
      * @return 结果
      */
     @PostMapping("/queryPages")
     public Result<Pagination<SysRolePO>> findPages(@RequestBody SysRolePO role,
-                                                   @RequestParam("pageNum") Integer pageNum,
-                                                   @RequestParam("pageSize") Integer pageSize) {
+        @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
         String baseLog = LogHelper.getBaseLog("分页查询角色列表");
         LOGGER.info("{}入参={}={}={}", baseLog, role, pageNum, pageSize);
         if (!Pagination.verify(pageNum, pageSize)) {
@@ -109,10 +109,12 @@ public class RoleController extends BaseController {
         where.andCondition(QueryType.EQUAL, "tenant_id", role.getTenantId());
         if (SecurityUtils.getCurrentUserParentId() != null) {
             // 非最高系统管理员，只能查询角色所属商户，及商户下的所有下级商户的角色
-            Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
+            Set<String> merchantIdSet =
+                iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
             where.andCondition(QueryType.IN, "tenant_id", merchantIdSet);
         }
-        Pagination<SysRolePO> pageResult = iSysRoleService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
+        Pagination<SysRolePO> pageResult =
+            iSysRoleService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pageResult.getData());
         LOGGER.info("{}出参={}", baseLog, pageResult);
         return Result.of(ErrorCode.SUCCESS, pageResult);
@@ -121,7 +123,8 @@ public class RoleController extends BaseController {
     /**
      * 添加角色
      *
-     * @param role 角色信息
+     * @param role
+     *            角色信息
      * @return 结果
      */
     @PostMapping("/add")
@@ -143,7 +146,8 @@ public class RoleController extends BaseController {
     /**
      * 修改角色
      *
-     * @param role 角色
+     * @param role
+     *            角色
      * @return 结果
      */
     @PostMapping("/update")
@@ -155,7 +159,7 @@ public class RoleController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         role.setUpdateBy(SecurityUtils.getCurrentUserId());
-        int updateRows = iSysRoleService.updateByBk(roleId, role);
+        int updateRows = iSysRoleService.update(Where.build().and().equal("role_id", roleId), role);
         if (updateRows != 1) {
             throw new BusinessException(ErrorCode.FAIL);
         }
@@ -166,7 +170,8 @@ public class RoleController extends BaseController {
     /**
      * 删除角色
      *
-     * @param roleId 角色ID
+     * @param roleId
+     *            角色ID
      * @return 结果
      */
     @GetMapping("/delete")
@@ -177,7 +182,8 @@ public class RoleController extends BaseController {
         if (StringUtils.isBlank(roleId)) {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
-        int deleteRows = iSysRoleService.logicDeleteByBk(roleId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
+        int deleteRows = iSysRoleService.logicDelete(Where.build().and().equal("role_id", roleId),
+            MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         if (deleteRows != 1) {
             throw new BusinessException(ErrorCode.FAIL);
         }
@@ -194,9 +200,12 @@ public class RoleController extends BaseController {
     public Result<Set<String>> getPermissionsUnderRole(@RequestParam("roleId") String roleId) {
         String baseLog = LogHelper.getBaseLog("获取角色的权限集合");
         LOGGER.info("{}入参={}", baseLog, roleId);
-        Set<String> permissionIdSet = iSysRoleAccessService.getPermissionIdSetByRoleIdSet(SetBuilder.build().add(roleId).get(String.class));
-        List<SysPermissionPO> permissionList = iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
-        Set<String> parentPermissionIdSet = permissionList.stream().map(SysPermissionPO::getParentId).collect(Collectors.toSet());
+        Set<String> permissionIdSet =
+            iSysRoleAccessService.getPermissionIdSetByRoleIdSet(SetBuilder.build().add(roleId).get(String.class));
+        List<SysPermissionPO> permissionList =
+            iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
+        Set<String> parentPermissionIdSet =
+            permissionList.stream().map(SysPermissionPO::getParentId).collect(Collectors.toSet());
         // 只返回叶子节点，防止父节点选中，导致子节点全部选中的问题
         permissionIdSet.removeAll(parentPermissionIdSet);
         LOGGER.info("{}出参={}", baseLog, permissionIdSet);
@@ -206,13 +215,16 @@ public class RoleController extends BaseController {
     /**
      * 更新用户的角色
      *
-     * @param roleId          角色
-     * @param permissionIdSet 权限id集合
+     * @param roleId
+     *            角色
+     * @param permissionIdSet
+     *            权限id集合
      * @return 更新结果
      */
     @PostMapping("/updateRolePermission")
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Result<Integer> updateRolePermission(@RequestParam("roleId") String roleId, @RequestBody Set<String> permissionIdSet) {
+    public Result<Integer> updateRolePermission(@RequestParam("roleId") String roleId,
+        @RequestBody Set<String> permissionIdSet) {
         String baseLog = LogHelper.getBaseLog("更新用户的角色");
         LOGGER.info("{}入参={}={}", baseLog, roleId, permissionIdSet);
         if (StringUtils.isBlank(roleId) || CollectionUtils.isEmpty(permissionIdSet)) {
@@ -226,7 +238,8 @@ public class RoleController extends BaseController {
         // 添加角色的权限信息
         int addRows = 0;
         for (String permissionId : permissionIdSet) {
-            SysRolePermissionPO insert = SysRolePermissionPO.builder().roleId(roleId).permissionId(permissionId).build();
+            SysRolePermissionPO insert =
+                SysRolePermissionPO.builder().roleId(roleId).permissionId(permissionId).build();
             insert.setCreateBy(SecurityUtils.getCurrentUserId());
             insert.setUpdateBy(SecurityUtils.getCurrentUserId());
             insert.setTenantId(SecurityUtils.getCurrentUserTenantId());
@@ -250,10 +263,12 @@ public class RoleController extends BaseController {
     @GetMapping("/getPermissionTreeUnderMerchant")
     public Result<ElementUITreeResponse> getPermissionTreeUnderMerchant() {
         ElementUITreeResponse response = new ElementUITreeResponse();
-        Set<String> subMerchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
+        Set<String> subMerchantIdSet =
+            iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
         Set<String> permissionIdSet = iSysPermissionService.getPermissionIdSetByMerchantIdSet(subMerchantIdSet);
         List<SysPermissionPO> allList = iSysPermissionService.getPermissionListByPermissionIdSet(permissionIdSet);
-        List<SysPermissionPO> topList = allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
+        List<SysPermissionPO> topList =
+            allList.stream().filter(access -> StringUtils.isBlank(access.getParentId())).collect(Collectors.toList());
         List<ElementUITree> treeDataList = findTreeCycle(allList, topList);
         response.setTreeDataList(treeDataList);
         return Result.of(ErrorCode.SUCCESS, response);
@@ -267,11 +282,10 @@ public class RoleController extends BaseController {
     private List<ElementUITree> findTreeCycle(List<SysPermissionPO> allList, List<SysPermissionPO> childList) {
         List<ElementUITree> treeDataList = new ArrayList<>();
         for (SysPermissionPO access : childList) {
-            ElementUITree treeData = ElementUITree.builder()
-                    .id(access.getPermissionId())
-                    .label(access.getPermissionName())
-                    .build();
-            List<SysPermissionPO> cList = allList.stream().filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
+            ElementUITree treeData =
+                ElementUITree.builder().id(access.getPermissionId()).label(access.getPermissionName()).build();
+            List<SysPermissionPO> cList = allList.stream()
+                .filter(acc -> access.getPermissionId().equals(acc.getParentId())).collect(Collectors.toList());
             treeData.setChildren(findTreeCycle(allList, cList));
             treeDataList.add(treeData);
         }
@@ -279,4 +293,3 @@ public class RoleController extends BaseController {
     }
 
 }
-

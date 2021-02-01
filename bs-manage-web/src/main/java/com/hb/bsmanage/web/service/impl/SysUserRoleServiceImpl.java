@@ -1,10 +1,10 @@
 package com.hb.bsmanage.web.service.impl;
 
+import com.hb.bsmanage.web.dao.base.impl.BaseDaoImpl;
 import com.hb.bsmanage.web.dao.po.SysUserRolePO;
 import com.hb.bsmanage.web.service.ISysUserRoleService;
-import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.tool.Where;
+import com.hb.mybatis.toolkit.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * @version v0.1, 2020/7/24 15:00, create by huangbiao.
  */
 @Service
-public class SysUserRoleServiceImpl extends DmlMapperImpl<SysUserRolePO, Integer, String> implements ISysUserRoleService {
+public class SysUserRoleServiceImpl extends BaseDaoImpl<SysUserRolePO> implements ISysUserRoleService {
 
     /**
      * 日志
@@ -44,5 +44,3 @@ public class SysUserRoleServiceImpl extends DmlMapperImpl<SysUserRolePO, Integer
         return userRoleList.stream().map(SysUserRolePO::getRoleId).collect(Collectors.toSet());
     }
 }
-
-    

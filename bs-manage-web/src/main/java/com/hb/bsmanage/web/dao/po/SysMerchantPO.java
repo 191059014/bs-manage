@@ -27,7 +27,7 @@ public class SysMerchantPO extends AbstractComplexPO {
     private static final long serialVersionUID = 5538623345484936541L;
 
     // 商户标识
-    @Column(value = "merchant_id", isBk = true)
+    @Column(value = "merchant_id")
     private String merchantId;
 
     // 商户名

@@ -24,7 +24,7 @@ public class SysPermissionPO extends AbstractComplexPO {
     // 序列化ID
     private static final long serialVersionUID = 4702444967524003359L;
     // 权限ID
-    @Column(value = "permission_id", isBk = true)
+    @Column(value = "permission_id")
     private String permissionId;
     // 权限名称
     @Column("permission_name")

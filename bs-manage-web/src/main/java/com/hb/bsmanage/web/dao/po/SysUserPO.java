@@ -27,7 +27,7 @@ public class SysUserPO extends AbstractComplexPO {
     private static final long serialVersionUID = -2355680884700265496L;
 
     // 用户标识
-    @Column(value = "user_id", isBk = true)
+    @Column(value = "user_id")
     private String userId;
 
     // 用户名

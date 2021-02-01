@@ -2,7 +2,7 @@ package com.hb.bsmanage.web.common.util;
 
 import com.hb.bsmanage.web.common.constans.Consts;
 import com.hb.bsmanage.web.dao.po.SysMerchantPO;
-import com.hb.mybatis.tool.Where;
+import com.hb.mybatis.toolkit.Where;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.util.DateUtils;
@@ -26,8 +26,10 @@ public class BsWebUtils {
     /**
      * 获取当前Path
      *
-     * @param pathOfParent 父级的level
-     * @param idOfParent   父级的id
+     * @param pathOfParent
+     *            父级的level
+     * @param idOfParent
+     *            父级的id
      * @return level
      */
     public static String getCurrentPath(Object pathOfParent, Object idOfParent) {
@@ -37,7 +39,8 @@ public class BsWebUtils {
     /**
      * 获取子级Path的前缀
      *
-     * @param pathOfCurrent 当前的Path
+     * @param pathOfCurrent
+     *            当前的Path
      * @return level
      */
     public static String getSubPathPrefix(Object pathOfCurrent) {
@@ -47,18 +50,15 @@ public class BsWebUtils {
     /**
      * 获取子级商户Path的where条件
      *
-     * @param where               where条件
-     * @param currentUserMerchant 当前的商户
+     * @param where
+     *            where条件
+     * @param currentUserMerchant
+     *            当前的商户
      * @return Where
      */
     public static Where getSubPathWhere(Where where, SysMerchantPO currentUserMerchant) {
-        where
-                .and()
-                .leftBracket()
-                .equal("merchant_id", currentUserMerchant.getMerchantId())
-                .or()
-                .like("path", getSubPathPrefix(currentUserMerchant.getPath()))
-                .rightBracket();
+        where.and().leftBracket().equal("merchant_id", currentUserMerchant.getMerchantId()).or()
+            .like("path", getSubPathPrefix(currentUserMerchant.getPath())).rightBracket();
         return where;
     }
 
@@ -93,5 +93,3 @@ public class BsWebUtils {
     }
 
 }
-
-    

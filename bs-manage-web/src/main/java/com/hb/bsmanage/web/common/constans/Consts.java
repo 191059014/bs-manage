@@ -22,6 +22,16 @@ public class Consts {
     /* N */
     public static final String N = "N";
 
+    /**
+     * 1
+     */
+    public static Integer ONE = 1;
+
+    /**
+     * 0
+     */
+    public static Integer ZERO = 1;
+
 }
 
     

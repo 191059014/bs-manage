@@ -14,7 +14,7 @@ import com.hb.bsmanage.web.service.ISysRoleService;
 import com.hb.bsmanage.web.service.ISysUserRoleService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.tool.Where;
+import com.hb.mybatis.toolkit.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.exception.BusinessException;
@@ -83,13 +83,13 @@ public class UserController extends BaseController {
     /**
      * 条件分页查询
      *
-     * @param user 用户信息
+     * @param user
+     *            用户信息
      * @return 结果
      */
     @PostMapping("/queryPages")
     public Result<Pagination<SysUserPO>> findPages(@RequestBody SysUserPO user,
-                                                   @RequestParam("pageNum") Integer pageNum,
-                                                   @RequestParam("pageSize") Integer pageSize) {
+        @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
         String baseLog = LogHelper.getBaseLog("分页查询用户信息");
         LOGGER.info("{}入参={}={}={}", baseLog, user, pageNum, pageSize);
         if (!Pagination.verify(pageNum, pageSize)) {
@@ -102,10 +102,12 @@ public class UserController extends BaseController {
         where.andCondition(QueryType.EQUAL, "tenant_id", user.getTenantId());
         if (SecurityUtils.getCurrentUserParentId() != null) {
             // 非最高系统管理员，只能查询用户所属商户，及商户下的所有下级商户的用户
-            Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
+            Set<String> merchantIdSet =
+                iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
             where.andCondition(QueryType.IN, "tenant_id", merchantIdSet);
         }
-        Pagination<SysUserPO> pageResult = iSysUserService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
+        Pagination<SysUserPO> pageResult =
+            iSysUserService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pageResult.getData());
         LOGGER.info("{}出参={}", baseLog, pageResult);
         return Result.of(ErrorCode.SUCCESS, pageResult);
@@ -114,7 +116,8 @@ public class UserController extends BaseController {
     /**
      * 添加用户
      *
-     * @param user 用户信息
+     * @param user
+     *            用户信息
      * @return 结果
      */
     @PostMapping("/add")
@@ -138,7 +141,8 @@ public class UserController extends BaseController {
     /**
      * 修改用户
      *
-     * @param user 用户信息
+     * @param user
+     *            用户信息
      * @return 结果
      */
     @PostMapping("/update")
@@ -150,7 +154,7 @@ public class UserController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         user.setUpdateBy(SecurityUtils.getCurrentUserId());
-        int updateRows = iSysUserService.updateByBk(userId, user);
+        int updateRows = iSysUserService.update(Where.build().and().equal("user_id", userId), user);
         if (updateRows != 1) {
             throw new BusinessException(ErrorCode.FAIL);
         }
@@ -161,7 +165,8 @@ public class UserController extends BaseController {
     /**
      * 删除用户
      *
-     * @param userId 用户ID
+     * @param userId
+     *            用户ID
      * @return 结果
      */
     @GetMapping("/delete")
@@ -172,7 +177,8 @@ public class UserController extends BaseController {
         if (StringUtils.isBlank(userId)) {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
-        int deleteRows = iSysUserService.logicDeleteByBk(userId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
+        int deleteRows = iSysUserService.logicDelete(Where.build().and().equal("user_id", userId),
+            MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         if (deleteRows != 1) {
             throw new BusinessException(ErrorCode.FAIL);
         }
@@ -191,8 +197,9 @@ public class UserController extends BaseController {
         if (StringUtils.isBlank(userId)) {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
-        SysUserPO sysUserDO = iSysUserService.selectByBk(userId);
-        List<SysUserRolePO> userRoleList = iSysUserRoleService.selectList(Where.build().andCondition(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
+        SysUserPO sysUserDO = iSysUserService.selectOne(Where.build().and().equal("user_id", userId));
+        List<SysUserRolePO> userRoleList = iSysUserRoleService
+            .selectList(Where.build().andCondition(QueryType.EQUAL, "user_id", sysUserDO.getUserId()));
         Set<String> roleIdSet = userRoleList.stream().map(SysUserRolePO::getRoleId).collect(Collectors.toSet());
         return Result.of(ErrorCode.SUCCESS, roleIdSet);
     }
@@ -205,16 +212,20 @@ public class UserController extends BaseController {
     @GetMapping("/getRolesUnderMerchant")
     @InOutLog("获取当前用户对应商户下所有角色集合")
     public Result<List<SysRolePO>> getRolesUnderMerchant() {
-        SysUserPO sysUserDO = iSysUserService.selectByBk(SecurityUtils.getCurrentUserId());
+        SysUserPO sysUserDO =
+            iSysUserService.selectOne(Where.build().and().equal("user_id", SecurityUtils.getCurrentUserId()));
         Set<String> subMerchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(sysUserDO.getTenantId());
-        return Result.of(ErrorCode.SUCCESS, iSysRoleService.selectList(Where.build().andCondition(QueryType.IN, "tenant_id", subMerchantIdSet)));
+        return Result.of(ErrorCode.SUCCESS,
+            iSysRoleService.selectList(Where.build().andCondition(QueryType.IN, "tenant_id", subMerchantIdSet)));
     }
 
     /**
      * 更新用户的角色
      *
-     * @param userId    用户id
-     * @param roleIdSet 角色集合
+     * @param userId
+     *            用户id
+     * @param roleIdSet
+     *            角色集合
      * @return 更新结果
      */
     @PostMapping("/updateUserRole")
@@ -262,7 +273,8 @@ public class UserController extends BaseController {
     /**
      * 修改密码
      *
-     * @param request 密码信息
+     * @param request
+     *            密码信息
      * @return 结果
      */
     @PostMapping("/updatePassword")
@@ -277,7 +289,8 @@ public class UserController extends BaseController {
         }
         SysUserPO user = SysUserPO.builder().password(BsWebUtils.bCryptEncode(request.getNewPassword())).build();
         user.setUpdateBy(SecurityUtils.getCurrentUserId());
-        int updateRows = iSysUserService.updateByBk(SecurityUtils.getCurrentUserId(), user);
+        int updateRows =
+            iSysUserService.update(Where.build().and().equal("user_id", SecurityUtils.getCurrentUserId()), user);
         if (updateRows != 1) {
             throw new BusinessException(ErrorCode.FAIL);
         }
@@ -285,5 +298,3 @@ public class UserController extends BaseController {
     }
 
 }
-
-    

@@ -1,11 +1,11 @@
 package com.hb.bsmanage.web.service.impl;
 
+import com.hb.bsmanage.web.dao.base.impl.BaseDaoImpl;
 import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.dao.po.base.impl.AbstractBasePO;
 import com.hb.bsmanage.web.service.ISysUserService;
-import com.hb.mybatis.base.DmlMapperImpl;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.tool.Where;
+import com.hb.mybatis.toolkit.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * @version v0.1, 2020/7/24 15:00, create by huangbiao.
  */
 @Service
-public class SysUserServiceImpl extends DmlMapperImpl<SysUserPO, Integer, String> implements ISysUserService {
+public class SysUserServiceImpl extends BaseDaoImpl<SysUserPO> implements ISysUserService {
 
     @Override
     @InOutLog("通过用户ID或者手机号查询用户")
@@ -31,21 +31,15 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserPO, Integer, String
         if (StringUtils.isBlank(usernameOrMobile)) {
             return null;
         }
-        Where where = Where.build()
-                .and()
-                .leftBracket()
-                .equal("user_name", usernameOrMobile)
-                .or()
-                .equal("mobile", usernameOrMobile)
-                .rightBracket();
+        Where where = Where.build().and().leftBracket().equal("user_name", usernameOrMobile).or()
+            .equal("mobile", usernameOrMobile).rightBracket();
         return selectOne(where);
     }
 
     @Override
     @InOutLog("通过用户ID集合查询用户list")
     public List<SysUserPO> getUserListByUserIdSet(Set<String> userIdSet) {
-        Where where = Where.build()
-                .andCondition(QueryType.IN, "user_id", userIdSet);
+        Where where = Where.build().andCondition(QueryType.IN, "user_id", userIdSet);
         return selectList(where);
     }
 
@@ -53,7 +47,8 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserPO, Integer, String
     @InOutLog("通过用户ID集合查询用户map")
     public Map<String, SysUserPO> getUserMapByUserIdSet(Set<String> userIdSet) {
         List<SysUserPO> list = getUserListByUserIdSet(userIdSet);
-        return list == null ? null : list.stream().collect(Collectors.toMap(SysUserPO::getUserId, v -> v, (k1, k2) -> k2));
+        return list == null ? null
+            : list.stream().collect(Collectors.toMap(SysUserPO::getUserId, v -> v, (k1, k2) -> k2));
     }
 
     @Override
@@ -78,5 +73,3 @@ public class SysUserServiceImpl extends DmlMapperImpl<SysUserPO, Integer, String
     }
 
 }
-
-    

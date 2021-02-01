@@ -8,7 +8,7 @@ import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.bsmanage.web.service.ISysMerchantService;
 import com.hb.bsmanage.web.service.ISysUserService;
 import com.hb.mybatis.enums.QueryType;
-import com.hb.mybatis.tool.Where;
+import com.hb.mybatis.toolkit.Where;
 import com.hb.unic.base.annotation.InOutLog;
 import com.hb.unic.base.common.Result;
 import com.hb.unic.base.util.LogHelper;
@@ -58,15 +58,17 @@ public class MerchantController extends BaseController {
     /**
      * 分页条件查询商户列表
      *
-     * @param merchant 查询条件
-     * @param pageNum  当前第几页
-     * @param pageSize 每页条数
+     * @param merchant
+     *            查询条件
+     * @param pageNum
+     *            当前第几页
+     * @param pageSize
+     *            每页条数
      * @return 商户分页列表
      */
     @PostMapping("/queryPages")
     public Result<Pagination<SysMerchantPO>> queryPages(@RequestBody SysMerchantPO merchant,
-                                                        @RequestParam("pageNum") Integer pageNum,
-                                                        @RequestParam("pageSize") Integer pageSize) {
+        @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
         String baseLog = LogHelper.getBaseLog("分页条件查询商户列表");
         LOGGER.info("{}入参={}={}={}", baseLog, merchant, pageNum, pageSize);
         if (!Pagination.verify(pageNum, pageSize)) {
@@ -77,10 +79,12 @@ public class MerchantController extends BaseController {
         where.andCondition(QueryType.LIKE, "merchant_name", merchant.getMerchantName());
         if (SecurityUtils.getCurrentUserParentId() != null) {
             // 非最高系统管理员，只能查询用户所属商户，及商户下的所有下级商户
-            Set<String> merchantIdSet = iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
+            Set<String> merchantIdSet =
+                iSysMerchantService.getCurrentSubMerchantIdSet(SecurityUtils.getCurrentUserTenantId());
             where.andCondition(QueryType.IN, "merchant_id", merchantIdSet);
         }
-        Pagination<SysMerchantPO> pagination = iSysMerchantService.selectPages(where, "create_time desc", Pagination.getStartRow(pageNum, pageSize), pageSize);
+        Pagination<SysMerchantPO> pagination = iSysMerchantService.selectPages(where, "create_time desc",
+            Pagination.getStartRow(pageNum, pageSize), pageSize);
         iSysUserService.formatCreateByAndUpdateBy(pagination.getData());
         LOGGER.info("{}出参={}", baseLog, pagination);
         return Result.of(ErrorCode.SUCCESS, pagination);
@@ -89,7 +93,8 @@ public class MerchantController extends BaseController {
     /**
      * 添加商户
      *
-     * @param merchant 查询条件
+     * @param merchant
+     *            查询条件
      * @return 结果
      */
     @PostMapping("/add")
@@ -99,7 +104,8 @@ public class MerchantController extends BaseController {
         if (StringUtils.isBlank(merchant.getMerchantName())) {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
-        SysMerchantPO currentUserMerchant = iSysMerchantService.selectByBk(SecurityUtils.getCurrentUserTenantId());
+        SysMerchantPO currentUserMerchant =
+            iSysMerchantService.selectOne(Where.build().equal("merchant_id", SecurityUtils.getCurrentUserTenantId()));
         merchant.setPath(BsWebUtils.getCurrentPath(currentUserMerchant.getPath(), currentUserMerchant.getId()));
         merchant.setParentId(SecurityUtils.getCurrentUserTenantId());
         merchant.setMerchantId(BsWebUtils.getTenantId());
@@ -114,7 +120,8 @@ public class MerchantController extends BaseController {
     /**
      * 修改商户
      *
-     * @param merchant 查询条件
+     * @param merchant
+     *            查询条件
      * @return 结果
      */
     @InOutLog("修改商户")
@@ -124,14 +131,15 @@ public class MerchantController extends BaseController {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
         merchant.setUpdateBy(SecurityUtils.getCurrentUserId());
-        int updateRows = iSysMerchantService.updateByBk(merchantId, merchant);
+        int updateRows = iSysMerchantService.update(Where.build().and().equal("merchant_id", merchantId), merchant);
         return Result.of(ErrorCode.SUCCESS, updateRows);
     }
 
     /**
      * 删除商户
      *
-     * @param merchantId 商户ID
+     * @param merchantId
+     *            商户ID
      * @return 结果
      */
     @GetMapping("/delete")
@@ -140,7 +148,8 @@ public class MerchantController extends BaseController {
         if (StringUtils.isBlank(merchantId)) {
             return Result.of(ErrorCode.PARAM_ILLEGAL);
         }
-        int deleteRows = iSysMerchantService.logicDeleteByBk(merchantId, MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
+        int deleteRows = iSysMerchantService.logicDelete(Where.build().and().equal("merchant_id", merchantId),
+            MapBuilder.build().add("updateBy", SecurityUtils.getCurrentUserId()).get());
         return Result.of(ErrorCode.SUCCESS, deleteRows);
     }
 
@@ -152,11 +161,12 @@ public class MerchantController extends BaseController {
     @GetMapping("/getAllSubMerchants")
     @InOutLog("获取所有下级商户")
     public Result<List> getAllSubMerchants() {
-        List<SysMerchantPO> merchantList = iSysMerchantService.getCurrentSubMerchantList(SecurityUtils.getCurrentUserTenantId());
-        List<SysMerchantPO> result = merchantList.stream().map(merchant -> SysMerchantPO.builder().merchantId(merchant.getMerchantId()).merchantName(merchant.getMerchantName()).build()).collect(Collectors.toList());
+        List<SysMerchantPO> merchantList =
+            iSysMerchantService.getCurrentSubMerchantList(SecurityUtils.getCurrentUserTenantId());
+        List<SysMerchantPO> result =
+            merchantList.stream().map(merchant -> SysMerchantPO.builder().merchantId(merchant.getMerchantId())
+                .merchantName(merchant.getMerchantName()).build()).collect(Collectors.toList());
         return Result.of(ErrorCode.SUCCESS, result);
     }
 
 }
-
-    
