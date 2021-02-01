@@ -35,8 +35,8 @@ public class BaseDaoImpl<T> extends DmlMapperImpl<T> implements IBaseDao<T> {
     @Override
     public int logicDelete(Where where, Map<String, Object> propertyMap) {
         where.and().equal(RECORD_STATUS_COLUMN_NAME, RECORD_STATUS_VALID);
-        propertyMap.put(RECORD_STATUS_COLUMN_NAME, RECORD_STATUS_VALID);
-        return this.updateByMap(where, propertyMap);
+        propertyMap.put(RECORD_STATUS_PROPERTY_NAME, RECORD_STATUS_INVALID);
+        return super.updateByMap(where, propertyMap);
     }
 
 }

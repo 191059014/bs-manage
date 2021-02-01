@@ -13,9 +13,14 @@ import java.util.Map;
 public interface IBaseDao<T> extends IDmlMapper<T> {
 
     /**
-     * 逻辑删除字段
+     * 逻辑删除数据库字段
      */
     public static final String RECORD_STATUS_COLUMN_NAME = "record_status";
+
+    /**
+     * 逻辑删除实体类字段
+     */
+    public static final String RECORD_STATUS_PROPERTY_NAME = "recordStatus";
 
     /**
      * 逻辑删除 - 有效
