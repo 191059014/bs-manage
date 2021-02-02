@@ -1,0 +1,13 @@
+package ${package};
+
+import com.hb.bsmanage.web.dao.base.IBaseDao;
+
+/**
+ * ${comments}服务层接口
+ *
+ * @version v0.1, ${nowTime}, create by ${author}.
+ */
+public interface I${upperClassName}Service extends IBaseDao<${upperClassName}PO> {
+
+
+}

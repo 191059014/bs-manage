@@ -1,0 +1,127 @@
+package ${package};
+
+import com.hb.unic.util.util.Pagination;
+import com.hb.unic.base.common.Result;
+import com.hb.bsmanage.web.common.enums.ErrorCode;
+import org.springframework.web.bind.annotation.*;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import javax.annotation.Resource;
+import com.hb.bsmanage.web.controller.BaseController;
+import com.hb.mybatis.enums.QueryType;
+import com.hb.mybatis.toolkit.Where;
+
+/**
+ * ${comments}控制层
+ *
+ * @version v0.1, ${nowTime}, create by ${author}.
+ */
+@RestController
+@RequestMapping("bs/auth/${lowerClassName}")
+public class ${upperClassName}Controller extends BaseController {
+
+    /**
+     * 日志
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(${upperClassName}Controller.class);
+
+    /**
+     * ${comments}服务层
+     */
+    @Resource
+    private I${upperClassName}Service i${lowerClassName}Service;
+
+    /**
+     * 分页查询${comments}
+     *
+     * @param ${lowerClassName}
+     *              查询条件对象
+     * @param pageNum
+     *              当前第几页
+     * @param pageSize
+     *              每页条数
+     * @return 分页结果
+     */
+    @PostMapping("/queryPages")
+    public Result<Pagination<${upperClassName}PO>> queryPages(@RequestBody ${upperClassName}PO ${lowerClassName},
+                                              @RequestParam("pageNum") Integer pageNum,
+                                              @RequestParam("pageSize") Integer pageSize) {
+        String baseLog = "[分页查询${comments}controller]";
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{}入参={}={}={}", baseLog, ${lowerClassName}, pageNum, pageSize);
+        }
+        if (!Pagination.verify(pageNum, pageSize)) {
+            return Result.of(ErrorCode.PARAM_ILLEGAL);
+        }
+        Where where = Where.build();
+    #foreach ($column in $columns)
+        where.andCondition(QueryType.EQUAL, "$column.columnName", ${lowerClassName}.get${column.upperAttrName}());
+    #end
+        Pagination<${upperClassName}PO> page = i${lowerClassName}Service.selectPages(where, (pageNum - 1) * pageSize, pageSize);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{}出参={}", baseLog, page);
+        }
+        return Result.of(ErrorCode.SUCCESS, page);
+    }
+
+    /**
+     * 新增${comments}
+     *
+     * @param ${lowerClassName}
+     *            新增对象信息
+     * @return 影响的行数
+     */
+    @PostMapping("/save")
+    public Result save(@RequestBody ${upperClassName}PO ${lowerClassName}) {
+        String baseLog = "[新增${comments}controller]";
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{}入参={}", baseLog, ${lowerClassName});
+        }
+        int addRows = i${lowerClassName}Service.insert(${lowerClassName});
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{}出参={}", baseLog, addRows);
+        }
+        return Result.of(ErrorCode.SUCCESS, addRows);
+    }
+
+    /**
+     * 通过主键修改${comments}
+     *
+     * @param ${lowerClassName}
+     *            要修改的信息
+     * @return 影响的行数
+     */
+    @PostMapping("/updateById")
+    public Result updateById(@RequestBody ${upperClassName}PO ${lowerClassName}) {
+        String baseLog = "[通过主键修改${comments}controller]";
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{}入参={}", baseLog, ${lowerClassName});
+        }
+        int updateRows = i${lowerClassName}Service.update(Where.build().and().equal("${pk.columnName}", ${lowerClassName}.get${pk.upperAttrName}()), ${lowerClassName});
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{}出参={}", baseLog, updateRows);
+        }
+        return Result.of(ErrorCode.SUCCESS, updateRows);
+    }
+
+    /**
+     * 通过主键删除${comments}
+     *
+     * @param ${pk.lowerAttrName}
+     *            主键
+     * @return 影响的行数
+     */
+    @GetMapping("/deleteById")
+    public Result deleteById(@RequestParam("${pk.lowerAttrName}") ${pk.attrType} ${pk.lowerAttrName}) {
+        String baseLog = "[通过主键删除${comments}controller]";
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{}入参={}", baseLog, ${pk.lowerAttrName});
+        }
+        int deleteRows = i${lowerClassName}Service.deleteById(${pk.lowerAttrName});
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{}出参={}", baseLog, deleteRows);
+        }
+        return Result.of(ErrorCode.SUCCESS, deleteRows);
+    }
+
+}
