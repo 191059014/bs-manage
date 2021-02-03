@@ -1,9 +1,8 @@
-package com.hb.bsmanage.web.controller.sys;
+package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.bsmanage.web.common.enums.PkPrefix;
 import com.hb.bsmanage.web.common.util.BsWebUtils;
-import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysRolePO;
 import com.hb.bsmanage.web.dao.po.SysUserPO;
 import com.hb.bsmanage.web.dao.po.SysUserRolePO;

@@ -1,4 +1,4 @@
-package com.hb.bsmanage.web.controller.common;
+package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.web.common.enums.ResourceType;
 import com.hb.bsmanage.web.common.enums.ErrorCode;

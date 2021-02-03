@@ -1,9 +1,8 @@
-package com.hb.bsmanage.web.controller.sys;
+package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.bsmanage.web.common.enums.PkPrefix;
 import com.hb.bsmanage.web.common.enums.ResourceType;
-import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysPermissionPO;
 import com.hb.bsmanage.web.model.dto.ElementUIMenu;
 import com.hb.bsmanage.web.model.vo.ElementUIMenuResponse;

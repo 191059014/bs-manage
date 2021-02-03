@@ -1,8 +1,7 @@
-package com.hb.bsmanage.web.controller.sys;
+package com.hb.bsmanage.web.controller;
 
 import com.hb.bsmanage.web.common.enums.ErrorCode;
 import com.hb.bsmanage.web.common.util.BsWebUtils;
-import com.hb.bsmanage.web.controller.BaseController;
 import com.hb.bsmanage.web.dao.po.SysMerchantPO;
 import com.hb.bsmanage.web.security.util.SecurityUtils;
 import com.hb.bsmanage.web.service.ISysMerchantService;
